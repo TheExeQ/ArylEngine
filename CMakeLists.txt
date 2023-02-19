@@ -38,10 +38,12 @@ target_include_directories(${TARGET_NAME} PRIVATE "${TARGET_PATH}/src")
 
 # add dependencies
 find_package(glm CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PRIVATE
-        glm::glm
+    glm::glm
+    glfw
 )
 
 # Editor target
@@ -66,5 +68,4 @@ target_include_directories(${TARGET_NAME} PRIVATE "${TARGET_PATH}/src")
 target_include_directories(${TARGET_NAME} PRIVATE "${ARYL_PATH}/src")
 
 # add dependencies
-find_package(glm CONFIG REQUIRED)
 target_link_libraries(${TARGET_NAME} PRIVATE ${PROJECT_NAME})
