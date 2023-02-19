@@ -5,21 +5,45 @@
 namespace Aryl
 {
 	Application::Application()
-		: myIsRunning(true)
 	{
-		glm::vec3 testVec = { 3.f, 4.f, 5.f };
+		/* Initialize the library */
+		if (!glfwInit())
+		{
+			std::cout << "Failed to initialize GLFW" << std::endl;
+			return;
+		}
+
+		/* Create a window */
+		myWindow = glfwCreateWindow(1080, 720, "Aryl Engine", nullptr, nullptr);
+		if (!myWindow)
+		{
+			glfwTerminate();
+			std::cout << "Failed to setup Window" << std::endl;
+			return;
+		}
 	}
 
 	Application::~Application()
 	{
+		glfwTerminate();
 	}
 
-	void Application::Run()
+	void Application::Update()
 	{
-		while (myIsRunning)
+		/* Make the window's context current */
+		glfwMakeContextCurrent(myWindow);
+
+		/* Loop until the user closes the window */
+		while (!glfwWindowShouldClose(myWindow))
 		{
+			/* Swap front and back buffers */
+			glfwSwapBuffers(myWindow);
+
+			/* Poll for and process events */
+			glfwPollEvents();
+
 			// Update
-			std::cout << "Test" << std::endl;
+			std::cout << "Application::Update()" << std::endl;
 		}
 	}
 }

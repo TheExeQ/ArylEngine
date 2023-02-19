@@ -3,8 +3,7 @@
 #include <string>
 #include <filesystem>
 
-//#include <GLFW/glfw3.h>
-//#include <glm/glm.hpp>
+#include <GLFW/glfw3.h>
 
 namespace Aryl
 {
@@ -14,10 +13,10 @@ namespace Aryl
 		Application();
 		virtual ~Application();
 
-		void Run();
+		void Update();
 
 	private:
-		bool myIsRunning = false;
+		GLFWwindow* myWindow;
 
 		inline static Application* myInstance;
 	};

@@ -41,7 +41,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
-    PRIVATE
+    PUBLIC
     glm::glm
     glfw
 )
