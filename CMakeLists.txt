@@ -49,7 +49,6 @@ AddSources(${TARGET_NAME} ${ARYL_PATH})
 # Add PCH
 set(PCH_HEADER "${ARYL_PATH}/ylpch.h")
 target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
-target_compile_options(${TARGET_NAME} PRIVATE /FI ${PCH_HEADER})
 
 # Include directories
 target_include_directories(${TARGET_NAME} PRIVATE "${ARYL_PATH}")
@@ -85,7 +84,6 @@ AddSources(${TARGET_NAME} ${EDITOR_PATH})
 # Add PCH
 set(PCH_HEADER "${EDITOR_PATH}/edpch.h")
 target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
-target_compile_options(${TARGET_NAME} PRIVATE /FI ${PCH_HEADER})
 
 # Include directories
 target_include_directories(${TARGET_NAME} PRIVATE "${EDITOR_PATH}")

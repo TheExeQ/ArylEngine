@@ -1,4 +1,3 @@
-#include "edpch.h"
 #include "Editor/Editor.h"
 
 #include <Aryl/Core/Application.h>

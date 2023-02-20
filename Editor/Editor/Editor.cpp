@@ -1,4 +1,3 @@
-#include "edpch.h"
 #include "Editor.h"
 
 Editor::Editor()

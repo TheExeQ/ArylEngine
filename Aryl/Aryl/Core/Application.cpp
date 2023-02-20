@@ -1,4 +1,3 @@
-#include "ylpch.h"
 #include "Application.h"
 
 #include <iostream>

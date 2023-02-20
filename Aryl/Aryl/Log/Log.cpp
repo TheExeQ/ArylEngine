@@ -1,4 +1,3 @@
-#include "ylpch.h"
 #include "Aryl/Log/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
