@@ -6,44 +6,63 @@ namespace Aryl
 {
 	Application::Application()
 	{
-		/* Initialize the library */
-		if (!glfwInit())
-		{
-			std::cout << "Failed to initialize GLFW" << std::endl;
-			return;
-		}
+		myIsRunning = true;
 
-		/* Create a window */
-		myWindow = glfwCreateWindow(1080, 720, "Aryl Engine", nullptr, nullptr);
-		if (!myWindow)
-		{
-			glfwTerminate();
-			std::cout << "Failed to setup Window" << std::endl;
-			return;
-		}
+		Log::Initialize();
+
+		WindowProperties windowProperties;
+
+		myWindow = Window::Create(windowProperties);
+		myWindow->SetEventCallback(YL_BIND_EVENT_FN(Application::OnEvent));
 	}
 
 	Application::~Application()
 	{
-		glfwTerminate();
+		Log::Shutdown();
+
+		myLayerStack.Clear();
+		myWindow->Shutdown();
+
+		myWindow = nullptr;
+		myInstance = nullptr;
 	}
 
-	void Application::Update()
+	void Application::Run()
 	{
-		/* Make the window's context current */
-		glfwMakeContextCurrent(myWindow);
-
-		/* Loop until the user closes the window */
-		while (!glfwWindowShouldClose(myWindow))
+		while (myIsRunning)
 		{
-			/* Swap front and back buffers */
-			glfwSwapBuffers(myWindow);
-
-			/* Poll for and process events */
-			glfwPollEvents();
-
 			// Update
-			std::cout << "Application::Update()" << std::endl;
+			YL_CORE_INFO("APP::Update()");
+
+			// Begin Frame
+			myWindow->BeginFrame();
+
+			// Present
+			myWindow->Present();
 		}
+	}
+
+	void Application::OnEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+
+		for (auto layer : myLayerStack)
+		{
+			layer->OnEvent(event);
+			if (event.handled)
+			{
+				break;
+			}
+		}
+	}
+
+	void Application::PushLayer(Layer* layer)
+	{
+		myLayerStack.PushLayer(layer);
+	}
+
+	void Application::PopLayer(Layer* layer)
+	{
+		myLayerStack.PopLayer(layer);
 	}
 }

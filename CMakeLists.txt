@@ -39,11 +39,13 @@ target_include_directories(${TARGET_NAME} PRIVATE "${TARGET_PATH}/src")
 # add dependencies
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
     glm::glm
     glfw
+    spdlog::spdlog spdlog::spdlog_header_only
 )
 
 # Editor target

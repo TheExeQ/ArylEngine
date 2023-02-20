@@ -11,7 +11,7 @@ namespace Aryl
 	void Create(const std::filesystem::path& appPath)
 	{
 		Application* app = Aryl::CreateApplication(appPath);
-		app->Update();
+		app->Run();
 
 		delete app;
 	}
