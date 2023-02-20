@@ -1,3 +1,4 @@
+#include "ylpch.h"
 #include "Application.h"
 
 #include <iostream>
@@ -7,6 +8,7 @@ namespace Aryl
 	Application::Application()
 	{
 		myIsRunning = true;
+		myIsMinimized = false;
 
 		Log::Initialize();
 
@@ -32,7 +34,6 @@ namespace Aryl
 		while (myIsRunning)
 		{
 			// Update
-			YL_CORE_INFO("APP::Update()");
 
 			// Begin Frame
 			myWindow->BeginFrame();
@@ -45,6 +46,8 @@ namespace Aryl
 	void Application::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowCloseEvent>(YL_BIND_EVENT_FN(Application::OnWindowCloseEvent));
+		dispatcher.Dispatch<WindowResizeEvent>(YL_BIND_EVENT_FN(Application::OnWindowResizeEvent));
 
 		for (auto layer : myLayerStack)
 		{
@@ -64,5 +67,24 @@ namespace Aryl
 	void Application::PopLayer(Layer* layer)
 	{
 		myLayerStack.PopLayer(layer);
+	}
+
+	bool Application::OnWindowCloseEvent(WindowCloseEvent&)
+	{
+		myIsRunning = false;
+		return false;
+	}
+
+	bool Application::OnWindowResizeEvent(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			myIsMinimized = true;
+			return false;
+		}
+
+		myIsMinimized = false;
+		myWindow->Resize(e.GetWidth(), e.GetHeight());
+		return false;
 	}
 }

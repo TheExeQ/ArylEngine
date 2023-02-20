@@ -30,7 +30,11 @@ namespace Aryl
 		inline static Application& Get() { return *myInstance; }
 
 	private:
-		bool myIsRunning;
+		bool OnWindowCloseEvent(WindowCloseEvent& e);
+		bool OnWindowResizeEvent(WindowResizeEvent& e);
+
+		bool myIsRunning = false;
+		bool myIsMinimized = false;
 
 		LayerStack myLayerStack;
 

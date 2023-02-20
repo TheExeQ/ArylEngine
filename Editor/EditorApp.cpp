@@ -1,3 +1,6 @@
+#include "edpch.h"
+#include "Editor/Editor.h"
+
 #include <Aryl/Core/Application.h>
 #include <Aryl/EntryPoint.h>
 
@@ -7,6 +10,8 @@ public:
 	EditorApp()
 		: Aryl::Application()
 	{
+		Editor* editor = new Editor();
+		PushLayer(editor);
 	}
 };
 
