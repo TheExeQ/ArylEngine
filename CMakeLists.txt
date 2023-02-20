@@ -60,7 +60,7 @@ find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
-    glm::glm
+    glm
     glfw
     spdlog::spdlog spdlog::spdlog_header_only
 )
