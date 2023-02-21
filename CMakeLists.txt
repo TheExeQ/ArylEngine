@@ -26,7 +26,7 @@ endfunction()
 project(Aryl)
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT "Editor")
 
-# specify the C++ standard
+# Specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -41,7 +41,7 @@ set(TARGET_NAME ${PROJECT_NAME})
 set(ARYL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
 
 # Add library
-add_library(${TARGET_NAME} ${TARGET_SOURCE_FILES} ${TARGET_HEADER_FILES})
+add_library(${TARGET_NAME})
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Core)
 
 AddSources(${TARGET_NAME} ${ARYL_PATH})
@@ -51,7 +51,7 @@ set(PCH_HEADER "${ARYL_PATH}/ylpch.h")
 target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 
 # Include directories
-target_include_directories(${TARGET_NAME} PRIVATE "${ARYL_PATH}")
+target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_PATH}")
 
 # Add link dependencies
 find_package(glm CONFIG REQUIRED)
@@ -76,7 +76,7 @@ set(TARGET_NAME "Editor")
 set(EDITOR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
 
 # Add the executable
-add_executable(${TARGET_NAME} ${TARGET_SOURCE_FILES} ${TARGET_HEADER_FILES})
+add_executable(${TARGET_NAME})
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Editor)
 
 AddSources(${TARGET_NAME} ${EDITOR_PATH})
@@ -87,7 +87,6 @@ target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 
 # Include directories
 target_include_directories(${TARGET_NAME} PRIVATE "${EDITOR_PATH}")
-target_include_directories(${TARGET_NAME} PRIVATE "${ARYL_PATH}")
 
 # Add link dependencies
 target_link_libraries(${TARGET_NAME} PRIVATE ${PROJECT_NAME})
