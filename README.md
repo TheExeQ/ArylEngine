@@ -1,3 +1,3 @@
 # ArylEngine
 
-Cross platform Vulkan Renderer/Engine
+Cross platform OpenGL/Vulkan Renderer
