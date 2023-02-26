@@ -6,23 +6,27 @@
 class EditorApp : public Aryl::Application
 {
 public:
-	EditorApp()
-		: Aryl::Application()
+	EditorApp(const Aryl::ApplicationInfo& appInfo)
+		: Aryl::Application(appInfo)
 	{
 		Editor* editor = new Editor();
 		PushLayer(editor);
 	}
 };
 
-inline void Create(EditorApp*& appPtr)
+inline void Create(EditorApp*& appPtr, const Aryl::ApplicationInfo& info)
 {
-	appPtr = new EditorApp();
+	appPtr = new EditorApp(info);
 }
 
 Aryl::Application* Aryl::CreateApplication(const std::filesystem::path& appPath)
 {
+	Aryl::ApplicationInfo info{};
+	info.title = "Aryl Editor";
+	info.useVSync = false;
+
 	EditorApp* app;
-	Create(app);
+	Create(app, info);
 
 	return app;
 }

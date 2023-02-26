@@ -4,14 +4,22 @@
 
 namespace Aryl
 {
-	Application::Application()
+	Application::Application(const ApplicationInfo& info)
 	{
+		YL_CORE_ASSERT(!myInstance, "Application already exists!");
+
+		myInfo = info;
+
 		myIsRunning = true;
 		myIsMinimized = false;
 
 		Log::Initialize();
-
 		WindowProperties windowProperties;
+		windowProperties.width = info.width;
+		windowProperties.height = info.height;
+		windowProperties.vsync = info.useVSync;
+		windowProperties.title = info.title;
+		windowProperties.windowMode = info.windowMode;
 
 		myWindow = Window::Create(windowProperties);
 		myWindow->SetEventCallback(YL_BIND_EVENT_FN(Application::OnEvent));

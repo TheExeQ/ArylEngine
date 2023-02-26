@@ -14,10 +14,28 @@
 
 namespace Aryl
 {
+	struct ApplicationInfo
+	{
+		ApplicationInfo(const std::string& aTitle = "Aryl", WindowMode aWindowMode = WindowMode::Windowed, uint32_t aWidth = 1280, uint32_t aHeight = 720, bool aUseVSync = true, bool aEnableImGui = true)
+			: title(aTitle), width(aWidth), height(aHeight), useVSync(aUseVSync), enableImGui(aEnableImGui), windowMode(aWindowMode)
+		{
+		}
+
+		std::string title;
+		WindowMode windowMode;
+		uint32_t width;
+		uint32_t height;
+		bool useVSync;
+		bool enableImGui;
+		bool isRuntime = false;
+
+		std::string version = "1.0";
+	};
+
 	class Application
 	{
 	public:
-		Application();
+		Application(const ApplicationInfo& info = ApplicationInfo());
 		virtual ~Application();
 
 		void Run();
@@ -40,6 +58,7 @@ namespace Aryl
 
 		Scope<Window> myWindow = nullptr;
 
+		ApplicationInfo myInfo;
 		inline static Application* myInstance;
 	};
 

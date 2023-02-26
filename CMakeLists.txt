@@ -47,8 +47,9 @@ set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Core)
 AddSources(${TARGET_NAME} ${ARYL_PATH})
 target_compile_definitions(${TARGET_NAME} 
 PUBLIC 
-$<$<CONFIG:Debug>:YL_DEBUG> 
-$<$<CONFIG:RelWithDebInfo>:YL_RELEASE> 
+$<$<CONFIG:Debug>:YL_DEBUG>
+$<$<CONFIG:Debug>:YL_ENABLE_ASSERTS>
+$<$<CONFIG:RelWithDebInfo>:YL_RELEASE>
 $<$<CONFIG:Release>:YL_DIST>)
 
 # Add PCH
