@@ -59,14 +59,16 @@ target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_PATH}")
 
 # Add link dependencies
-find_package(glm CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
-    glm
+    glad::glad
     glfw
+    glm
     spdlog::spdlog spdlog::spdlog_header_only
 )
 
