@@ -37,7 +37,7 @@ namespace Aryl
 		EventCategoryAnyInput = EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton
 	};
 
-#define EVENT_CLASS_TYPE(type) static Aryl::EventType GetStaticType() { return Aryl::EventType::##type; }\
+#define EVENT_CLASS_TYPE(type) static Aryl::EventType GetStaticType() { return Aryl::EventType::type; }\
 								virtual Aryl::EventType GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 
