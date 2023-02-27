@@ -21,12 +21,10 @@ namespace Aryl
 
 namespace std
 {
-	template <typename T> struct hash;
-
 	template<>
-	struct hash<Aryl::UUID>
+	struct hash<::Aryl::UUID>
 	{
-		std::size_t operator()(const Aryl::UUID& uuid) const
+		std::size_t operator()(const ::Aryl::UUID& uuid) const
 		{
 			return (uint64_t)uuid;
 		}
