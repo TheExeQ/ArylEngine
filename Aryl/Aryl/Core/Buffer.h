@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Aryl/Core/Base.h"
+#include "Aryl/Log/Log.h"
 
 #include <stdint.h>
 #include <vector>

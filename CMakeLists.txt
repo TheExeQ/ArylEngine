@@ -49,8 +49,9 @@ target_compile_definitions(${TARGET_NAME}
 PUBLIC 
 $<$<CONFIG:Debug>:YL_DEBUG>
 $<$<CONFIG:Debug>:YL_ENABLE_ASSERTS>
-$<$<CONFIG:RelWithDebInfo>:YL_RELEASE>
-$<$<CONFIG:Release>:YL_DIST>)
+$<$<CONFIG:RelWithDebInfo>:YL_RELDEB>
+$<$<CONFIG:Release>:YL_RELEASE>
+$<$<CONFIG:MinSizeRel>:YL_RELEASE>)
 
 # Add PCH
 set(PCH_HEADER "${ARYL_PATH}/ylpch.h")

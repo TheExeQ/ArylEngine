@@ -41,6 +41,7 @@ namespace Aryl
 		while (myIsRunning)
 		{
 			// Update
+			myWindow->ProcessEvents();
 
 			// Begin Frame
 			myWindow->BeginFrame();

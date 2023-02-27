@@ -2,6 +2,8 @@
 
 #include "Aryl/Core/Application.h"
 
+#include "Aryl/Renderer/RendererAPI.h"
+
 #include "Aryl/Events/ApplicationEvent.h"
 #include "Aryl/Events/KeyEvent.h"
 #include "Aryl/Events/MouseEvent.h"
@@ -59,8 +61,21 @@ namespace Aryl
 
 		glfwSetErrorCallback(GLFWErrorCallback);
 		glfwWindowHint(GLFW_SAMPLES, 0);
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_AUTO_ICONIFY, false);
+
+		switch (RendererAPI::Current())
+		{
+			case RendererAPIType::OpenGL:
+			{
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+				break;
+			}
+			default:
+			{
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+				break;
+			}
+		}
 
 		myWindow = glfwCreateWindow((int32_t)myData.width, (int32_t)myData.height, myData.title.c_str(), nullptr, nullptr);
 
@@ -192,7 +207,6 @@ namespace Aryl
 	{
 		if (myWindow)
 		{
-
 			glfwDestroyWindow(myWindow);
 			myWindow = nullptr;
 		}
@@ -209,6 +223,11 @@ namespace Aryl
 	}
 
 	void Window::Present()
+	{
+		glfwSwapBuffers(myWindow);
+	}
+
+	void Window::ProcessEvents()
 	{
 		glfwPollEvents();
 	}

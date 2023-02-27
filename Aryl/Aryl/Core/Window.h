@@ -32,9 +32,6 @@ namespace Aryl
 		WindowMode windowMode;
 	};
 
-	class GraphicsContext;
-	class Swapchain;
-
 	class Window
 	{
 	public:
@@ -50,6 +47,7 @@ namespace Aryl
 
 		void BeginFrame();
 		void Present();
+		void ProcessEvents();
 
 		void Resize(uint32_t aWidth, uint32_t aHeight);
 		void SetEventCallback(const EventCallbackFn& callback);
@@ -74,8 +72,6 @@ namespace Aryl
 		inline const WindowMode GetWindowMode() const { return myData.windowMode; }
 		inline GLFWwindow* GetNativeWindow() const { return myWindow; }
 
-		//inline const Swapchain& GetSwapchain() const { return *mySwapchain; }
-
 		static Scope<Window> Create(const WindowProperties& aProperties = WindowProperties());
 
 	private:
@@ -94,9 +90,6 @@ namespace Aryl
 			EventCallbackFn eventCallback;
 
 		} myData;
-
-		//Ref<GraphicsContext> myGraphicsContext;
-		//Ref<Swapchain> mySwapchain;
 
 		glm::uvec2 myStartPosition = { 0u, 0u };
 		glm::uvec2 myStartSize = { 0u, 0u };

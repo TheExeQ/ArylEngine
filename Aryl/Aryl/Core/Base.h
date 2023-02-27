@@ -20,12 +20,12 @@
 
 #else
 
-#ifdef YL_DIST
+#ifdef YL_RELEASE
 #define YL_OPTIMIZE_OFF
 #define YL_OPTIMIZE_ON
 #endif
 
-#ifdef YL_RELEASE
+#ifdef YL_RELDEB
 #define YL_ENABLE_SHADER_DEBUG
 #define YL_PROFILE_GPU
 #define YL_OPTIMIZE_OFF __pragma(optimize("", off));
