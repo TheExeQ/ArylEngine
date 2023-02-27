@@ -1,5 +1,7 @@
 #include "Editor.h"
 
+#include "Aryl/Core/Base.h"
+
 #include <Aryl/Events/KeyEvent.h>
 #include <Aryl/Input/KeyCodes.h>
 

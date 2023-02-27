@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <cassert>
 #include <iostream>
 
 #define BIT(X) (1 << (X))
@@ -9,7 +10,7 @@
 #define YL_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
 
 #ifdef YL_DEBUG
-#define YL_DEBUGBREAK() __debugbreak()
+#define YL_DEBUGBREAK(x) assert(x)
 #define YL_ENABLE_DEBUG_ALLOCATIONS
 #define YL_ENABLE_SHADER_DEBUG
 #define YL_SHADER_PRINT
@@ -42,8 +43,8 @@ if (x)					\
 }	
 
 #ifdef YL_ENABLE_ASSERTS
-#define YL_ASSERT(x, ...) { if(!(x)) { YL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); YL_DEBUGBREAK(); } }
-#define YL_CORE_ASSERT(x, ...) { if(!(x)) { YL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); YL_DEBUGBREAK(); } }
+#define YL_ASSERT(x, ...) { if(!(x)) { YL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); YL_DEBUGBREAK(x); } }
+#define YL_CORE_ASSERT(x, ...) { if(!(x)) { YL_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); YL_DEBUGBREAK(x); } }
 #else
 #define YL_ASSERT(x, ...)
 #define YL_CORE_ASSERT(x, ...)
