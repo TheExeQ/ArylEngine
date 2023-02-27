@@ -6,13 +6,6 @@
 #include <cstdint>
 #include <string>
 
-#define EVENT_CLASS_TYPE(type) static Aryl::EventType GetStaticType() { return Aryl::EventType::##type; }\
-								virtual Aryl::EventType GetEventType() const override { return GetStaticType(); }\
-								virtual const char* GetName() const override { return #type; }
-
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
-
-
 namespace Aryl
 {
 	enum EventType
@@ -43,6 +36,12 @@ namespace Aryl
 
 		EventCategoryAnyInput = EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton
 	};
+
+#define EVENT_CLASS_TYPE(type) static Aryl::EventType GetStaticType() { return Aryl::EventType::##type; }\
+								virtual Aryl::EventType GetEventType() const override { return GetStaticType(); }\
+								virtual const char* GetName() const override { return #type; }
+
+#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
 	class Event
 	{
