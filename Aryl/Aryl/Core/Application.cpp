@@ -1,5 +1,10 @@
 #include "Application.h"
 
+#include "Aryl/Scene/Entity.h"
+#include "Aryl/Scene/Scene.h"
+#include "Aryl/Scene/SceneManager.h"
+#include "Aryl/Components/Components.h"
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -28,11 +33,15 @@ namespace Aryl
 		myWindow = Window::Create(windowProperties);
 		myWindow->SetEventCallback(YL_BIND_EVENT_FN(Application::OnEvent));
 
-		// #SAMUEL_TODO: Move this to OpenGL class later
-		glfwMakeContextCurrent(myWindow->GetNativeWindow());
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		YL_CORE_ASSERT(status, "Failed to initialize Glad!");
-		glfwSwapInterval(1); // Enable vsync
+		// #SAMUEL_TODO: Temporary Stuff
+		{
+			glfwMakeContextCurrent(myWindow->GetNativeWindow());
+			int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+			YL_CORE_ASSERT(status, "Failed to initialize Glad!");
+			glfwSwapInterval(1); // Enable vsync
+
+			SceneManager::SetActiveScene(CreateRef<Scene>("Test Scene"));
+		}
 
 		if (info.enableImGui)
 		{
@@ -84,9 +93,15 @@ namespace Aryl
 			{
 				myImGuiImplementation->Begin();
 
-				ImGui::Begin("test");
-				static bool test;
-				ImGui::Checkbox("Test", &test);
+				ImGui::Begin("TestWindow");
+				if (ImGui::Button("Spawn Ent"))
+				{
+					auto entity = SceneManager::GetActiveScene()->CreateEntity("New");
+					auto comp = entity.GetComponent<TagComponent>();
+					YL_TRACE(comp.tag);
+					comp.tag = "Yolo kid";
+					YL_TRACE(comp.tag);
+				}
 				ImGui::End();
 
 				AppImGuiUpdateEvent imguiEvent{};
