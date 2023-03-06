@@ -83,28 +83,6 @@ namespace Aryl
 		EVENT_CLASS_CATEGORY(EventCategoryApplication);
 	};
 
-	class WindowTitlebarHittestEvent : public Event
-	{
-	public:
-		WindowTitlebarHittestEvent(int x, int y, int& hit)
-			: m_x(x), m_y(y), m_hit(hit)
-		{
-		}
-
-		inline const int32_t GetX() const { return m_x; }
-		inline const int32_t GetY() const { return m_y; }
-
-		inline void SetHit(bool hasHit) { m_hit = (int32_t)hasHit; }
-
-		EVENT_CLASS_TYPE(WindowTitlebarHittest);
-		EVENT_CLASS_CATEGORY(EventCategoryApplication);
-
-	private:
-		int m_x;
-		int m_y;
-		int& m_hit;
-	};
-
 	class AppUpdateEvent : public Event
 	{
 	public:
@@ -189,7 +167,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "EditorDragDrop Accepted!" << std::endl;
+			ss << "WindowDragDropEvent" << std::endl;
 			return ss.str();
 		}
 
@@ -208,7 +186,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnScenePlay" << std::endl;
+			ss << "OnScenePlayEvent" << std::endl;
 			return ss.str();
 		}
 
@@ -224,7 +202,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnSceneStop" << std::endl;
+			ss << "OnSceneStopEvent" << std::endl;
 			return ss.str();
 		}
 
@@ -244,7 +222,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnSceneLoaded" << std::endl;
+			ss << "OnSceneLoadedEvent" << std::endl;
 			return ss.str();
 		}
 

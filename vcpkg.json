@@ -5,6 +5,13 @@
   "builtin-baseline": "f14984af3738e69f197bf0e647a8dca12de92996",
   "dependencies": [
     {
+        "name": "imgui",
+        "features": 
+        [
+            "docking-experimental"
+        ]
+    },
+    {
         "name": "glad",
         "features": 
         [
@@ -13,9 +20,14 @@
     },
     "glfw3",
     "glm",
+    "entt",
     "spdlog"
   ],
   "overrides": [
+    {
+        "name": "imgui",
+        "version": "1.89.2"
+    },
     {
         "name": "glad",
         "version": "0.1.36"
@@ -27,6 +39,10 @@
     {
         "name": "glm",
         "version": "0.9.9.8"
+    },
+    {
+        "name": "entt",
+        "version": "3.11.1"
     },
     {
         "name": "spdlog",

@@ -62,16 +62,20 @@ target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_PATH}")
 
 # Add link dependencies
+find_package(imgui CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
+    imgui::imgui
     glad::glad
     glfw
     glm
+    EnTT::EnTT
     spdlog::spdlog spdlog::spdlog_header_only
 )
 
@@ -87,7 +91,7 @@ set(EDITOR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
 
 # Add the executable
 add_executable(${TARGET_NAME})
-set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Editor)
+set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Runtime)
 
 AddSources(${TARGET_NAME} ${EDITOR_PATH})
 

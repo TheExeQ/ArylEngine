@@ -11,16 +11,11 @@ namespace Aryl
 	enum EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved, WindowDragDrop, ViewportResize, WindowTitlebarHittest,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved, WindowDragDrop, ViewportResize,
 		AppUpdate, AppRender, AppLog, AppImGuiUpdate,
 		KeyPressed, KeyReleased, KeyTyped,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled, MouseMovedViewport,
-
-		// Game
-		OnScenePlay, OnSceneStop, OnSceneLoaded, OnSceneTransition, OnRespawn, OnGameStateChanged, OnPlayGame,
-
-		// GraphKey
-		OnCollisionEnter, OnCollisionExit, OnTriggerEnter, OnTriggerExit
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
+		OnScenePlay, OnSceneStop, OnSceneLoaded
 	};
 
 	enum EventCategory
@@ -31,8 +26,6 @@ namespace Aryl
 		EventCategoryKeyboard = BIT(2),
 		EventCategoryMouse = BIT(3),
 		EventCategoryMouseButton = BIT(4),
-		EventCategoryGame = BIT(5),
-		EventCategoryGraphKey = BIT(6),
 
 		EventCategoryAnyInput = EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton
 	};
