@@ -28,6 +28,8 @@ void Editor::OnDetach()
 
 void Editor::OnEvent(Aryl::Event& e)
 {
+	if (e.GetEventType() == Aryl::AppUpdate || e.GetEventType() == Aryl::AppRender) { return; }
+
 	// Print events for debugging
 	YL_CORE_TRACE(e.ToString());
 

@@ -1,5 +1,8 @@
 #include "Application.h"
 
+#include <glad/glad.h>
+#include <glfw/glfw3.h>
+
 #include <iostream>
 
 namespace Aryl
@@ -9,6 +12,7 @@ namespace Aryl
 		YL_CORE_ASSERT(!myInstance, "Application already exists!");
 
 		myInfo = info;
+		myInstance = this;
 
 		myIsRunning = true;
 		myIsMinimized = false;
@@ -23,15 +27,25 @@ namespace Aryl
 
 		myWindow = Window::Create(windowProperties);
 		myWindow->SetEventCallback(YL_BIND_EVENT_FN(Application::OnEvent));
+
+		// #SAMUEL_TODO: Move this to OpenGL class later
+		glfwMakeContextCurrent(myWindow->GetNativeWindow());
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		YL_CORE_ASSERT(status, "Failed to initialize Glad!");
+		glfwSwapInterval(1); // Enable vsync
+
+		if (info.enableImGui)
+		{
+			myImGuiImplementation = ImGuiImplementation::Create();
+		}
 	}
 
 	Application::~Application()
 	{
 		Log::Shutdown();
-
 		myLayerStack.Clear();
-		myWindow->Shutdown();
 
+		myImGuiImplementation = nullptr;
 		myWindow = nullptr;
 		myInstance = nullptr;
 	}
@@ -40,11 +54,46 @@ namespace Aryl
 	{
 		while (myIsRunning)
 		{
-			// Update
-			myWindow->ProcessEvents();
-
 			// Begin Frame
 			myWindow->BeginFrame();
+
+			float time = (float)glfwGetTime();
+			myCurrentDeltaTime = time - myLastTotalTime;
+			myLastTotalTime = time;
+
+			// Update
+			{
+				AppUpdateEvent updateEvent(myCurrentDeltaTime);
+				OnEvent(updateEvent);
+			}
+
+			// Render
+			{
+				static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
+				int display_w, display_h;
+				glfwGetFramebufferSize(myWindow->GetNativeWindow(), &display_w, &display_h);
+				glViewport(0, 0, display_w, display_h);
+				glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+				glClear(GL_COLOR_BUFFER_BIT);
+
+				AppRenderEvent renderEvent;
+				OnEvent(renderEvent);
+			}
+
+			if (myInfo.enableImGui)
+			{
+				myImGuiImplementation->Begin();
+
+				ImGui::Begin("test");
+				static bool test;
+				ImGui::Checkbox("Test", &test);
+				ImGui::End();
+
+				AppImGuiUpdateEvent imguiEvent{};
+				OnEvent(imguiEvent);
+
+				myImGuiImplementation->End();
+			}
 
 			// Present
 			myWindow->Present();

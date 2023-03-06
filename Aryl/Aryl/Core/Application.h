@@ -9,6 +9,10 @@
 #include "Aryl/Events/ApplicationEvent.h"
 #include "Aryl/Log/Log.h"
 
+#include "Aryl/ImGui/ImGuiImplementation.h"
+
+#include <glfw/glfw3.h>
+
 #include <string>
 #include <filesystem>
 
@@ -54,9 +58,13 @@ namespace Aryl
 		bool myIsRunning = false;
 		bool myIsMinimized = false;
 
+		float myCurrentDeltaTime = 0.f;
+		float myLastTotalTime = 0.f;
+
 		LayerStack myLayerStack;
 
 		Scope<Window> myWindow = nullptr;
+		Scope<ImGuiImplementation> myImGuiImplementation;
 
 		ApplicationInfo myInfo;
 		inline static Application* myInstance;

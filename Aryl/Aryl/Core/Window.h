@@ -47,7 +47,6 @@ namespace Aryl
 
 		void BeginFrame();
 		void Present();
-		void ProcessEvents();
 
 		void Resize(uint32_t aWidth, uint32_t aHeight);
 		void SetEventCallback(const EventCallbackFn& callback);

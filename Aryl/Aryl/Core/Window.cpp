@@ -10,7 +10,7 @@
 
 #include "Aryl/Log/Log.h"
 
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
 namespace Aryl
 {
@@ -40,7 +40,6 @@ namespace Aryl
 	void Window::Shutdown()
 	{
 		Release();
-
 		glfwTerminate();
 	}
 
@@ -225,10 +224,6 @@ namespace Aryl
 	void Window::Present()
 	{
 		glfwSwapBuffers(myWindow);
-	}
-
-	void Window::ProcessEvents()
-	{
 		glfwPollEvents();
 	}
 

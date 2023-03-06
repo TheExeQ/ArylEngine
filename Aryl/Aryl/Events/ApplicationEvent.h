@@ -30,7 +30,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "WindowResizeEvent: " << m_width << ", " << m_height << std::endl;
+			ss << "WindowResizeEvent: " << m_width << ", " << m_height;
 			return ss.str();
 		}
 
@@ -60,7 +60,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "ViewportResizeEvent: " << m_width << ", " << m_height << std::endl;
+			ss << "ViewportResizeEvent: " << m_width << ", " << m_height;
 			return ss.str();
 		}
 
@@ -123,7 +123,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "AppLogEvent: " << m_message << ", " << m_severity << std::endl;
+			ss << "AppLogEvent: " << m_message << ", " << m_severity;
 			return ss.str();
 		}
 
@@ -143,7 +143,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "AppImGuiUpdateEvent" << std::endl;
+			ss << "AppImGuiUpdateEvent";
 			return ss.str();
 		}
 
@@ -167,7 +167,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "WindowDragDropEvent" << std::endl;
+			ss << "WindowDragDropEvent";
 			return ss.str();
 		}
 
@@ -186,7 +186,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnScenePlayEvent" << std::endl;
+			ss << "OnScenePlayEvent";
 			return ss.str();
 		}
 
@@ -202,7 +202,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnSceneStopEvent" << std::endl;
+			ss << "OnSceneStopEvent";
 			return ss.str();
 		}
 
@@ -222,7 +222,7 @@ namespace Aryl
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "OnSceneLoadedEvent" << std::endl;
+			ss << "OnSceneLoadedEvent";
 			return ss.str();
 		}
 
