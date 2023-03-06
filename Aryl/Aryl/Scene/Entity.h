@@ -118,7 +118,7 @@ namespace Aryl
 	template<typename T>
 	inline bool Entity::HasComponent() const
 	{
-		return myScene->myRegistry.get()<T>(myId);
+		return myScene->myRegistry.get<T>(myId);
 	}
 
 	template<typename T>
