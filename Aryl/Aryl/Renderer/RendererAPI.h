@@ -24,7 +24,7 @@ namespace Aryl
 		virtual void EndFrame() = 0;
 
 		static RendererAPIType Current() { return s_CurrentRendererAPI; }
-		static void SetAPI(RendererAPIType api);
+		static void SetAPI(RendererAPIType api) { s_CurrentRendererAPI = api; }
 
 	private:
 		inline static RendererAPIType s_CurrentRendererAPI = RendererAPIType::OpenGL;

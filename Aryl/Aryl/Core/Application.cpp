@@ -23,6 +23,8 @@ namespace Aryl
 		windowProperties.title = info.title;
 		windowProperties.windowMode = info.windowMode;
 
+		myNetManager = NetManager::Create();
+
 		if (!myInfo.headless)
 		{
 			myWindow = Window::Create(windowProperties);

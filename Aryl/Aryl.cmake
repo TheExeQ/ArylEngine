@@ -36,6 +36,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(asio CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
@@ -45,4 +46,5 @@ target_link_libraries(
     glm
     EnTT::EnTT
     spdlog::spdlog spdlog::spdlog_header_only
+    asio::asio
 )

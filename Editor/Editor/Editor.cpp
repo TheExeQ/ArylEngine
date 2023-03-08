@@ -65,9 +65,9 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		{
 			auto entity = scene->CreateEntity("New");
 			auto comp = entity.GetComponent<Aryl::TagComponent>();
-			YL_TRACE(comp.tag);
+			YL_CORE_TRACE(comp.tag);
 			comp.tag = "Rename";
-			YL_TRACE(comp.tag);
+			YL_CORE_TRACE(comp.tag);
 		}
 	}
 	ImGui::End();

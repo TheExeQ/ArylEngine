@@ -23,7 +23,8 @@
     "glfw3",
     "glm",
     "entt",
-    "spdlog"
+    "spdlog",
+    "asio"
   ],
   "overrides": [
     {
@@ -49,6 +50,10 @@
     {
         "name": "spdlog",
         "version": "1.11.0"
+    },
+    {
+        "name": "asio",
+        "version": "1.24.0"
     }
   ]
 }

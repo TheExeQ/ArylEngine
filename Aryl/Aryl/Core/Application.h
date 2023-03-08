@@ -11,6 +11,8 @@
 
 #include "Aryl/ImGui/ImGuiImplementation.h"
 
+#include "Aryl/Networking/NetManager.h"
+
 #include <glfw/glfw3.h>
 
 #include <string>
@@ -66,6 +68,7 @@ namespace Aryl
 
 		Scope<Window> myWindow = nullptr;
 		Scope<ImGuiImplementation> myImGuiImplementation;
+		Scope<NetManager> myNetManager;
 
 		ApplicationInfo myInfo;
 		inline static Application* myInstance;
