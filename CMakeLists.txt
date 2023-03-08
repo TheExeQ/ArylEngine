@@ -19,9 +19,9 @@ function(AddSources TARGET_NAME TARGET_PATH)
     target_sources(${TARGET_NAME} PRIVATE ${TARGET_SOURCE_FILES} ${TARGET_HEADER_FILES})
 endfunction()
 
-################
+#################
 #### PROJECT ####
-################
+#################
 
 project(Aryl)
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT "Editor")
@@ -30,127 +30,8 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT "Editor")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-################
-#### ENGINE ####
-################
-
-# Engine target
-set(TARGET_NAME "Aryl")
-
-# Add sources
-set(ARYL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
-
-# Add library
-add_library(${TARGET_NAME})
-set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Core)
-
-AddSources(${TARGET_NAME} ${ARYL_PATH})
-target_compile_definitions(${TARGET_NAME} 
-PUBLIC 
-GLFW_INCLUDE_NONE
-$<$<CONFIG:Debug>:YL_DEBUG>
-$<$<CONFIG:Debug>:YL_ENABLE_ASSERTS>
-$<$<CONFIG:RelWithDebInfo>:YL_RELDEB>
-$<$<CONFIG:Release>:YL_RELEASE>
-$<$<CONFIG:MinSizeRel>:YL_RELEASE>)
-
-# Add PCH
-set(PCH_HEADER "${ARYL_PATH}/ylpch.h")
-target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
-
-# Include directories
-target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_PATH}")
-
-# Add link dependencies
-find_package(imgui CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(EnTT CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-target_link_libraries(
-    ${TARGET_NAME}
-    PUBLIC
-    imgui::imgui
-    glad::glad
-    glfw
-    glm
-    EnTT::EnTT
-    spdlog::spdlog spdlog::spdlog_header_only
-)
-
-################
-#### GAME ####
-################
-
-# Game target
-set(TARGET_NAME "Game")
-
-# Add sources
-set(GAME_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
-
-# Add library
-add_library(${TARGET_NAME})
-set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Game)
-
-AddSources(${TARGET_NAME} ${GAME_PATH})
-
-# Add PCH
-set(PCH_HEADER "${GAME_PATH}/gepch.h")
-target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
-
-# Include directories
-target_include_directories(${TARGET_NAME} PUBLIC "${GAME_PATH}")
-
-# Add link dependencies
-target_link_libraries(${TARGET_NAME} PRIVATE "Aryl")
-
-################
-#### EDITOR ####
-################
-
-# Editor target
-set(TARGET_NAME "Editor")
-
-# Add sources
-set(EDITOR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
-
-# Add executable
-add_executable(${TARGET_NAME})
-set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Runtime)
-
-AddSources(${TARGET_NAME} ${EDITOR_PATH})
-
-# Add PCH
-set(PCH_HEADER "${EDITOR_PATH}/edpch.h")
-target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
-
-# Include directories
-target_include_directories(${TARGET_NAME} PRIVATE "${EDITOR_PATH}")
-
-# Add link dependencies
-target_link_libraries(${TARGET_NAME} PRIVATE "Aryl")
-target_link_libraries(${TARGET_NAME} PRIVATE "Game")
-
-################
-#### LAUNCHER ####
-################
-
-# Editor target
-set(TARGET_NAME "Launcher")
-
-# Add sources
-set(LAUNCHER_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
-
-# Add executable
-add_executable(${TARGET_NAME})
-set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Runtime)
-
-AddSources(${TARGET_NAME} ${LAUNCHER_PATH})
-
-# Include directories
-target_include_directories(${TARGET_NAME} PRIVATE "${LAUNCHER_PATH}")
-
-# Add link dependencies
-target_link_libraries(${TARGET_NAME} PRIVATE "Aryl")
-target_link_libraries(${TARGET_NAME} PRIVATE "Game")
+# Add projects
+include(Aryl/Aryl.cmake)
+include(Game/Game.cmake)
+include(Editor/Editor.cmake)
+include(Launcher/Launcher.cmake)
