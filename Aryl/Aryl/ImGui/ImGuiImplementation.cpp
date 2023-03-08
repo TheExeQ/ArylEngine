@@ -61,10 +61,10 @@ namespace Aryl
 		//io.Fonts->AddFontFromMemoryTTF((void*)tahoma, sizeof(tahoma), 17.f, &fontCfg);
 		//ImGui::MergeIconsWithLatestFont(17.f, false);
 
-		io.IniFilename = nullptr;
+		//io.IniFilename = nullptr;
 
-		const std::filesystem::path iniPath = GetOrCreateIniPath();
-		ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
+		//const std::filesystem::path iniPath = GetOrCreateIniPath();
+		//ImGui::LoadIniSettingsFromDisk(iniPath.string().c_str());
 
 		ImGui::StyleColorsDark();
 
@@ -173,8 +173,8 @@ namespace Aryl
 		ImGui_ImplGlfw_Shutdown();
 		ImGui_ImplOpenGL3_Shutdown();
 
-		const std::filesystem::path iniPath = GetOrCreateIniPath();
-		ImGui::SaveIniSettingsToDisk(iniPath.string().c_str());
+		//const std::filesystem::path iniPath = GetOrCreateIniPath();
+		//ImGui::SaveIniSettingsToDisk(iniPath.string().c_str());
 		ImGui::DestroyContext();
 	}
 

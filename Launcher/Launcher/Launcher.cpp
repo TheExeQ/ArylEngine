@@ -1,4 +1,4 @@
-#include "Editor.h"
+#include "Launcher.h"
 
 #include <Aryl/Core/Base.h>
 #include <Aryl/Core/Application.h>
@@ -15,36 +15,35 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
-Editor::Editor()
+Launcher::Launcher()
 {
-	YL_ASSERT(!myInstance, "Editor already exists!");
+	YL_ASSERT(!myInstance, "Launcher already exists!");
 	myInstance = this;
 }
 
-Editor::~Editor()
+Launcher::~Launcher()
 {
 	myInstance = nullptr;
 }
 
-void Editor::OnAttach()
+void Launcher::OnAttach()
 {
 
 }
 
-void Editor::OnDetach()
+void Launcher::OnDetach()
 {
 
 }
 
-void Editor::OnEvent(Aryl::Event& e)
+void Launcher::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
 
-	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(Editor::OnRender));
-	dispatcher.Dispatch<Aryl::AppImGuiUpdateEvent>(YL_BIND_EVENT_FN(Editor::OnImGuiUpdate));
+	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(Launcher::OnRender));
 }
 
-bool Editor::OnRender(Aryl::AppRenderEvent& e)
+bool Launcher::OnRender(Aryl::AppRenderEvent& e)
 {
 	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
 	int display_w, display_h;
@@ -52,25 +51,6 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 	glViewport(0, 0, display_w, display_h);
 	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	return false;
-}
-
-bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
-{
-	ImGui::Begin("TestWindow");
-	if (ImGui::Button("Spawn Ent"))
-	{
-		if (auto scene = Aryl::SceneManager::GetActiveScene())
-		{
-			auto entity = scene->CreateEntity("New");
-			auto comp = entity.GetComponent<Aryl::TagComponent>();
-			YL_TRACE(comp.tag);
-			comp.tag = "Rename";
-			YL_TRACE(comp.tag);
-		}
-	}
-	ImGui::End();
 
 	return false;
 }

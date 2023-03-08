@@ -1,35 +1,37 @@
-#include "Editor/Editor.h"
+#include "Launcher/Launcher.h"
 
 #include <Game/Game.h>
 
 #include <Aryl/Core/Application.h>
 #include <Aryl/EntryPoint.h>
 
-class EditorApp : public Aryl::Application
+class LauncherApp : public Aryl::Application
 {
 public:
-	EditorApp(const Aryl::ApplicationInfo& appInfo)
+	LauncherApp(const Aryl::ApplicationInfo& appInfo)
 		: Aryl::Application(appInfo)
 	{
-		Editor* editor = new Editor();
+		Launcher* editor = new Launcher();
 		Game* game = new Game();
 		PushLayer(editor);
 		PushLayer(game);
 	}
 };
 
-inline void Create(EditorApp*& appPtr, const Aryl::ApplicationInfo& info)
+inline void Create(LauncherApp*& appPtr, const Aryl::ApplicationInfo& info)
 {
-	appPtr = new EditorApp(info);
+	appPtr = new LauncherApp(info);
 }
 
 Aryl::Application* Aryl::CreateApplication(const std::filesystem::path& appPath)
 {
 	Aryl::ApplicationInfo info{};
-	info.title = "Aryl Editor";
+	info.title = "Game";
 	info.useVSync = false;
+	info.enableImGui = false;
+	info.isRuntime = true;
 
-	EditorApp* app;
+	LauncherApp* app;
 	Create(app, info);
 
 	return app;

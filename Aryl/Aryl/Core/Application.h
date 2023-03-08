@@ -31,6 +31,7 @@ namespace Aryl
 		uint32_t height;
 		bool useVSync;
 		bool enableImGui;
+		bool headless = false;
 		bool isRuntime = false;
 
 		std::string version = "1.0";
