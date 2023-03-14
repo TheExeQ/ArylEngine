@@ -1,23 +1,14 @@
 #pragma once
-#include "NetApi.h"
-
-#include "Interfaces/IPv4/IPv4Address.h"
-#include "Interfaces/IPv4/IPv4Endpoint.h"
-
 #include "Aryl/Core/Base.h"
+#include "Aryl/Networking/NetAPI.h"
+
+#include "Aryl/Networking/Socket/UdpSocket.h"
+
+#include "Aryl/Networking/Interfaces/IPv4/IPv4Address.h"
+#include "Aryl/Networking/Interfaces/IPv4/IPv4Endpoint.h"
 
 namespace Aryl
 {
-	class Socket
-	{
-	public:
-		Socket() = default;
-		~Socket() = default;
-		
-	private:
-
-	};
-
 	class UdpSocketBuilder
 	{
 	public:
@@ -32,7 +23,6 @@ namespace Aryl
 		virtual UdpSocketBuilder& BoundToPort(uint32_t Port) = 0;
 		virtual UdpSocketBuilder& WithSendBufferSize(uint32_t SizeInBytes) = 0;
 
-		virtual Ref<Socket> Build() const = 0;
+		virtual Ref<UdpSocket> Build() const = 0;
 	};
-
 }
