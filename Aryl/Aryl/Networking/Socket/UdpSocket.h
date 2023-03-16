@@ -7,8 +7,5 @@ namespace Aryl
 	public:
 		UdpSocket() = default;
 		virtual ~UdpSocket() = default;
-
-	private:
-
 	};
 }

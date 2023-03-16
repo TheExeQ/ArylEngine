@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace Aryl
 {
@@ -6,9 +7,13 @@ namespace Aryl
 	{
 	public:
 		IPv4Address() = default;
+		IPv4Address(std::string address) : myAddress(address) {};
 		~IPv4Address() = default;
 
-	private:
+		bool IsValid() const { return !myAddress.empty(); }
+		std::string GetAddressString() const { return myAddress; };
 
+	private:
+		std::string myAddress;
 	};
 }

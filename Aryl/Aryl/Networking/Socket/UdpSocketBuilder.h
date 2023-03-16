@@ -13,16 +13,24 @@ namespace Aryl
 	{
 	public:
 		UdpSocketBuilder() = default;
-		~UdpSocketBuilder() = default;
+		virtual ~UdpSocketBuilder() = default;
 
-		virtual UdpSocketBuilder& AsBlocking() = 0;
-		virtual UdpSocketBuilder& AsNonBlocking() = 0;
-		virtual UdpSocketBuilder& AsReusable() = 0;
-		virtual UdpSocketBuilder& BoundToAddress(const IPv4Address& Address) = 0;
-		virtual UdpSocketBuilder& BoundToEndpoint(const IPv4Endpoint& Endpoint) = 0;
-		virtual UdpSocketBuilder& BoundToPort(uint32_t Port) = 0;
-		virtual UdpSocketBuilder& WithSendBufferSize(uint32_t SizeInBytes) = 0;
+		UdpSocketBuilder& AsBlocking();
+		UdpSocketBuilder& AsNonBlocking();
+		UdpSocketBuilder& BoundToAddress(IPv4Address Address);
+		UdpSocketBuilder& BoundToEndpoint(IPv4Endpoint Endpoint);
+		UdpSocketBuilder& BoundToPort(uint32_t Port);
+		UdpSocketBuilder& WithSendBufferSize(uint32_t SizeInBytes);
 
 		virtual Ref<UdpSocket> Build() const = 0;
+
+	protected:
+		bool myBlocking = true;
+
+		IPv4Address myAddress;
+		IPv4Endpoint myEndpoint;
+
+		uint32_t myPort = 0u;
+		uint32_t myBufferSize = 512u;
 	};
 }

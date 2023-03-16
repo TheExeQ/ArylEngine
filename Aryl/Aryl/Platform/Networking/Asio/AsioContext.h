@@ -39,6 +39,8 @@ namespace Aryl
 			}
 		}
 
+		asio::io_context& GetIoContext() { return myContext; }
+
 	private:
 		asio::io_context myContext;
 	};
