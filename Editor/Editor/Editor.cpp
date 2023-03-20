@@ -15,6 +15,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+#include <Aryl/Networking/Socket/UdpSocketBuilder.h>
+
 Editor::Editor()
 {
 	YL_ASSERT(!myInstance, "Editor already exists!");
@@ -28,7 +30,12 @@ Editor::~Editor()
 
 void Editor::OnAttach()
 {
+	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+	builder->BoundToAddress(Aryl::IPv4Address("127.0.0.1"));
+	builder->BoundToPort(44000);
 
+	mySocket = builder->Build();
+	mySocket->Start();
 }
 
 void Editor::OnDetach()

@@ -3,6 +3,8 @@
 #include <Aryl/Core/Layer/Layer.h>
 #include <Aryl/Events/ApplicationEvent.h>
 
+#include <Aryl/Networking/Socket/UdpSocket.h>
+
 class Editor : public Aryl::Layer
 {
 public:
@@ -19,5 +21,7 @@ public:
 	inline static Editor& Get() { return *myInstance; }
 
 private:
+	Ref<Aryl::UdpSocket> mySocket;
+
 	inline static Editor* myInstance = nullptr;
 };

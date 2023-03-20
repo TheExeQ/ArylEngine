@@ -6,12 +6,17 @@ namespace Aryl
 	{
 		Ref<AsioUdpSocket> result = CreateRef<AsioUdpSocket>(myContext);
 
-		result->mySocket = udp::socket(myContext->GetIoContext());
+		auto& io_context = ((AsioContext*)myContext.get())->GetIoContext();
+		udp::resolver resolver(io_context);
+		udp::resolver::results_type endpoints = resolver.resolve(myAddress.GetAddressString(), std::to_string(myPort));
 
-		if (myAddress.IsValid() && myPort)
+		if (!myAddress.IsValid() || !myPort)
 		{
-			result->mySocket.bind(udp::endpoint(udp::v4(), myPort));
+			YL_CORE_ASSERT(false, "Address and port needs to be provided");
+			return nullptr;
 		}
+
+		result->mySocket = udp::socket(io_context, *endpoints.begin());
 
 		result->mySocket.non_blocking(!myBlocking);
 
@@ -22,7 +27,6 @@ namespace Aryl
 
 		if (myEndpoint.IsValid())
 		{
-			udp::resolver resolver(myContext->GetIoContext());
 			udp::resolver::results_type endpoints = resolver.resolve(myEndpoint.GetAddress().GetAddressString(), std::to_string(myEndpoint.GetPort()));
 			result->myEndpoint = *endpoints.begin();
 		}

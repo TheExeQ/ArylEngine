@@ -51,6 +51,8 @@ namespace Aryl
 		void PushLayer(Layer* layer);
 		void PopLayer(Layer* layer);
 
+		Ref<NetContext> GetNetworkContext() const { return myNetManager->GetContext(); };
+
 		inline Window& GetWindow() const { return *myWindow; }
 		inline static Application& Get() { return *myInstance; }
 

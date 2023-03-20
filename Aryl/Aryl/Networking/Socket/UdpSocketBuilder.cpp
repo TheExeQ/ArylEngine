@@ -1,5 +1,9 @@
 #include "UdpSocketBuilder.h"
 
+#include "Aryl/Networking/NetAPI.h"
+
+#include "Aryl/Platform/Networking/Asio/Socket/AsioUdpSocketBuilder.h"
+
 namespace Aryl
 {
 	UdpSocketBuilder& UdpSocketBuilder::AsBlocking()
@@ -36,5 +40,23 @@ namespace Aryl
 	{
 		myBufferSize = SizeInBytes;
 		return *this;
+	}
+
+	Ref<UdpSocket> UdpSocketBuilder::Build() const
+	{
+		return nullptr;
+	}
+
+	Ref<UdpSocketBuilder> UdpSocketBuilder::Create(Ref<NetContext> context)
+	{
+		switch (NetAPI::Current())
+		{
+			case NetAPIType::None: return nullptr;
+			case NetAPIType::Asio: return CreateRef<AsioUdpSocketBuilder>(context);
+			case NetAPIType::WinSock2: return nullptr;
+		}
+
+		YL_CORE_ASSERT(false, "Unknown NetAPI");
+		return nullptr;
 	}
 }

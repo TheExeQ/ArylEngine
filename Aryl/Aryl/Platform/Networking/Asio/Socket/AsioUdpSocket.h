@@ -7,13 +7,15 @@ namespace Aryl
 	class AsioUdpSocket : public UdpSocket
 	{
 	public:
-		AsioUdpSocket(Ref<AsioContext> context);
+		AsioUdpSocket(Ref<NetContext> context);
 		~AsioUdpSocket() = default;
+
+	protected:
+		void Update(uint32_t waitTime) override;
 
 	private:
 		friend class AsioUdpSocketBuilder;
 
-		Ref<AsioContext> myContext = nullptr;
 		udp::socket mySocket;
 		udp::endpoint myEndpoint;
 	};

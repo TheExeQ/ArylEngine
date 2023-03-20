@@ -6,8 +6,6 @@
 #include "Interfaces/IPv4/IPv4Endpoint.h"
 
 #include "Socket/UdpSocketBuilder.h"
-#include "Socket/UdpSocketReceiver.h"
-#include "Socket/UdpSocketSender.h"
 
 namespace Aryl
 {

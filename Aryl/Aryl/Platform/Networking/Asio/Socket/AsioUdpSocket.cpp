@@ -2,8 +2,13 @@
 
 namespace Aryl
 {
-	AsioUdpSocket::AsioUdpSocket(Ref<AsioContext> context)
-		: myContext(context), mySocket(myContext->GetIoContext(), udp::v4())
+	AsioUdpSocket::AsioUdpSocket(Ref<NetContext> context)
+		: UdpSocket(context), mySocket(((AsioContext*)myContext.get())->GetIoContext(), udp::v4())
 	{
+	}
+
+	void AsioUdpSocket::Update(uint32_t waitTime)
+	{
+		YL_CORE_TRACE("Socket: Update");
 	}
 }
