@@ -30,12 +30,7 @@ Editor::~Editor()
 
 void Editor::OnAttach()
 {
-	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-	builder->BoundToAddress(Aryl::IPv4Address("127.0.0.1"));
-	builder->BoundToPort(44000);
 
-	mySocket = builder->Build();
-	mySocket->Start();
 }
 
 void Editor::OnDetach()
@@ -65,17 +60,41 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	ImGui::Begin("TestWindow");
-	if (ImGui::Button("Spawn Ent"))
+	static std::string address = "127.0.0.1";
+	static int port = 44000;
+
+	ImGui::Begin("ArylNet");
+	ImGui::InputText("Address", (char*)address.c_str(), 16);
+	ImGui::InputInt("Port", &port);
+
+	if (ImGui::Button("Host"))
 	{
-		if (auto scene = Aryl::SceneManager::GetActiveScene())
+		if (mySocket)
 		{
-			auto entity = scene->CreateEntity("New");
-			auto comp = entity.GetComponent<Aryl::TagComponent>();
-			YL_CORE_TRACE(comp.tag);
-			comp.tag = "Rename";
-			YL_CORE_TRACE(comp.tag);
+			mySocket->Stop();
 		}
+
+		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+		builder->BoundToAddress(Aryl::IPv4Address(address));
+		builder->BoundToPort(port);
+
+		mySocket = builder->Build();
+		mySocket->Start();
+
+		//if (auto scene = Aryl::SceneManager::GetActiveScene())
+		//{
+		//	auto entity = scene->CreateEntity("New");
+		//	auto comp = entity.GetComponent<Aryl::TagComponent>();
+		//	YL_CORE_TRACE(comp.tag);
+		//	comp.tag = "Rename";
+		//	YL_CORE_TRACE(comp.tag);
+		//}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Connect"))
+	{
+		YL_CORE_INFO("Address: {0}", address);
+		YL_CORE_INFO("Port: {0}", port);
 	}
 	ImGui::End();
 

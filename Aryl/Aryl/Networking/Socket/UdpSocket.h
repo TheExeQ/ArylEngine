@@ -12,7 +12,7 @@ namespace Aryl
 	{
 	public:
 		UdpSocket(Ref<NetContext> context) : myContext(context) {};
-		virtual ~UdpSocket() = default;
+		virtual ~UdpSocket() { myThread.join(); };
 
 		void Start();
 		void Stop();
