@@ -1,9 +1,14 @@
 #pragma once
+#define PACKET_SIZE 512u
 
 #include "Interfaces/IPv4/IPv4Endpoint.h"
 
+#include <array>
+
 namespace Aryl
 {
+	typedef std::array<uint8_t, PACKET_SIZE> PacketBuffer;
+
 	struct NetPacket
 	{
 	public:
@@ -11,6 +16,6 @@ namespace Aryl
 		~NetPacket() = default;
 	
 		IPv4Endpoint endpoint;
-		uint8_t* data;
+		PacketBuffer data;
 	};
 }

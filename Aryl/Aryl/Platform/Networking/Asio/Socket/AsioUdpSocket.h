@@ -1,5 +1,6 @@
 #pragma once
 #include "Aryl/Networking/Socket/UdpSocket.h"
+
 #include "Aryl/Platform/Networking/Asio/AsioContext.h"
 
 namespace Aryl
@@ -10,9 +11,13 @@ namespace Aryl
 		AsioUdpSocket(Ref<NetContext> context);
 		~AsioUdpSocket() = default;
 
+		void SendTo(PacketBuffer data, uint32_t size, IPv4Endpoint endpoint) override;
+		void ReceieveFrom(PacketBuffer& outData, IPv4Endpoint& outSender) override;
+
 	private:
 		friend class AsioUdpSocketBuilder;
 
+		PacketBuffer myRecvBuffer;
 		udp::socket mySocket;
 	};
 }

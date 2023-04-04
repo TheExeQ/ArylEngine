@@ -63,9 +63,15 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 	static std::string address = "127.0.0.1";
 	static int port = 44000;
 
+	static std::string sendAddress = "127.0.0.1";
+	static int sendPort = 44000;
+
 	ImGui::Begin("ArylNet");
 	ImGui::InputText("Address", (char*)address.c_str(), 16);
 	ImGui::InputInt("Port", &port);
+	
+	ImGui::InputText("Send Address", (char*)sendAddress.c_str(), 16);
+	ImGui::InputInt("Send Port", &sendPort);
 
 	if (ImGui::Button("Sender"))
 	{
@@ -86,6 +92,15 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		builder->BoundToPort(port);
 
 		mySender = Aryl::UdpSocketSender::Create(builder->Build());
+
+		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+		packet->data[0] = 'h';
+		packet->data[1] = 'e';
+		packet->data[2] = 'l';
+		packet->data[3] = 'l';
+		packet->data[4] = 'o';
+
+		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Receiver"))
