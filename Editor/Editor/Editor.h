@@ -4,6 +4,7 @@
 #include <Aryl/Events/ApplicationEvent.h>
 
 #include <Aryl/Networking/Socket/UdpSocketSender.h>
+#include <Aryl/Networking/Socket/UdpSocketReceiver.h>
 
 class Editor : public Aryl::Layer
 {
@@ -22,6 +23,7 @@ public:
 
 private:
 	Ref<Aryl::UdpSocketSender> mySender;
+	Ref<Aryl::UdpSocketReceiver> myReceiver;
 
 	inline static Editor* myInstance = nullptr;
 };

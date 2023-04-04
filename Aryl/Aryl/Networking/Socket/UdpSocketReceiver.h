@@ -13,7 +13,7 @@ namespace Aryl
 	class UdpSocketReceiver
 	{
 	public:
-		UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate);
+		UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate = nullptr);
 		virtual ~UdpSocketReceiver() { myThread.join(); };
 
 		void Stop()
@@ -21,7 +21,7 @@ namespace Aryl
 			myStopping = true;
 		}
 
-		static Ref<UdpSocketReceiver> Create(Ref<UdpSocket> socket);
+		static Ref<UdpSocketReceiver> Create(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate = nullptr);
 
 	protected:
 		virtual void Update() {};

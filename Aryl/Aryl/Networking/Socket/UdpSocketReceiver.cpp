@@ -23,12 +23,12 @@ namespace Aryl
 		return 0;
 	}
 
-	Ref<UdpSocketReceiver> UdpSocketReceiver::Create(Ref<UdpSocket> socket)
+	Ref<UdpSocketReceiver> UdpSocketReceiver::Create(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
 	{
 		switch (NetAPI::Current())
 		{
 			case NetAPIType::None: return nullptr;
-			case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket);
+			case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket, onDataReceivedDelegate);
 			case NetAPIType::WinSock2: return nullptr;
 		}
 

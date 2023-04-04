@@ -11,6 +11,6 @@ namespace Aryl
 
 	void AsioUdpSocketSender::Update()
 	{
-		YL_CORE_TRACE("Socket: Update");
+		YL_CORE_TRACE("Sender: Update");
 	}
 }

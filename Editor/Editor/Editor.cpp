@@ -67,11 +67,18 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 	ImGui::InputText("Address", (char*)address.c_str(), 16);
 	ImGui::InputInt("Port", &port);
 
-	if (ImGui::Button("Host"))
+	if (ImGui::Button("Sender"))
 	{
 		if (mySender)
 		{
 			mySender->Stop();
+			mySender = nullptr;
+		}
+
+		if (myReceiver)
+		{
+			myReceiver->Stop();
+			myReceiver = nullptr;
 		}
 
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
@@ -79,23 +86,37 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		builder->BoundToPort(port);
 
 		mySender = Aryl::UdpSocketSender::Create(builder->Build());
-
-		//if (auto scene = Aryl::SceneManager::GetActiveScene())
-		//{
-		//	auto entity = scene->CreateEntity("New");
-		//	auto comp = entity.GetComponent<Aryl::TagComponent>();
-		//	YL_CORE_TRACE(comp.tag);
-		//	comp.tag = "Rename";
-		//	YL_CORE_TRACE(comp.tag);
-		//}
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Connect"))
+	if (ImGui::Button("Receiver"))
+	{
+		if (mySender)
+		{
+			mySender->Stop();
+			mySender = nullptr;
+		}
+
+		if (myReceiver)
+		{
+			myReceiver->Stop();
+			myReceiver = nullptr;
+		}
+
+		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+		builder->BoundToAddress(Aryl::IPv4Address(address));
+		builder->BoundToPort(port);
+
+		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build());
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Print Info"))
 	{
 		YL_CORE_INFO("Address: {0}", address);
 		YL_CORE_INFO("Port: {0}", port);
 	}
+
 	ImGui::End();
+	
 
 	return false;
 }

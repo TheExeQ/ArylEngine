@@ -3,14 +3,14 @@
 namespace Aryl
 {
 
-	AsioUdpSocketReceiver::AsioUdpSocketReceiver(Ref<UdpSocket> socket)
-		: UdpSocketReceiver(socket)
+	AsioUdpSocketReceiver::AsioUdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
+		: UdpSocketReceiver(socket, onDataReceivedDelegate)
 	{
 
 	}
 
 	void AsioUdpSocketReceiver::Update()
 	{
-		YL_CORE_TRACE("Socket: Update");
+		YL_CORE_TRACE("Receiver: Update");
 	}
 }
