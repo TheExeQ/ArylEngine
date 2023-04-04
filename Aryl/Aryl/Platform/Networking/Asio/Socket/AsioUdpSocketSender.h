@@ -13,8 +13,5 @@ namespace Aryl
 
 	protected:
 		void Update() override;
-
-	private:
-		friend class AsioUdpSocketBuilder;
 	};
-}
+} 

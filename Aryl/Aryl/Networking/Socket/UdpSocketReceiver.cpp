@@ -7,8 +7,8 @@
 
 namespace Aryl
 {
-	UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket)
-		: mySocket(socket), myThread([this]() { Run(); })
+	UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
+		: mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate)
 	{
 
 	}
