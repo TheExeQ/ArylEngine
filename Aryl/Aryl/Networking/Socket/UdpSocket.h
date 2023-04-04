@@ -7,32 +7,13 @@
 
 namespace Aryl
 {
-	// #SAMUEL_TODO: Break out to sender and receiver
 	class UdpSocket
 	{
 	public:
 		UdpSocket(Ref<NetContext> context) : myContext(context) {};
-		virtual ~UdpSocket() { myThread.join(); };
-
-		void Start();
-		void Stop();
-
-		void SetWaitTime(uint32_t waitTime)
-		{
-			myWaitTime = waitTime;
-		}
+		virtual ~UdpSocket() = default;
 
 	protected:
-		virtual void Update(uint32_t waitTime) {};
-
-		bool myStopping = false;
-		uint32_t myWaitTime = 0u;
-
-		std::thread myThread;
-
 		Ref<NetContext> myContext = nullptr;
-
-	private:
-		uint32_t Run();
 	};
 }

@@ -69,17 +69,16 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 	if (ImGui::Button("Host"))
 	{
-		if (mySocket)
+		if (mySender)
 		{
-			mySocket->Stop();
+			mySender->Stop();
 		}
 
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
 		builder->BoundToAddress(Aryl::IPv4Address(address));
 		builder->BoundToPort(port);
 
-		mySocket = builder->Build();
-		mySocket->Start();
+		mySender = Aryl::UdpSocketSender::Create(builder->Build());
 
 		//if (auto scene = Aryl::SceneManager::GetActiveScene())
 		//{

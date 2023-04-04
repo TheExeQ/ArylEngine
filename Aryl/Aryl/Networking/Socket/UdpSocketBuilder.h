@@ -18,7 +18,6 @@ namespace Aryl
 		UdpSocketBuilder& AsBlocking();
 		UdpSocketBuilder& AsNonBlocking();
 		UdpSocketBuilder& BoundToAddress(IPv4Address Address);
-		UdpSocketBuilder& BoundToEndpoint(IPv4Endpoint Endpoint);
 		UdpSocketBuilder& BoundToPort(uint32_t Port);
 		UdpSocketBuilder& WithSendBufferSize(uint32_t SizeInBytes);
 
@@ -30,9 +29,8 @@ namespace Aryl
 		bool myBlocking = true;
 
 		IPv4Address myAddress;
-		IPv4Endpoint myEndpoint;
-
 		uint32_t myPort = 0u;
+
 		uint32_t myBufferSize = 512u;
 
 		Ref<NetContext> myContext = nullptr;

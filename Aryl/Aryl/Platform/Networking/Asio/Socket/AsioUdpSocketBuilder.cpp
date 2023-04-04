@@ -25,12 +25,6 @@ namespace Aryl
 		result->mySocket.set_option(resv_bufsize_option);
 		result->mySocket.set_option(send_bufsize_option);
 
-		if (myEndpoint.IsValid())
-		{
-			udp::resolver::results_type endpoints = resolver.resolve(myEndpoint.GetAddress().GetAddressString(), std::to_string(myEndpoint.GetPort()));
-			result->myEndpoint = *endpoints.begin();
-		}
-
 		return result;
 	}
 }

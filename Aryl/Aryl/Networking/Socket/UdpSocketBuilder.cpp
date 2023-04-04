@@ -24,12 +24,6 @@ namespace Aryl
 		return *this;
 	}
 
-	UdpSocketBuilder& UdpSocketBuilder::BoundToEndpoint(IPv4Endpoint Endpoint)
-	{
-		myEndpoint = Endpoint;
-		return *this;
-	}
-
 	UdpSocketBuilder& UdpSocketBuilder::BoundToPort(uint32_t Port)
 	{
 		myPort = Port;

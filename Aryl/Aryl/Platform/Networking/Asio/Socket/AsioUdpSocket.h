@@ -10,13 +10,9 @@ namespace Aryl
 		AsioUdpSocket(Ref<NetContext> context);
 		~AsioUdpSocket() = default;
 
-	protected:
-		void Update(uint32_t waitTime) override;
-
 	private:
 		friend class AsioUdpSocketBuilder;
 
 		udp::socket mySocket;
-		udp::endpoint myEndpoint;
 	};
 }
