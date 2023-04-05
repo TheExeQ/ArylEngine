@@ -81,12 +81,6 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 			mySender = nullptr;
 		}
 
-		if (myReceiver)
-		{
-			myReceiver->Stop();
-			myReceiver = nullptr;
-		}
-
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
 		builder->BoundToAddress(Aryl::IPv4Address(address));
 		builder->BoundToPort(port);
@@ -105,12 +99,6 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 	ImGui::SameLine();
 	if (ImGui::Button("Receiver"))
 	{
-		if (mySender)
-		{
-			mySender->Stop();
-			mySender = nullptr;
-		}
-
 		if (myReceiver)
 		{
 			myReceiver->Stop();
