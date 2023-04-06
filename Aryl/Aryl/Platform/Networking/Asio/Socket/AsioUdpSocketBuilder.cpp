@@ -10,9 +10,9 @@ namespace Aryl
 		udp::resolver resolver(io_context);
 		udp::resolver::results_type endpoints = resolver.resolve(myAddress.GetAddressString(), std::to_string(myPort));
 
-		if (!myAddress.IsValid() || !myPort)
+		if (!myAddress.IsValid())
 		{
-			YL_CORE_ASSERT(false, "Address and port needs to be provided");
+			YL_CORE_ASSERT(false, "Address needs to be provided");
 			return nullptr;
 		}
 

@@ -1,13 +1,13 @@
 #pragma once
-#define PACKET_SIZE 512u
+#define PACKET_MAXSIZE 512u
 
 #include "Interfaces/IPv4/IPv4Endpoint.h"
 
-#include <array>
+#include <vector>
 
 namespace Aryl
 {
-	typedef std::array<uint8_t, PACKET_SIZE> PacketBuffer;
+	typedef std::vector<uint8_t> PacketBuffer;
 
 	struct NetPacket
 	{
@@ -15,7 +15,18 @@ namespace Aryl
 		NetPacket() = default;
 		~NetPacket() = default;
 	
-		IPv4Endpoint endpoint;
-		PacketBuffer data;
+		void SetData(uint8_t* data, uint32_t size);
+
+		const PacketBuffer& GetData() const;
+		IPv4Endpoint GetSender() const;
+		IPv4Endpoint GetReceiver() const;
+
+	private:
+		friend class UdpSocketReceiver;
+		friend class UdpSocketSender;
+
+		IPv4Endpoint mySender;
+		IPv4Endpoint myReceiver;
+		PacketBuffer myData = {};
 	};
 }

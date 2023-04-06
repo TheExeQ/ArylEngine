@@ -12,13 +12,18 @@ namespace Aryl
 	{
 		//YL_CORE_TRACE("Receiver: Update");
 
-		PacketBuffer buffer;
-		IPv4Endpoint sender;
+		if (myOnDataReceivedDelegate)
+		{
+			PacketBuffer buffer;
+			IPv4Endpoint sender;
 
-		mySocket->ReceieveFrom(buffer, sender);
+			mySocket->ReceieveFrom(buffer, sender);
 
-		std::string str((const char*)buffer.data());
+			NetPacket packet;
+			packet.SetData(buffer.data(), buffer.size());
+			SetPacketSender(packet, sender);
 
-		YL_CORE_TRACE(str);
+			myOnDataReceivedDelegate(packet);
+		}
 	}
 }

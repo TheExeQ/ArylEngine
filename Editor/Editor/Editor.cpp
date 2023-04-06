@@ -60,16 +60,15 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	static std::string address = "127.0.0.1";
-	static int port = 44000;
+	static std::string hostAddress = "127.0.0.1";
+	static int hostPort = 44000;
 
 	static std::string sendAddress = "127.0.0.1";
 	static int sendPort = 44000;
 
 	ImGui::Begin("ArylNet");
-	ImGui::InputText("Address", (char*)address.c_str(), 16);
-	ImGui::InputInt("Port", &port);
-	
+	ImGui::InputInt("Host Port", &hostPort);
+	ImGui::NewLine();
 	ImGui::InputText("Send Address", (char*)sendAddress.c_str(), 16);
 	ImGui::InputInt("Send Port", &sendPort);
 
@@ -82,17 +81,15 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		}
 
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(address));
-		builder->BoundToPort(port);
+		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
+		builder->BoundToPort(0);
 
 		mySender = Aryl::UdpSocketSender::Create(builder->Build());
 
+		std::string data = "Hello there how are you doing this fine day?";
+
 		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-		packet->data[0] = 'h';
-		packet->data[1] = 'e';
-		packet->data[2] = 'l';
-		packet->data[3] = 'l';
-		packet->data[4] = 'o';
+		packet->SetData((uint8_t*)data.c_str(), data.size() + 1);
 
 		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 	}
@@ -106,16 +103,21 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		}
 
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(address));
-		builder->BoundToPort(port);
+		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
+		builder->BoundToPort(hostPort);
 
-		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build());
+		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
+			std::string str((const char*)packet.GetData().data());
+
+			YL_CORE_TRACE(str);
+			YL_CORE_TRACE("From {0}:{1}", packet.GetSender().GetAddress().GetAddressString(), packet.GetSender().GetPort());
+			});
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Print Info"))
 	{
-		YL_CORE_INFO("Address: {0}", address);
-		YL_CORE_INFO("Port: {0}", port);
+		YL_CORE_INFO("Address: {0}", hostAddress);
+		YL_CORE_INFO("Port: {0}", hostPort);
 	}
 
 	ImGui::End();

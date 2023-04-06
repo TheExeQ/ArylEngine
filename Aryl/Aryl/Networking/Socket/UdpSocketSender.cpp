@@ -26,9 +26,9 @@ namespace Aryl
 
 	bool UdpSocketSender::Send(Ref<NetPacket> packet, IPv4Endpoint receiver)
 	{
-		packet->endpoint = receiver;
+		packet->myReceiver = receiver;
 
-		if (!myStopping && packet->endpoint.IsValid())
+		if (!myStopping && packet->myReceiver.IsValid())
 		{
 			mySendQueue.push(packet);
 			return true;

@@ -17,7 +17,7 @@ namespace Aryl
 			auto message = mySendQueue.front();
 			mySendQueue.pop();
 
-			mySocket->SendTo(message->data, message->data.size(), message->endpoint);
+			mySocket->SendTo(message->GetData(), message->GetData().size(), message->GetReceiver());
 		}
 	}
 }
