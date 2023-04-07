@@ -30,7 +30,8 @@ Editor::~Editor()
 
 void Editor::OnAttach()
 {
-
+	myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
+	myTestingEntity.AddComponent<Aryl::TestComponent>();
 }
 
 void Editor::OnDetach()
@@ -62,6 +63,7 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
 	static std::string hostAddress = "127.0.0.1";
 	static int hostPort = 44000;
+	static int currentHostPort = hostPort;
 
 	static std::string sendAddress = "127.0.0.1";
 	static int sendPort = 44000;
@@ -86,7 +88,7 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 		mySender = Aryl::UdpSocketSender::Create(builder->Build());
 
-		std::string data = "Hello there how are you doing this fine day?";
+		std::string data = "Connection";
 
 		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
 
@@ -109,23 +111,52 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
 		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
 		builder->BoundToPort(hostPort);
+		currentHostPort = hostPort;
 
 		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
 			std::string str((const char*)packet.data.data());
 
-			YL_CORE_TRACE(str);
-			YL_CORE_TRACE("From {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			});
 	}
-	ImGui::SameLine();
-	if (ImGui::Button("Print Info"))
+	ImGui::NewLine();
+
+	// Debug info
+
+	if (myReceiver || mySender)
 	{
-		YL_CORE_INFO("Address: {0}", hostAddress);
-		YL_CORE_INFO("Port: {0}", hostPort);
+		ImGui::TextColored({ 0.f, 1.f, 0.f, 1.f }, "Connected");
+		if (myReceiver)
+		{
+			std::string text = "Receiver Active on port: " + std::to_string(currentHostPort);
+			ImGui::TextColored({ 0.f, 0.5f, 0.f, 1.f }, text.c_str());
+		}
+		if (mySender)
+		{
+			ImGui::TextColored({ 0.f, 0.5f, 0.f, 1.f }, "Sender Active");
+		}
+	}
+	else
+	{
+		ImGui::TextColored({ 1.f, 0.f, 0.f, 1.f }, "Disconnected");
 	}
 
 	ImGui::End();
-	
+
+	if (!myTestingEntity.IsNull())
+	{
+		auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
+
+		ImGui::Begin("Example Component");
+		ImGui::InputInt("CompentInt", &comp.intValue);
+		ImGui::InputFloat("CompentFloat", &comp.floatValue);
+		ImGui::Checkbox("CompentBool", &comp.boolValue);
+		if (ImGui::Button("Sync"))
+		{
+			// Notify server/client of changes
+		}
+		ImGui::End();
+	}
 
 	return false;
 }

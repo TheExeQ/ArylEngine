@@ -13,8 +13,8 @@ public:
 	{
 		Editor* editor = new Editor();
 		Game* game = new Game();
-		PushLayer(editor);
 		PushLayer(game);
+		PushLayer(editor);
 	}
 };
 

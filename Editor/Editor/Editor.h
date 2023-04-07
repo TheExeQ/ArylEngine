@@ -6,6 +6,8 @@
 #include <Aryl/Networking/Socket/UdpSocketSender.h>
 #include <Aryl/Networking/Socket/UdpSocketReceiver.h>
 
+#include <Aryl/Scene/Entity.h>
+
 class Editor : public Aryl::Layer
 {
 public:
@@ -22,6 +24,8 @@ public:
 	inline static Editor& Get() { return *myInstance; }
 
 private:
+	Aryl::Entity myTestingEntity;
+
 	Ref<Aryl::UdpSocketSender> mySender;
 	Ref<Aryl::UdpSocketReceiver> myReceiver;
 
