@@ -21,6 +21,8 @@ public:
 	bool OnRender(Aryl::AppRenderEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
+	void ArylNetExample();
+
 	inline static Editor& Get() { return *myInstance; }
 
 private:

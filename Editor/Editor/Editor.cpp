@@ -61,6 +61,13 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
+	ArylNetExample();
+
+	return false;
+}
+
+void Editor::ArylNetExample()
+{
 	static std::string hostAddress = "127.0.0.1";
 	static int hostPort = 44000;
 	static int currentHostPort = hostPort;
@@ -166,6 +173,4 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		}
 		ImGui::End();
 	}
-
-	return false;
 }
