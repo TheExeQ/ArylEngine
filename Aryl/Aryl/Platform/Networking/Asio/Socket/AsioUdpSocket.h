@@ -11,7 +11,7 @@ namespace Aryl
 		AsioUdpSocket(Ref<NetContext> context);
 		~AsioUdpSocket() = default;
 
-		void SendTo(PacketBuffer data, uint32_t size, IPv4Endpoint endpoint) override;
+		void SendTo(PacketBuffer data, IPv4Endpoint endpoint) override;
 		void ReceieveFrom(PacketBuffer& outData, IPv4Endpoint& outSender) override;
 
 	private:

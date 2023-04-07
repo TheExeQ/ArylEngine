@@ -17,6 +17,21 @@ namespace Aryl
 	{
 		while (!myStopping)
 		{
+			if (myOnDataReceivedDelegate)
+			{
+				PacketBuffer buffer;
+				IPv4Endpoint sender;
+
+				mySocket->ReceieveFrom(buffer, sender);
+
+				NetPacket packet;
+				packet.deserialize(buffer);
+
+				packet.endpoint = sender;
+
+				myOnDataReceivedDelegate(packet);
+			}
+
 			Update();
 		}
 

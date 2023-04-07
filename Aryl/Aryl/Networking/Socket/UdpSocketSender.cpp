@@ -26,9 +26,16 @@ namespace Aryl
 
 	bool UdpSocketSender::Send(Ref<NetPacket> packet, IPv4Endpoint receiver)
 	{
-		packet->myReceiver = receiver;
+		packet->header.size = packet->size();
+		if (packet->size() > PACKET_MAXSIZE)
+		{
+			YL_CORE_WARN("Packet exceeded allowed size limit and will be aborted.");
+			return false;
+		}
 
-		if (!myStopping && packet->myReceiver.IsValid())
+		packet->endpoint = receiver;
+
+		if (!myStopping && packet->endpoint.IsValid())
 		{
 			mySendQueue.push(packet);
 			return true;

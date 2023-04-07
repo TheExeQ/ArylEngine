@@ -10,14 +10,12 @@ namespace Aryl
 
 	void AsioUdpSocketSender::Update()
 	{
-		//YL_CORE_TRACE("Sender: Update");
-
 		if (!mySendQueue.empty())
 		{
 			auto message = mySendQueue.front();
 			mySendQueue.pop();
 
-			mySocket->SendTo(message->GetData(), message->GetData().size(), message->GetReceiver());
+			mySocket->SendTo(message->serialize(), message->endpoint);
 		}
 	}
 }

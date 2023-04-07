@@ -15,7 +15,7 @@ namespace Aryl
 		UdpSocket(Ref<NetContext> context) : myContext(context) {};
 		virtual ~UdpSocket() = default;
 
-		virtual void SendTo(PacketBuffer data, uint32_t size, IPv4Endpoint endpoint) {};
+		virtual void SendTo(PacketBuffer data, IPv4Endpoint endpoint) {};
 		virtual void ReceieveFrom(PacketBuffer& outData, IPv4Endpoint& outSender) {};
 
 	protected:

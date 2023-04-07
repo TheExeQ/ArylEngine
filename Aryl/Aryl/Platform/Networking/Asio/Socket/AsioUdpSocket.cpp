@@ -9,7 +9,7 @@ namespace Aryl
 	{
 	}
 
-	void AsioUdpSocket::SendTo(PacketBuffer data, uint32_t size, IPv4Endpoint endpoint)
+	void AsioUdpSocket::SendTo(PacketBuffer data, IPv4Endpoint endpoint)
 	{
 		if (mySocket.is_open())
 		{

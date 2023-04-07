@@ -25,7 +25,6 @@ namespace Aryl
 
 	protected:
 		virtual void Update() {};
-		void SetPacketSender(NetPacket& outPacket, IPv4Endpoint sender) { outPacket.mySender = sender; };
 
 		std::function<void(NetPacket)> myOnDataReceivedDelegate = nullptr;
 

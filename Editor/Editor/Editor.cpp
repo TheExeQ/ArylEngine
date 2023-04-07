@@ -89,7 +89,11 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		std::string data = "Hello there how are you doing this fine day?";
 
 		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-		packet->SetData((uint8_t*)data.c_str(), data.size() + 1);
+
+		packet->header.id = Aryl::NetMessageType::StringMessage;
+
+		packet->data.resize(data.size() + 1);
+		memcpy_s(packet->data.data(), packet->data.size(), data.c_str(), packet->data.size());
 
 		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 	}
@@ -107,10 +111,10 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		builder->BoundToPort(hostPort);
 
 		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
-			std::string str((const char*)packet.GetData().data());
+			std::string str((const char*)packet.data.data());
 
 			YL_CORE_TRACE(str);
-			YL_CORE_TRACE("From {0}:{1}", packet.GetSender().GetAddress().GetAddressString(), packet.GetSender().GetPort());
+			YL_CORE_TRACE("From {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			});
 	}
 	ImGui::SameLine();

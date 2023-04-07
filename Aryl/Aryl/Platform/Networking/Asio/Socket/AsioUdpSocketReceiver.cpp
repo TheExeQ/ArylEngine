@@ -10,20 +10,6 @@ namespace Aryl
 
 	void AsioUdpSocketReceiver::Update()
 	{
-		//YL_CORE_TRACE("Receiver: Update");
 
-		if (myOnDataReceivedDelegate)
-		{
-			PacketBuffer buffer;
-			IPv4Endpoint sender;
-
-			mySocket->ReceieveFrom(buffer, sender);
-
-			NetPacket packet;
-			packet.SetData(buffer.data(), buffer.size());
-			SetPacketSender(packet, sender);
-
-			myOnDataReceivedDelegate(packet);
-		}
 	}
 }
