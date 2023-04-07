@@ -6,5 +6,6 @@ namespace Aryl
 	{
 		Unknown,
 		StringMessage,
+		ComponentSync,
 	};
 }

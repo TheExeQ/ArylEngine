@@ -87,18 +87,8 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		builder->BoundToPort(0);
 
 		mySender = Aryl::UdpSocketSender::Create(builder->Build());
-
-		std::string data = "Connection";
-
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-		packet->header.id = Aryl::NetMessageType::StringMessage;
-
-		packet->data.resize(data.size() + 1);
-		memcpy_s(packet->data.data(), packet->data.size(), data.c_str(), packet->data.size());
-
-		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 	}
+
 	ImGui::SameLine();
 	if (ImGui::Button("Receiver"))
 	{
@@ -119,6 +109,25 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			});
 	}
+
+	if (mySender)
+	{
+		ImGui::SameLine();
+		if (ImGui::Button("Ping"))
+		{
+			std::string data = "Ping";
+
+			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+
+			packet->header.id = Aryl::NetMessageType::StringMessage;
+
+			packet->data.resize(data.size() + 1);
+			memcpy_s(packet->data.data(), packet->data.size(), data.c_str(), packet->data.size());
+
+			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
+		}
+	}
+
 	ImGui::NewLine();
 
 	// Debug info
@@ -148,9 +157,9 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 		auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
 
 		ImGui::Begin("Example Component");
-		ImGui::InputInt("CompentInt", &comp.intValue);
-		ImGui::InputFloat("CompentFloat", &comp.floatValue);
-		ImGui::Checkbox("CompentBool", &comp.boolValue);
+		ImGui::InputInt("ComponentInt", &comp.intValue);
+		ImGui::InputFloat("ComponentFloat", &comp.floatValue);
+		ImGui::Checkbox("ComponentBool", &comp.boolValue);
 		if (ImGui::Button("Sync"))
 		{
 			// Notify server/client of changes
