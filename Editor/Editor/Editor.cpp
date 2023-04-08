@@ -37,11 +37,14 @@ void Editor::OnAttach()
 
 	if (Aryl::Application::Get().IsHeadless())
 	{
-		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address("127.0.0.1"));
-		builder->BoundToPort(44000);
+		char address[16] = "0.0.0.0";
+		uint32_t port = 44000;
 
-		YL_CORE_TRACE("Starting UDP server on 127.0.0.1:44000");
+		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+		builder->BoundToAddress(Aryl::IPv4Address(address));
+		builder->BoundToPort(port);
+
+		YL_CORE_TRACE("Starting UDP server on {0}:{1}", address, port);
 
 		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
 			std::string str((const char*)packet.data.data());
