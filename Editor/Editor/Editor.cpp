@@ -15,6 +15,8 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+#include <entt/entt.hpp>
+
 #include <Aryl/Networking/Socket/UdpSocketBuilder.h>
 
 Editor::Editor()
@@ -32,6 +34,60 @@ void Editor::OnAttach()
 {
 	myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
 	myTestingEntity.AddComponent<Aryl::TestComponent>();
+
+	// ENTT REFLECTION TESTING
+	{
+		//auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+
+		//entt::entity entity = registry.create();
+		//std::string component_class_name = "my_type";
+		//std::string component_member_name = "value";
+		//std::string component_member_type = "float";
+		//float component_member_data = 21.4f;
+
+		//auto type = entt::resolve(entt::hashed_string(component_class_name.c_str()));
+		//auto member = type.data(entt::hashed_string(component_member_name.c_str()));
+
+		//registry.emplace<my_type>(entity, 42.0f);
+
+		//auto component_id = entt::type_id<my_type>();
+
+		//auto component_meta_type = entt::resolve<my_type>();
+
+		//auto& component_data = registry.get_or_emplace<entt::any>(entity, my_type{});
+
+		//auto& my_type_data = entt::any_cast<my_type&>(component_data);
+		//my_type_data.value = 13.37f;
+
+		//auto value = my_type_data.value;
+		//YL_CORE_TRACE("Value: {0}", value);
+
+		// ---
+
+		//entt::meta<my_type>()
+		//	.type(entt::hashed_string("my_type"))
+		//	.data<&my_type::value>(entt::hashed_string("value"));
+
+		//registry.emplace<entt::meta_any>(myTestingEntity.GetId(), my_type{ 42.0f });
+
+		//auto type = entt::resolve(entt::hashed_string("my_type"));
+		//auto data = type.data(entt::hashed_string("value"));
+		//auto& any = registry.get<entt::meta_any>(myTestingEntity.GetId());
+		//
+		//if (auto* inst = any.try_cast<my_type>())
+		//{
+		//	inst->value = 20.f;
+		//}
+
+		//auto& comp = registry.get<entt::meta_any>(myTestingEntity.GetId());
+		//if (auto* inst = comp.try_cast<my_type>(); inst)
+		//{
+		//	YL_CORE_TRACE("Value: {0}", inst->value);
+		//}
+		//
+		//auto pool = registry.storage(type.id());
+		//data.set(any.cast(type), 5.3f);
+	}
 }
 
 void Editor::OnDetach()

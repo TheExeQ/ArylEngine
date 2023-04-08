@@ -2,6 +2,11 @@
 
 #include <string>
 
+struct my_type
+{
+	float value;
+};
+
 namespace Aryl
 {
 	struct TagComponent
