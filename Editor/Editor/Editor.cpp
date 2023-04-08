@@ -160,17 +160,18 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 void Editor::ArylNetExample()
 {
-	static std::string hostAddress = "127.0.0.1";
+	static char hostAddress[16] = "127.0.0.1";
 	static int hostPort = 44000;
 	static int currentHostPort = hostPort;
 
-	static std::string sendAddress = "127.0.0.1";
+	static char sendAddress[16] = "127.0.0.1";
 	static int sendPort = 44000;
 
 	ImGui::Begin("ArylNet");
+	ImGui::InputText("Host Address", hostAddress, sizeof(hostAddress));
 	ImGui::InputInt("Host Port", &hostPort);
 	ImGui::NewLine();
-	ImGui::InputText("Send Address", (char*)sendAddress.c_str(), 16);
+	ImGui::InputText("Send Address", sendAddress, sizeof(sendAddress));
 	ImGui::InputInt("Send Port", &sendPort);
 
 	if (ImGui::Button("Sender"))
