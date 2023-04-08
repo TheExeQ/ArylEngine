@@ -53,6 +53,8 @@ namespace Aryl
 
 		Ref<NetContext> GetNetworkContext() const { return myNetManager->GetContext(); };
 
+		inline bool IsHeadless() const { return myWindow == nullptr; }
+
 		inline Window& GetWindow() const { return *myWindow; }
 		inline static Application& Get() { return *myInstance; }
 

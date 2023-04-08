@@ -35,6 +35,19 @@ void Editor::OnAttach()
 	myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
 	myTestingEntity.AddComponent<Aryl::TestComponent>();
 
+	if (Aryl::Application::Get().IsHeadless())
+	{
+		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+		builder->BoundToAddress(Aryl::IPv4Address("127.0.0.1"));
+		builder->BoundToPort(44000);
+
+		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
+			std::string str((const char*)packet.data.data());
+
+			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+			});
+	}
+
 	// ENTT REFLECTION TESTING
 	{
 		//auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();

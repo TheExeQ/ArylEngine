@@ -29,6 +29,10 @@ Aryl::Application* Aryl::CreateApplication(const std::filesystem::path& appPath)
 	info.title = "Aryl Editor";
 	info.useVSync = false;
 
+#ifndef _WINDOWS
+	info.headless = true;
+#endif
+
 	EditorApp* app;
 	Create(app, info);
 
