@@ -51,27 +51,6 @@ void Editor::OnAttach()
 
 			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			});
-
-		// Sender
-
-		builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address("127.0.0.1"));
-		builder->BoundToPort(0);
-
-		mySender = Aryl::UdpSocketSender::Create(builder->Build());
-
-		// Ping
-
-		std::string data = "Ping";
-
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-		packet->header.id = Aryl::NetMessageType::StringMessage;
-
-		packet->data.resize(data.size() + 1);
-		std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
-
-		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address("127.0.0.1"), 44000));
 	}
 
 	// ENTT REFLECTION TESTING
