@@ -38,7 +38,7 @@ namespace Aryl
 
 			size_t len = mySocket.receive_from(asio::buffer(myRecvBuffer), remote_endpoint);
 			outData.resize(len);
-			memcpy_s(outData.data(), len, myRecvBuffer.data(), len);
+			std::memcpy(outData.data(), myRecvBuffer.data(), len);
 
 			outSender = IPv4Endpoint(IPv4Address(remote_endpoint.address().to_string()), (uint32_t)remote_endpoint.port());
 		}

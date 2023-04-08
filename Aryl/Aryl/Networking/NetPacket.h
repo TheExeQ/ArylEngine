@@ -37,10 +37,10 @@ namespace Aryl
 			
 			buffer.resize(size);
 
-			memcpy_s(buffer.data() + offset, sizeof(header), &header, sizeof(header));
+			std::memcpy(buffer.data() + offset, &header, sizeof(header));
 			offset += sizeof(header);
 
-			memcpy_s(buffer.data() + offset, data.size(), data.data(), data.size());
+			std::memcpy(buffer.data() + offset, data.data(), data.size());
 			offset += data.size();
 
 			return buffer;
@@ -51,12 +51,12 @@ namespace Aryl
 		{
 			uint32_t offset = 0u;
 
-			memcpy_s(&header, sizeof(header), buffer.data() + offset, sizeof(header));
+			std::memcpy(&header, buffer.data() + offset, sizeof(header));
 			offset += sizeof(header);
 
 			data.resize(header.size);
 
-			memcpy_s(data.data(), data.size(), buffer.data() + offset, data.size());
+			std::memcpy(data.data(), buffer.data() + offset, data.size());
 			offset += data.size();
 		}
 
@@ -83,7 +83,7 @@ namespace Aryl
 
 			msg.data.resize(msg.data.size() + sizeof(DataType));
 
-			memcpy_s(msg.data.data() + i, sizeof(DataType), &data, sizeof(DataType));
+			std::memcpy(msg.data.data() + i, &data, sizeof(DataType));
 			msg.header.size = msg.size();
 
 			return msg;
@@ -96,7 +96,7 @@ namespace Aryl
 			YL_CORE_ASSERT(std::is_standard_layout<DataType>::value, "Data is too complex to be pulled from vector");
 
 			size_t i = msg.data.size() - sizeof(DataType);
-			memcpy_s(&data, sizeof(DataType), msg.data.data() + i, sizeof(DataType));
+			std::memcpy(&data, msg.data.data() + i, sizeof(DataType));
 
 			msg.data.resize(i);
 			msg.header.size = msg.size();

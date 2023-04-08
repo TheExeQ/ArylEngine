@@ -185,7 +185,7 @@ void Editor::ArylNetExample()
 			packet->header.id = Aryl::NetMessageType::StringMessage;
 
 			packet->data.resize(data.size() + 1);
-			memcpy_s(packet->data.data(), packet->data.size(), data.c_str(), packet->data.size());
+			std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
 
 			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 		}
