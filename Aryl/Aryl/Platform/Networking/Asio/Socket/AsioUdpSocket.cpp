@@ -23,6 +23,7 @@ namespace Aryl
 
 			if (err)
 			{
+				YL_CORE_ERROR("Failed to send to {0}:{1}", endpoint.GetAddress().GetAddressString(), endpoint.GetPort());
 				YL_CORE_ERROR("Error {0}: {1}", err.value(), err.message());
 			}
 		}
