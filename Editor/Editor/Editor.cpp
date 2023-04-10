@@ -46,14 +46,18 @@ void Editor::OnAttach()
 
 		YL_CORE_TRACE("Starting UDP server on {0}:{1}", address, port);
 
-		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
-			if (packet.header.id == Aryl::NetMessageType::StringMessage)
-			{
-				std::string str((const char*)packet.data.data());
+		auto socket = builder->Build();
+		if (socket)
+		{
+			myReceiver = Aryl::UdpSocketReceiver::Create(socket, [](Aryl::NetPacket packet) {
+				if (packet.header.id == Aryl::NetMessageType::StringMessage)
+				{
+					std::string str((const char*)packet.data.data());
 
-				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-			}
-		});
+					YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+				}
+			});
+		}
 	}
 
 	// ENTT REFLECTION TESTING
@@ -172,7 +176,12 @@ void Editor::ArylNetExample()
 		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
 		builder->BoundToPort(0);
 
-		mySender = Aryl::UdpSocketSender::Create(builder->Build());
+		auto socket = builder->Build();
+		
+		if (socket)
+		{
+			mySender = Aryl::UdpSocketSender::Create(socket);
+		}
 	}
 
 	ImGui::SameLine();
@@ -212,16 +221,20 @@ void Editor::ArylNetExample()
 		std::memcpy(currentHostAddress, hostAddress, sizeof(hostAddress));
 		currentHostPort = hostPort;
 
-		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
-			if (packet.header.id == Aryl::NetMessageType::StringMessage)
-			{
-				std::string str((const char*)packet.data.data());
+		auto socket = builder->Build();
+		
+		if (socket)
+		{
+			myReceiver = Aryl::UdpSocketReceiver::Create(socket, [](Aryl::NetPacket packet) {
+				if (packet.header.id == Aryl::NetMessageType::StringMessage)
+				{
+					std::string str((const char*)packet.data.data());
 
-				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-			}
-		});
-
-		YL_CORE_TRACE("Starting UDP server on {0}:{1}", currentHostAddress, currentHostPort);
+					YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+				}
+			});
+			YL_CORE_TRACE("Starting UDP server on {0}:{1}", currentHostAddress, currentHostPort);
+		}
 	}
 
 	if (mySender)

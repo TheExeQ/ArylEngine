@@ -16,7 +16,15 @@ namespace Aryl
 			return nullptr;
 		}
 
-		result->mySocket = udp::socket(io_context, *endpoints.begin());
+		try
+		{
+			result->mySocket = udp::socket(io_context, *endpoints.begin());
+		}
+		catch (std::system_error err)
+		{
+			YL_CORE_ERROR("Could not bind to: {0}:{1}", myAddress.GetAddressString(), myPort);
+			return nullptr;
+		}
 
 		result->mySocket.non_blocking(!myBlocking);
 
