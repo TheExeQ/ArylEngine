@@ -47,27 +47,13 @@ void Editor::OnAttach()
 		YL_CORE_TRACE("Starting UDP server on {0}:{1}", address, port);
 
 		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
-			std::string str((const char*)packet.data.data());
+			if (packet.header.id == Aryl::NetMessageType::StringMessage)
+			{
+				std::string str((const char*)packet.data.data());
 
-			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-			});
-
-		builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(address));
-		builder->BoundToPort(0);
-
-		mySender = Aryl::UdpSocketSender::Create(builder->Build());
-
-		std::string data = "Ping";
-
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-		packet->header.id = Aryl::NetMessageType::StringMessage;
-
-		packet->data.resize(data.size() + 1);
-		std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
-
-		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address("192.168.1.168"), port));
+				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+			}
+		});
 	}
 
 	// ENTT REFLECTION TESTING
@@ -160,6 +146,7 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 void Editor::ArylNetExample()
 {
 	static char hostAddress[16] = "127.0.0.1";
+	static char currentHostAddress[16] = "127.0.0.1";
 	static int hostPort = 44000;
 	static int currentHostPort = hostPort;
 
@@ -193,20 +180,48 @@ void Editor::ArylNetExample()
 	{
 		if (myReceiver)
 		{
+			bool hasSender = mySender != nullptr;
+			if (!hasSender)
+			{
+				Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+				builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
+				builder->BoundToPort(0);
+
+				mySender = Aryl::UdpSocketSender::Create(builder->Build());
+			}
 			myReceiver->Stop();
+
+			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+			packet->header.id = Aryl::NetMessageType::Disconnect;
+
+			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(currentHostAddress), currentHostPort));
+
 			myReceiver = nullptr;
+			
+			if (!hasSender)
+			{
+				mySender->Stop();
+				mySender = nullptr;
+			}
 		}
 
 		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
 		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
 		builder->BoundToPort(hostPort);
+
+		std::memcpy(currentHostAddress, hostAddress, sizeof(hostAddress));
 		currentHostPort = hostPort;
 
 		myReceiver = Aryl::UdpSocketReceiver::Create(builder->Build(), [](Aryl::NetPacket packet) {
-			std::string str((const char*)packet.data.data());
+			if (packet.header.id == Aryl::NetMessageType::StringMessage)
+			{
+				std::string str((const char*)packet.data.data());
 
-			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-			});
+				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+			}
+		});
+
+		YL_CORE_TRACE("Starting UDP server on {0}:{1}", currentHostAddress, currentHostPort);
 	}
 
 	if (mySender)
