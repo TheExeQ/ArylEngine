@@ -19,6 +19,7 @@ namespace Aryl
 		try
 		{
 			result->mySocket = udp::socket(io_context, *endpoints.begin());
+			result->myEndpoint = IPv4Endpoint(myAddress, myPort);
 		}
 		catch (std::system_error err)
 		{

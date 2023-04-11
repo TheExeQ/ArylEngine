@@ -21,6 +21,8 @@ namespace Aryl
 			myStopping = true;
 		}
 
+		Ref<UdpSocket> GetSocket() { return mySocket; };
+
 		static Ref<UdpSocketReceiver> Create(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate = nullptr);
 
 	protected:

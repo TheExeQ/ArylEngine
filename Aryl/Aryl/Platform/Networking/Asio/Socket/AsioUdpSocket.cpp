@@ -5,7 +5,7 @@
 namespace Aryl
 {
 	AsioUdpSocket::AsioUdpSocket(Ref<NetContext> context)
-		: UdpSocket(context), mySocket(((AsioContext*)myContext.get())->GetIoContext(), udp::v4()), myRecvBuffer({})
+		: UdpSocket(context), mySocket(((AsioContext*)myContext.get())->GetIoContext(), udp::v4())
 	{
 	}
 
@@ -35,11 +35,12 @@ namespace Aryl
 		{
 			asio::ip::udp::endpoint remote_endpoint;
 
-			myRecvBuffer.resize(PACKET_MAXSIZE);
+			PacketBuffer recvBuffer;
+			recvBuffer.resize(PACKET_MAXSIZE);
 
-			size_t len = mySocket.receive_from(asio::buffer(myRecvBuffer), remote_endpoint);
+			size_t len = mySocket.receive_from(asio::buffer(recvBuffer), remote_endpoint);
 			outData.resize(len);
-			std::memcpy(outData.data(), myRecvBuffer.data(), len);
+			std::memcpy(outData.data(), recvBuffer.data(), len);
 
 			outSender = IPv4Endpoint(IPv4Address(remote_endpoint.address().to_string()), (uint32_t)remote_endpoint.port());
 		}

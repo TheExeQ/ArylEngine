@@ -18,7 +18,12 @@ namespace Aryl
 		virtual void SendTo(PacketBuffer data, IPv4Endpoint endpoint) {};
 		virtual void ReceieveFrom(PacketBuffer& outData, IPv4Endpoint& outSender) {};
 
+		IPv4Endpoint GetEndpoint() const { return myEndpoint; };
+
 	protected:
+		friend class UdpSocketBuilder;
+		IPv4Endpoint myEndpoint;
+
 		Ref<NetContext> myContext = nullptr;
 	};
 }

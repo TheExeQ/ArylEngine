@@ -32,36 +32,50 @@ Editor::~Editor()
 
 void Editor::OnAttach()
 {
-	myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
-	myTestingEntity.AddComponent<Aryl::TestComponent>();
-
-	if (Aryl::Application::Get().IsHeadless())
+	// U3
 	{
-		char address[16] = "0.0.0.0";
-		uint32_t port = 44000;
-
-		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(address));
-		builder->BoundToPort(port);
-
-		YL_CORE_TRACE("Starting UDP server on {0}:{1}", address, port);
-
-		auto socket = builder->Build();
-		if (socket)
+		uint32_t port;
+		std::cout << "Enter Receiver Port: \n";
+		while (!(std::cin >> port))
 		{
-			myReceiver = Aryl::UdpSocketReceiver::Create(socket, [](Aryl::NetPacket packet) {
-				if (packet.header.id == Aryl::NetMessageType::StringMessage)
-				{
-					std::string str((const char*)packet.data.data());
-
-					YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-				}
-			});
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			std::cerr << "Invalid input. Please enter a valid number: ";
 		}
+
+		SetupSender(Aryl::IPv4Endpoint(Aryl::IPv4Address("0.0.0.0"), 0));
+		SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address("0.0.0.0"), port), [this](Aryl::NetPacket packet) {
+			if (packet.header.id == Aryl::NetMessageType::StringMessage)
+			{
+				std::string str((const char*)packet.data.data());
+				myChatMessages.emplace_back(str);
+
+				if (Aryl::Application::Get().IsHeadless())
+				{
+					std::cout << str << std::endl;
+				}
+			}
+		});
 	}
+
+	//if (Aryl::Application::Get().IsHeadless())
+	//{
+	//	char address[16] = "0.0.0.0";
+	//	uint32_t port = 44000;
+
+	//	SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address(address), port), [](Aryl::NetPacket packet) {
+	//		if (packet.header.id == Aryl::NetMessageType::StringMessage)
+	//		{
+	//			std::string str((const char*)packet.data.data());
+	//			YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+	//		}
+	//	});
+	//}
 
 	// ENTT REFLECTION TESTING
 	{
+		//myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
+		//myTestingEntity.AddComponent<Aryl::TestComponent>();
 		//auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 
 		//entt::entity entity = registry.create();
@@ -124,11 +138,31 @@ void Editor::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
 
+	if (Aryl::Application::Get().IsHeadless())
+	{
+		ChatAppHeadless();
+	}
+
 	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(Editor::OnRender));
 	dispatcher.Dispatch<Aryl::AppImGuiUpdateEvent>(YL_BIND_EVENT_FN(Editor::OnImGuiUpdate));
 }
 
 bool Editor::OnRender(Aryl::AppRenderEvent& e)
+{
+	TempOpenGLRender();
+
+	return false;
+}
+
+bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
+{
+	//ArylNetExample();
+	ChatApp();
+
+	return false;
+}
+
+void Editor::TempOpenGLRender()
 {
 	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
 	int display_w, display_h;
@@ -136,15 +170,88 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 	glViewport(0, 0, display_w, display_h);
 	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	return false;
 }
 
-bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
+void Editor::ChatApp()
 {
-	ArylNetExample();
+	static char sendAddress[16] = "127.0.0.1";
+	static int sendPort = 44000;
 
-	return false;
+	static char messageBuffer[50] = "";
+
+	ImGui::Begin("Chat");
+	ImGui::InputText("Send Address", sendAddress, sizeof(sendAddress));
+	ImGui::InputInt("Send Port", &sendPort);
+
+	ImGui::InputText("Message", messageBuffer, sizeof(messageBuffer));
+	if (ImGui::Button("Send"))
+	{
+		if (mySender)
+		{
+			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+
+			packet->header.id = Aryl::NetMessageType::StringMessage;
+
+			packet->data.resize(sizeof(messageBuffer) + 1);
+			std::memcpy(packet->data.data(), messageBuffer, packet->data.size());
+
+			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
+		}
+	}
+	for (const auto& msg : myChatMessages)
+	{
+		ImGui::Text(msg.c_str());
+	}
+	ImGui::End();
+}
+
+void Editor::ChatAppHeadless()
+{
+	static bool isSendAddressSet = false;
+
+	static char sendAddress[16] = "127.0.0.1";
+	static int sendPort = 44000;
+
+	static char messageBuffer[50] = "";
+
+	if (!isSendAddressSet)
+	{
+		// Input sendAddress
+		std::cout << "Input Send Address: \n";
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cin >> sendAddress;
+
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cout << "Input Send Port: \n";
+		while (!(std::cin >> sendPort))
+		{
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			std::cerr << "Invalid input. Please enter a valid number: ";
+		}
+
+		std::cout << "Every line from now on will be sent as a message: \n";
+
+		isSendAddressSet = true;
+	}
+
+	// Input message
+	std::cin.clear();
+	std::cin.getline(messageBuffer, sizeof(messageBuffer));
+
+	if (mySender)
+	{
+		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+
+		packet->header.id = Aryl::NetMessageType::StringMessage;
+
+		packet->data.resize(sizeof(messageBuffer) + 1);
+		std::memcpy(packet->data.data(), messageBuffer, packet->data.size());
+
+		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
+	}
 }
 
 void Editor::ArylNetExample()
@@ -166,75 +273,19 @@ void Editor::ArylNetExample()
 
 	if (ImGui::Button("Sender"))
 	{
-		if (mySender)
-		{
-			mySender->Stop();
-			mySender = nullptr;
-		}
-
-		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
-		builder->BoundToPort(0);
-
-		auto socket = builder->Build();
-		
-		if (socket)
-		{
-			mySender = Aryl::UdpSocketSender::Create(socket);
-		}
+		SetupSender(Aryl::IPv4Endpoint(Aryl::IPv4Address(hostAddress), 0));
 	}
 
 	ImGui::SameLine();
 	if (ImGui::Button("Receiver"))
 	{
-		if (myReceiver)
-		{
-			bool hasSender = mySender != nullptr;
-			if (!hasSender)
+		SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address(hostAddress), hostPort), [this](Aryl::NetPacket packet) {
+			if (packet.header.id == Aryl::NetMessageType::StringMessage)
 			{
-				Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-				builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
-				builder->BoundToPort(0);
-
-				mySender = Aryl::UdpSocketSender::Create(builder->Build());
+				std::string str((const char*)packet.data.data());
+				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			}
-			myReceiver->Stop();
-
-			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-			packet->header.id = Aryl::NetMessageType::Disconnect;
-
-			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(currentHostAddress), currentHostPort));
-
-			myReceiver = nullptr;
-			
-			if (!hasSender)
-			{
-				mySender->Stop();
-				mySender = nullptr;
-			}
-		}
-
-		Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-		builder->BoundToAddress(Aryl::IPv4Address(hostAddress));
-		builder->BoundToPort(hostPort);
-
-		std::memcpy(currentHostAddress, hostAddress, sizeof(hostAddress));
-		currentHostPort = hostPort;
-
-		auto socket = builder->Build();
-		
-		if (socket)
-		{
-			myReceiver = Aryl::UdpSocketReceiver::Create(socket, [](Aryl::NetPacket packet) {
-				if (packet.header.id == Aryl::NetMessageType::StringMessage)
-				{
-					std::string str((const char*)packet.data.data());
-
-					YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-				}
-			});
-			YL_CORE_TRACE("Starting UDP server on {0}:{1}", currentHostAddress, currentHostPort);
-		}
+		});
 	}
 
 	if (mySender)
@@ -292,5 +343,67 @@ void Editor::ArylNetExample()
 			// Notify server/client of changes
 		}
 		ImGui::End();
+	}
+}
+
+void Editor::SetupSender(Aryl::IPv4Endpoint endpoint)
+{
+	if (mySender)
+	{
+		mySender->Stop();
+		mySender = nullptr;
+	}
+
+	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+	builder->BoundToAddress(endpoint.GetAddress());
+	builder->BoundToPort(0);
+
+	auto socket = builder->Build();
+
+	if (socket)
+	{
+		mySender = Aryl::UdpSocketSender::Create(socket);
+	}
+}
+
+void Editor::SetupReceiver(Aryl::IPv4Endpoint endpoint, std::function<void(Aryl::NetPacket)> callback)
+{
+	if (myReceiver)
+	{
+		bool hasSender = mySender != nullptr;
+		if (!hasSender)
+		{
+			Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+			builder->BoundToAddress(endpoint.GetAddress());
+			builder->BoundToPort(0);
+
+			mySender = Aryl::UdpSocketSender::Create(builder->Build());
+		}
+		myReceiver->Stop();
+
+		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+		packet->header.id = Aryl::NetMessageType::Disconnect;
+
+		mySender->Send(packet, endpoint);
+
+		myReceiver = nullptr;
+
+		if (!hasSender)
+		{
+			mySender->Stop();
+			mySender = nullptr;
+		}
+	}
+
+	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
+	builder->BoundToAddress(endpoint.GetAddress());
+	builder->BoundToPort(endpoint.GetPort());
+
+	auto socket = builder->Build();
+
+	if (socket)
+	{
+		myReceiver = Aryl::UdpSocketReceiver::Create(socket, callback);
+		YL_CORE_TRACE("Starting UDP server on {0}:{1}", endpoint.GetAddress().GetAddressString(), endpoint.GetPort());
 	}
 }

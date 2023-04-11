@@ -21,7 +21,15 @@ public:
 	bool OnRender(Aryl::AppRenderEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
+	void TempOpenGLRender();
+
+	void ChatApp();
+	void ChatAppHeadless();
+
 	void ArylNetExample();
+
+	void SetupSender(Aryl::IPv4Endpoint endpoint);
+	void SetupReceiver(Aryl::IPv4Endpoint endpoint, std::function<void(Aryl::NetPacket)> callback);
 
 	inline static Editor& Get() { return *myInstance; }
 
@@ -30,6 +38,8 @@ private:
 
 	Ref<Aryl::UdpSocketSender> mySender;
 	Ref<Aryl::UdpSocketReceiver> myReceiver;
+
+	std::vector<std::string> myChatMessages;
 
 	inline static Editor* myInstance = nullptr;
 };

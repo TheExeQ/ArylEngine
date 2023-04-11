@@ -22,6 +22,7 @@ namespace Aryl
 		}
 
 		bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver);
+		Ref<UdpSocket> GetSocket() { return mySocket; };
 
 		static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
 

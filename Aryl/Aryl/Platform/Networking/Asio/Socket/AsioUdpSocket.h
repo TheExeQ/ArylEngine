@@ -17,7 +17,6 @@ namespace Aryl
 	private:
 		friend class AsioUdpSocketBuilder;
 
-		PacketBuffer myRecvBuffer;
 		udp::socket mySocket;
 	};
 }
