@@ -74,9 +74,9 @@ void Editor::OnAttach()
 
 	// ENTT REFLECTION TESTING
 	{
-		//myTestingEntity = Aryl::SceneManager::GetActiveScene()->CreateEntity("TestEntity");
-		//myTestingEntity.AddComponent<Aryl::TestComponent>();
-		//auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+		auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+		registry.emplace<my_type>(myTestingEntity.GetId());
 
 		//entt::entity entity = registry.create();
 		//std::string component_class_name = "my_type";
@@ -103,16 +103,38 @@ void Editor::OnAttach()
 
 		// ---
 
-		//entt::meta<my_type>()
-		//	.type(entt::hashed_string("my_type"))
-		//	.data<&my_type::value>(entt::hashed_string("value"));
+		entt::meta<my_type>()
+			.type(entt::hashed_string("my_type"))
+			.data<&my_type::value>(entt::hashed_string("value"))
+			.data<&my_type::value2>(entt::hashed_string("value2"))
+			.data<&my_type::value3>(entt::hashed_string("value3"));
+
 
 		//registry.emplace<entt::meta_any>(myTestingEntity.GetId(), my_type{ 42.0f });
 
-		//auto type = entt::resolve(entt::hashed_string("my_type"));
-		//auto data = type.data(entt::hashed_string("value"));
-		//auto& any = registry.get<entt::meta_any>(myTestingEntity.GetId());
-		//
+		auto& comp = myTestingEntity.GetComponent<my_type>();
+
+		YL_CORE_TRACE(comp.value);
+		YL_CORE_TRACE(comp.value2);
+		YL_CORE_TRACE(comp.value3);
+
+		auto type = entt::resolve(entt::hashed_string("my_type"));
+		auto data = type.data(entt::hashed_string("value"));
+		auto data2 = type.data(entt::hashed_string("value2"));
+		auto data3 = type.data(entt::hashed_string("value3"));
+		
+		auto storage = registry.storage(entt::type_id<my_type>().hash());
+		auto compontentPtr = storage->get(myTestingEntity.GetId());
+
+		auto componentAny = type.from_void(compontentPtr);
+		data.set(componentAny, 5.f);
+		data2.set(componentAny, true);
+		data3.set(componentAny, 69.f);
+
+		YL_CORE_TRACE(comp.value);
+		YL_CORE_TRACE(comp.value2);
+		YL_CORE_TRACE(comp.value3);
+
 		//if (auto* inst = any.try_cast<my_type>())
 		//{
 		//	inst->value = 20.f;

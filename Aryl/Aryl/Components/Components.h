@@ -4,7 +4,9 @@
 
 struct my_type
 {
-	float value;
+	float value = 0.f;
+	bool value2 = false;
+	float value3 = 0.f;
 };
 
 namespace Aryl
