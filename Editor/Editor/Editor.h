@@ -25,6 +25,7 @@ public:
 
 	void ChatApp();
 	void ChatAppHeadless();
+	void ChatDisconnect();
 
 	void ArylNetExample();
 
@@ -39,6 +40,7 @@ private:
 	Ref<Aryl::UdpSocketSender> mySender;
 	Ref<Aryl::UdpSocketReceiver> myReceiver;
 
+	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
 	std::vector<std::string> myChatMessages;
 
 	inline static Editor* myInstance = nullptr;

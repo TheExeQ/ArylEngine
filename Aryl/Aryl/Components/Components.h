@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Aryl/Reflection/ReflectionMacros.h"
+
 #include <string>
 
 struct my_type
