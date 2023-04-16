@@ -30,6 +30,11 @@ namespace Aryl
 		myProperties = aProperties;
 
 		Invalidate();
+
+		myContext = RendererContext::Create(myWindow);
+		myContext->Init();
+
+		SetVSync(myProperties.vsync);
 	}
 
 	Window::~Window()
@@ -223,7 +228,7 @@ namespace Aryl
 
 	void Window::Present()
 	{
-		glfwSwapBuffers(myWindow);
+		myContext->SwapBuffers();
 		glfwPollEvents();
 	}
 
@@ -270,6 +275,20 @@ namespace Aryl
 	void Window::SetClipboard(const std::string& string)
 	{
 		glfwSetClipboardString(myWindow, string.c_str());
+	}
+
+	void Window::SetVSync(bool aActive)
+	{
+		myProperties.vsync = aActive;
+
+		if (myProperties.vsync)
+		{
+			glfwSwapInterval(1);
+		}
+		else
+		{
+			glfwSwapInterval(0);
+		}
 	}
 
 	const std::pair<float, float> Window::GetPosition() const

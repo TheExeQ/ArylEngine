@@ -23,10 +23,6 @@ public:
 
 	void TempOpenGLRender();
 
-	void ChatApp();
-	void ChatAppHeadless();
-	void ChatDisconnect();
-
 	void ArylNetExample();
 
 	void SetupSender(Aryl::IPv4Endpoint endpoint);

@@ -32,65 +32,6 @@ Editor::~Editor()
 
 void Editor::OnAttach()
 {
-	// U3
-	{
-		uint32_t port;
-		std::cout << "Enter Receiver Port: \n";
-		while (!(std::cin >> port))
-		{
-			std::cin.clear();
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			std::cerr << "Invalid input. Please enter a valid number: ";
-		}
-
-		SetupSender(Aryl::IPv4Endpoint(Aryl::IPv4Address("0.0.0.0"), 0));
-		SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address("0.0.0.0"), port), [this](Aryl::NetPacket packet) {
-
-			std::string id = packet.endpoint.GetAddress().GetAddressString() + ":" + std::to_string(packet.endpoint.GetPort());
-			
-			if (Aryl::Application::Get().IsHeadless())
-			{
-				if (packet.header.id == Aryl::NetMessageType::Connect)
-				{
-					uint32_t receiverPort = 0;
-					packet >> receiverPort;
-					myConnectedClients[id] = Aryl::IPv4Endpoint(packet.endpoint.GetAddress(), receiverPort);
-					YL_CORE_INFO("{0} has connected with receiver port: {1}", id, receiverPort);
-				}
-
-				if (packet.header.id == Aryl::NetMessageType::Disconnect)
-				{
-					myConnectedClients.erase(id);
-					YL_CORE_INFO("{0} has disconnected", id);
-				}
-			}
-
-			if (packet.header.id == Aryl::NetMessageType::StringMessage)
-			{
-				std::string str((const char*)packet.data.data());
-				myChatMessages.emplace_back(str);
-
-				if (Aryl::Application::Get().IsHeadless())
-				{
-					std::cout << id << " sent " << str << std::endl;
-
-					if (mySender)
-					{
-						for (const auto& client : myConnectedClients)
-						{
-							Ref<Aryl::NetPacket> newPacket = CreateRef<Aryl::NetPacket>();
-
-							newPacket->header.id = Aryl::NetMessageType::StringMessage;
-							newPacket->data = packet.data;
-
-							mySender->Send(newPacket, client.second);
-						}
-					}
-				}
-			}
-		});
-	}
-
 	// ENTT REFLECTION TESTING
 	if (false)
 	{
@@ -139,17 +80,11 @@ void Editor::OnAttach()
 
 void Editor::OnDetach()
 {
-	ChatDisconnect();
 }
 
 void Editor::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
-
-	if (Aryl::Application::Get().IsHeadless())
-	{
-		//ChatAppHeadless();
-	}
 
 	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(Editor::OnRender));
 	dispatcher.Dispatch<Aryl::AppImGuiUpdateEvent>(YL_BIND_EVENT_FN(Editor::OnImGuiUpdate));
@@ -164,8 +99,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	//ArylNetExample();
-	ChatApp();
+	ArylNetExample();
 
 	return false;
 }
@@ -182,114 +116,6 @@ void Editor::TempOpenGLRender()
 
 char g_sendAddress[16] = "127.0.0.1";
 int g_sendPort = 44000;
-
-void Editor::ChatApp()
-{
-	static bool connected = false;
-	static char messageBuffer[50] = "";
-
-	ImGui::Begin("Chat");
-	ImGui::InputText("Server Address", g_sendAddress, sizeof(g_sendAddress));
-	ImGui::InputInt("Server Port", &g_sendPort);
-
-	if (ImGui::Button("Connect"))
-	{
-		if (mySender)
-		{
-			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-			packet->header.id = Aryl::NetMessageType::Connect;
-			*packet << myReceiver->GetSocket()->GetEndpoint().GetPort();
-
-			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(g_sendAddress), g_sendPort));
-			connected = true;
-		}
-	}
-	if (connected)
-	{
-		ImGui::InputText("Message", messageBuffer, sizeof(messageBuffer));
-		if (ImGui::Button("Send"))
-		{
-			if (mySender)
-			{
-				Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-				packet->header.id = Aryl::NetMessageType::StringMessage;
-
-				packet->data.resize(sizeof(messageBuffer) + 1);
-				std::memcpy(packet->data.data(), messageBuffer, packet->data.size());
-
-				mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(g_sendAddress), g_sendPort));
-			}
-		}
-		for (const auto& msg : myChatMessages)
-		{
-			ImGui::Text(msg.c_str());
-		}
-	}
-	ImGui::End();
-}
-
-void Editor::ChatAppHeadless()
-{
-	static bool isSendAddressSet = false;
-
-	static char sendAddress[16] = "127.0.0.1";
-	static int sendPort = 44000;
-
-	static char messageBuffer[50] = "";
-
-	if (!isSendAddressSet)
-	{
-		// Input sendAddress
-		std::cout << "Input Send Address: \n";
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		std::cin >> sendAddress;
-
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		std::cout << "Input Send Port: \n";
-		while (!(std::cin >> sendPort))
-		{
-			std::cin.clear();
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			std::cerr << "Invalid input. Please enter a valid number: ";
-		}
-
-		std::cout << "Every line from now on will be sent as a message: \n";
-
-		isSendAddressSet = true;
-	}
-
-	// Input message
-	std::cin.clear();
-	std::cin.getline(messageBuffer, sizeof(messageBuffer));
-
-	if (mySender)
-	{
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-		packet->header.id = Aryl::NetMessageType::StringMessage;
-
-		packet->data.resize(sizeof(messageBuffer) + 1);
-		std::memcpy(packet->data.data(), messageBuffer, packet->data.size());
-
-		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
-	}
-}
-
-void Editor::ChatDisconnect()
-{
-	if (mySender)
-	{
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-		packet->header.id = Aryl::NetMessageType::Disconnect;
-
-		mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(g_sendAddress), g_sendPort));
-	}
-}
 
 void Editor::ArylNetExample()
 {

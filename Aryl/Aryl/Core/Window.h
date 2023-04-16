@@ -2,6 +2,7 @@
 
 #include "Aryl/Events/Event.h"
 #include "Aryl/Core/Base.h"
+#include "Aryl/Renderer/RendererContext.h"
 
 #include <functional>
 #include <filesystem>
@@ -63,6 +64,8 @@ namespace Aryl
 		void SetOpacity(float opacity) const;
 		void SetClipboard(const std::string& string);
 
+		void SetVSync(bool aActive);
+
 		const std::pair<float, float> GetPosition() const;
 
 		inline const uint32_t GetWidth() const { return myData.width; }
@@ -75,6 +78,8 @@ namespace Aryl
 
 	private:
 		GLFWwindow* myWindow = nullptr;
+		Ref<RendererContext> myContext = nullptr;
+
 		bool myHasBeenInitialized = false;
 		bool myIsFullscreen = false;
 

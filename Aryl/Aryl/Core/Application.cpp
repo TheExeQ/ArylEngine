@@ -1,6 +1,5 @@
 #include "Application.h"
 
-#include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 namespace Aryl
@@ -29,14 +28,6 @@ namespace Aryl
 		{
 			myWindow = Window::Create(windowProperties);
 			myWindow->SetEventCallback(YL_BIND_EVENT_FN(Application::OnEvent));
-
-			// #SAMUEL_TODO: Temporary Stuff
-			{
-				glfwMakeContextCurrent(myWindow->GetNativeWindow());
-				int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-				YL_CORE_ASSERT(status, "Failed to initialize Glad!");
-				glfwSwapInterval(1); // Enable vsync
-			}
 
 			if (myInfo.enableImGui)
 			{
