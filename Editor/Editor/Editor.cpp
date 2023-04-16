@@ -92,19 +92,20 @@ void Editor::OnEvent(Aryl::Event& e)
 
 bool Editor::OnRender(Aryl::AppRenderEvent& e)
 {
-	TempOpenGLRender();
+	TempOpenGLPreFrame();
+	TempOpenGLTesting();
 
 	return false;
 }
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	ArylNetExample();
+	//ArylNetExample();
 
 	return false;
 }
 
-void Editor::TempOpenGLRender()
+void Editor::TempOpenGLPreFrame()
 {
 	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
 	int display_w, display_h;
@@ -112,6 +113,42 @@ void Editor::TempOpenGLRender()
 	glViewport(0, 0, display_w, display_h);
 	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Editor::TempOpenGLTesting()
+{
+	static unsigned int vertexArray = 0, vertexBuffer = 0, indexBuffer = 0;
+
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
+
+	glGenBuffers(1, &vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+	float vertices[3 * 3] =
+	{
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f,
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+	glGenBuffers(1, &indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+	unsigned int indices[3] =
+	{
+		0, 1, 2
+	};
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glBindVertexArray(vertexArray);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
 }
 
 char g_sendAddress[16] = "127.0.0.1";

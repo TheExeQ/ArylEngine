@@ -21,7 +21,8 @@ public:
 	bool OnRender(Aryl::AppRenderEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
-	void TempOpenGLRender();
+	void TempOpenGLPreFrame();
+	void TempOpenGLTesting();
 
 	void ArylNetExample();
 

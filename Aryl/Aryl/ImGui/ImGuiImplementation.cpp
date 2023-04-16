@@ -8,6 +8,7 @@
 
 namespace Aryl
 {
+	// #SAMUEL_TODO: Continue adding this
 	std::filesystem::path GetOrCreateIniPath()
 	{
 		const std::filesystem::path userIniPath = "User/imgui.ini";
