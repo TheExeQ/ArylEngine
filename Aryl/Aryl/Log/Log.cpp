@@ -17,6 +17,8 @@ namespace Aryl
 		myCoreLogger = spdlog::stdout_color_mt("ARYL");
 		myCoreLogger->sinks().emplace_back(myCallbackSink);
 		myCoreLogger->set_level(spdlog::level::trace);
+
+		YL_CORE_INFO("Initialized Log");
 	}
 
 	void Log::Shutdown()

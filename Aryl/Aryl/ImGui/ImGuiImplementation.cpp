@@ -165,8 +165,13 @@ namespace Aryl
 
 		const char* glsl_version = "#version 130";
 
-		ImGui_ImplGlfw_InitForOpenGL(myWindowPtr, true);
-		ImGui_ImplOpenGL3_Init(glsl_version);
+		// #SAMUEL_TODO: Fix for support for different apis
+		{
+			ImGui_ImplGlfw_InitForOpenGL(myWindowPtr, true);
+			ImGui_ImplOpenGL3_Init(glsl_version);
+		}
+
+		YL_CORE_INFO("Initialized ImGui Layer");
 	}
 
 	ImGuiImplementation::~ImGuiImplementation()

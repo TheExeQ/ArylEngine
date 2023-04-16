@@ -31,6 +31,8 @@ namespace Aryl
 
 		Invalidate();
 
+		YL_CORE_INFO("Created window {0} ({1}, {2})", myData.title, myData.width, myData.height);
+
 		myContext = RendererContext::Create(myWindow);
 		myContext->Init();
 
