@@ -40,9 +40,7 @@ void Editor::OnAttach()
 		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
 		registry.emplace<Aryl::TestComponent>(myTestingEntity.GetId());
 
-		YL_REFLECT(Aryl::TestComponent, intValue);
-		YL_REFLECT(Aryl::TestComponent, floatValue);
-		YL_REFLECT(Aryl::TestComponent, boolValue);
+		Aryl::RegisterReflection();
 
 		auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
 
