@@ -30,33 +30,34 @@ Editor::~Editor()
 	myInstance = nullptr;
 }
 
+
 void Editor::OnAttach()
 {
 	// ENTT REFLECTION TESTING
-	if (false)
+	//if (false)
 	{
 		auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
-		registry.emplace<my_type>(myTestingEntity.GetId());
+		registry.emplace<Aryl::TestComponent>(myTestingEntity.GetId());
 
-		YL_REFLECT(my_type, value);
-		YL_REFLECT(my_type, value2);
-		YL_REFLECT(my_type, value3);
+		YL_REFLECT(Aryl::TestComponent, intValue);
+		YL_REFLECT(Aryl::TestComponent, floatValue);
+		YL_REFLECT(Aryl::TestComponent, boolValue);
 
-		auto& comp = myTestingEntity.GetComponent<my_type>();
+		auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
 
-		YL_CORE_TRACE(comp.value);
-		YL_CORE_TRACE(comp.value2);
-		YL_CORE_TRACE(comp.value3);
+		YL_CORE_TRACE(comp.intValue);
+		YL_CORE_TRACE(comp.floatValue);
+		YL_CORE_TRACE(comp.boolValue);
 
-		auto type = entt::resolve(entt::hashed_string("my_type"));
+		auto type = entt::resolve(entt::hashed_string(typeid(Aryl::TestComponent).name()));
 		if (type)
 		{
-			auto data = type.data(entt::hashed_string("value"));
-			auto data2 = type.data(entt::hashed_string("value2"));
-			auto data3 = type.data(entt::hashed_string("value3"));
+			auto data = type.data(entt::hashed_string("intValue"));
+			auto data2 = type.data(entt::hashed_string("floatValue"));
+			auto data3 = type.data(entt::hashed_string("boolValue"));
 
-			auto type_id = entt::type_id<my_type>().hash();
+			auto type_id = entt::type_id<Aryl::TestComponent>().hash();
 			auto storage = registry.storage(type_id);
 
 			YL_CORE_TRACE("TypeId: {0}", type_id);
@@ -66,15 +67,15 @@ void Editor::OnAttach()
 				auto compontentPtr = storage->get(myTestingEntity.GetId());
 				auto componentAny = type.from_void(compontentPtr);
 
-				if (data) { data.set(componentAny, 5.f); }
-				if (data2) { data2.set(componentAny, true); }
-				if (data3) { data3.set(componentAny, 69.f); }
+				if (data) { data.set(componentAny, 5); }
+				if (data2) { data2.set(componentAny, 4.3f); }
+				if (data3) { data3.set(componentAny, true); }
 			}
 		}
 
-		YL_CORE_TRACE(comp.value);
-		YL_CORE_TRACE(comp.value2);
-		YL_CORE_TRACE(comp.value3);
+		YL_CORE_TRACE(comp.intValue);
+		YL_CORE_TRACE(comp.floatValue);
+		YL_CORE_TRACE(comp.boolValue);
 	}
 }
 
@@ -100,7 +101,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	//ArylNetExample();
+	ArylNetExample();
 
 	return false;
 }

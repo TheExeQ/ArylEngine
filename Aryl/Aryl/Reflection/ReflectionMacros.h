@@ -1,16 +1,10 @@
 #pragma once
 
-#define YL_REFLECT(typename, ...) \
-    entt::meta<typename>() \
-        .type(entt::hashed_string(#typename)) \
-        INTERNAL_REFLECT_DATA(typename, __VA_ARGS__)
+#define UNPACK(...) __VA_ARGS__
+#define YL_COMPONENT(componentStruct, componentName) \
+    UNPACK componentStruct; \
 
-#define INTERNAL_REFLECT_DATA(typename, ...) \
-    INTERNAL_REFLECT_DATA_IMPL(typename, __VA_ARGS__)
-
-#define INTERNAL_REFLECT_DATA_IMPL(typename, data_member, ...) \
-    .data<&typename::data_member>(entt::hashed_string(#data_member)) \
-    INTERNAL_REFLECT_DATA_IMPL(typename, __VA_ARGS__)
-
-#define INTERNAL_REFLECT_DATA_IMPL(typename, data_member) \
-    .data<&typename::data_member>(entt::hashed_string(#data_member))
+#define YL_REFLECT(typeName, data_member) \
+    entt::meta<typeName>() \
+        .type(entt::hashed_string(typeid(typeName).name())) \
+        .data<&typeName::data_member>(entt::hashed_string(#data_member))
