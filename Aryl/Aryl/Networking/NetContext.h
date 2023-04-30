@@ -13,6 +13,6 @@ namespace Aryl
 
 		virtual void Init() = 0;
 
-		static NetContext* Create();
+		static Ref<NetContext> Create();
 	};
 }

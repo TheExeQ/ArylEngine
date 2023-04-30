@@ -23,11 +23,11 @@ namespace Aryl
 
 		void Clear();
 
-		std::vector<Layer*>::iterator begin() { return m_layers.begin(); }
-		std::vector<Layer*>::iterator end() { return m_layers.end(); }
+		std::vector<Layer*>::iterator begin() { return myLayers.begin(); }
+		std::vector<Layer*>::iterator end() { return myLayers.end(); }
 
 	private:
-		std::vector<Layer*> m_layers;
-		uint32_t m_lastInsertIndex = 0;
+		std::vector<Layer*> myLayers;
+		uint32_t myLastInsertIndex = 0;
 	};
 }

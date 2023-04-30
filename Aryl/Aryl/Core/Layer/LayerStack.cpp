@@ -15,64 +15,64 @@ namespace Aryl
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_layers.emplace(m_layers.begin() + m_lastInsertIndex, layer);
-		m_lastInsertIndex++;
+		myLayers.emplace(myLayers.begin() + myLastInsertIndex, layer);
+		myLastInsertIndex++;
 		layer->OnAttach();
 	}
 
 	void LayerStack::PushOverlay(Layer* overlay)
 	{
-		m_layers.emplace_back(overlay);
+		myLayers.emplace_back(overlay);
 		overlay->OnAttach();
 	}
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		auto it = std::find(m_layers.begin(), m_layers.begin() + m_lastInsertIndex, layer);
-		if (it != m_layers.begin() + m_lastInsertIndex)
+		auto it = std::find(myLayers.begin(), myLayers.begin() + myLastInsertIndex, layer);
+		if (it != myLayers.begin() + myLastInsertIndex)
 		{
 			layer->OnDetach();
-			m_layers.erase(it);
-			m_lastInsertIndex--;
+			myLayers.erase(it);
+			myLastInsertIndex--;
 			delete layer;
 		}
 	}
 
 	void LayerStack::PopOverlay(Layer* overlay)
 	{
-		auto it = std::find(m_layers.begin() + m_lastInsertIndex, m_layers.end(), overlay);
-		if (it != m_layers.end())
+		auto it = std::find(myLayers.begin() + myLastInsertIndex, myLayers.end(), overlay);
+		if (it != myLayers.end())
 		{
 			overlay->OnDetach();
-			m_layers.erase(it);
+			myLayers.erase(it);
 			delete overlay;
 		}
 	}
 
 	void LayerStack::PopLast()
 	{
-		Layer* lastLayer = m_layers.back();
+		Layer* lastLayer = myLayers.back();
 		PopLayer(lastLayer);
 	}
 
 	Layer* LayerStack::GetLastLayer()
 	{
-		if (m_layers.empty())
+		if (myLayers.empty())
 		{
 			return nullptr;
 		}
-		return m_layers.back();
+		return myLayers.back();
 	}
 
 	void LayerStack::Clear()
 	{
-		for (Layer* layer : m_layers)
+		for (Layer* layer : myLayers)
 		{
 			layer->OnDetach();
 			delete layer;
 		}
 
-		m_lastInsertIndex = 0;
-		m_layers.clear();
+		myLastInsertIndex = 0;
+		myLayers.clear();
 	}
 }

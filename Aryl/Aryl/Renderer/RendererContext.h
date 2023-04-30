@@ -15,6 +15,6 @@ namespace Aryl
 		virtual void Init() = 0;
 		virtual void SwapBuffers() = 0;
 
-		static RendererContext* Create(GLFWwindow* windowHandle);
+		static Ref<RendererContext> Create(GLFWwindow* windowHandle);
 	};
 }

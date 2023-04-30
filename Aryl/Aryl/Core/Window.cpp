@@ -33,7 +33,7 @@ namespace Aryl
 
 		YL_CORE_INFO("Created window {0} ({1}, {2})", myData.title, myData.width, myData.height);
 
-		myContext.reset(RendererContext::Create(myWindow));
+		myContext = RendererContext::Create(myWindow);
 		myContext->Init();
 
 		SetVSync(myProperties.vsync);

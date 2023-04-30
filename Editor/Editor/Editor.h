@@ -45,9 +45,9 @@ private:
 	std::vector<std::string> myChatMessages;
 
 	unsigned int myVertexArray;
-	Scope<Aryl::Shader> myShader;
-	Scope<Aryl::VertexBuffer> myVertexBuffer;
-	Scope<Aryl::IndexBuffer> myIndexBuffer;
+	Ref<Aryl::Shader> myShader;
+	Ref<Aryl::VertexBuffer> myVertexBuffer;
+	Ref<Aryl::IndexBuffer> myIndexBuffer;
 
 	inline static Editor* myInstance = nullptr;
 };

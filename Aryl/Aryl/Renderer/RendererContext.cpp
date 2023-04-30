@@ -5,12 +5,12 @@
 
 namespace Aryl
 {
-	RendererContext* RendererContext::Create(GLFWwindow* windowHandle)
+	Ref<RendererContext> RendererContext::Create(GLFWwindow* windowHandle)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 			case RendererAPI::API::None:    return nullptr;
-			case RendererAPI::API::OpenGL:  return new OpenGLContext(windowHandle);
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLContext>(windowHandle);
 			case RendererAPI::API::Vulkan:  YL_CORE_ASSERT(false, "Vulkan is currently not supported!") break;
 		}
 

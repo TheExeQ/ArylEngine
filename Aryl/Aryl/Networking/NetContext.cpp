@@ -4,12 +4,12 @@
 
 namespace Aryl
 {
-	NetContext* NetContext::Create()
+	Ref<NetContext> NetContext::Create()
 	{
 		switch (NetAPI::Current())
 		{
 			case NetAPIType::None: return nullptr;
-			case NetAPIType::Asio: return new AsioContext();
+			case NetAPIType::Asio: return Ref<AsioContext>();
 			case NetAPIType::WinSock2: return nullptr;
 		}
 

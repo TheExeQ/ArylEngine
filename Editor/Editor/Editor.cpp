@@ -30,6 +30,26 @@ Editor::~Editor()
 	myInstance = nullptr;
 }
 
+static GLenum ShaderDataTypeToOpenGLBaseType(Aryl::ShaderDataType type)
+{
+	switch (type)
+	{
+		case Aryl::ShaderDataType::Float:    return GL_FLOAT;
+		case Aryl::ShaderDataType::Float2:   return GL_FLOAT;
+		case Aryl::ShaderDataType::Float3:   return GL_FLOAT;
+		case Aryl::ShaderDataType::Float4:   return GL_FLOAT;
+		case Aryl::ShaderDataType::Mat3:     return GL_FLOAT;
+		case Aryl::ShaderDataType::Mat4:     return GL_FLOAT;
+		case Aryl::ShaderDataType::Int:      return GL_INT;
+		case Aryl::ShaderDataType::Int2:     return GL_INT;
+		case Aryl::ShaderDataType::Int3:     return GL_INT;
+		case Aryl::ShaderDataType::Int4:     return GL_INT;
+		case Aryl::ShaderDataType::Bool:     return GL_BOOL;
+	}
+
+	YL_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	return 0;
+}
 
 void Editor::OnAttach()
 {
@@ -82,28 +102,53 @@ void Editor::OnAttach()
 		glGenVertexArrays(1, &myVertexArray);
 		glBindVertexArray(myVertexArray);
 
-		float vertices[3 * 3] = {
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f
+		float vertices[3 * 7] = {
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
 		};
 
-		myVertexBuffer.reset(Aryl::VertexBuffer::Create(vertices, sizeof(vertices)));
+		myVertexBuffer = Aryl::VertexBuffer::Create(vertices, sizeof(vertices));
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+		{
+			Aryl::BufferLayout layout = {
+				{ Aryl::ShaderDataType::Float3, "a_Position" },
+				{ Aryl::ShaderDataType::Float4, "a_Color" }
+			};
+
+			myVertexBuffer->SetLayout(layout);
+		}
+
+		uint32_t index = 0;
+		const auto& layout = myVertexBuffer->GetLayout();
+		for (const auto& element : layout)
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index,
+				element.GetComponentCount(),
+				ShaderDataTypeToOpenGLBaseType(element.Type),
+				element.Normalized ? GL_TRUE : GL_FALSE,
+				layout.GetStride(),
+				(const void*)element.Offset);
+			index++;
+		}
 
 		uint32_t indices[3] = { 0, 1, 2 };
-		myIndexBuffer.reset(Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		myIndexBuffer = Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 
 		std::string vertexSrc = R"(
 			#version 330 core
 			
 			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec4 a_Color;
+
 			out vec3 v_Position;
+			out vec4 v_Color;
+
 			void main()
 			{
 				v_Position = a_Position;
+				v_Color = a_Color;
 				gl_Position = vec4(a_Position, 1.0);	
 			}
 		)";
@@ -112,14 +157,18 @@ void Editor::OnAttach()
 			#version 330 core
 			
 			layout(location = 0) out vec4 color;
+
 			in vec3 v_Position;
+			in vec4 v_Color;
+
 			void main()
 			{
 				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+				color = v_Color;
 			}
 		)";
 
-		myShader.reset(Aryl::Shader::Create(vertexSrc, fragmentSrc));
+		myShader = Aryl::Shader::Create(vertexSrc, fragmentSrc);
 	}
 }
 
@@ -150,6 +199,10 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 	return false;
 }
 
+//////////////////////
+////// RENDERER //////
+//////////////////////
+
 void Editor::TempOpenGLPreFrame()
 {
 	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
@@ -169,6 +222,10 @@ void Editor::TempOpenGLTesting()
 
 char g_sendAddress[16] = "127.0.0.1";
 int g_sendPort = 44000;
+
+//////////////////////
+///// NETWORKING /////
+//////////////////////
 
 void Editor::ArylNetExample()
 {

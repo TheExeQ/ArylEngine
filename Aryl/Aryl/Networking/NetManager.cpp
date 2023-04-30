@@ -4,7 +4,7 @@ namespace Aryl
 {
 	NetManager::NetManager()
 	{
-		myContext.reset(NetContext::Create());
+		myContext = NetContext::Create();
 	}
 
 	NetManager::~NetManager()
