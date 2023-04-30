@@ -6,6 +6,10 @@
 #include <Aryl/Networking/Socket/UdpSocketSender.h>
 #include <Aryl/Networking/Socket/UdpSocketReceiver.h>
 
+#include <Aryl/Renderer/Renderer.h>
+#include <Aryl/Renderer/Shader.h>
+#include <Aryl/Renderer/Buffer.h>
+
 #include <Aryl/Scene/Entity.h>
 
 class Editor : public Aryl::Layer
@@ -39,6 +43,11 @@ private:
 
 	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
 	std::vector<std::string> myChatMessages;
+
+	unsigned int myVertexArray;
+	Scope<Aryl::Shader> myShader;
+	Scope<Aryl::VertexBuffer> myVertexBuffer;
+	Scope<Aryl::IndexBuffer> myIndexBuffer;
 
 	inline static Editor* myInstance = nullptr;
 };

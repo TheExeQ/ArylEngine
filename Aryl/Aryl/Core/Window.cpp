@@ -33,7 +33,7 @@ namespace Aryl
 
 		YL_CORE_INFO("Created window {0} ({1}, {2})", myData.title, myData.width, myData.height);
 
-		myContext = RendererContext::Create(myWindow);
+		myContext.reset(RendererContext::Create(myWindow));
 		myContext->Init();
 
 		SetVSync(myProperties.vsync);
@@ -69,9 +69,9 @@ namespace Aryl
 		glfwWindowHint(GLFW_SAMPLES, 0);
 		glfwWindowHint(GLFW_AUTO_ICONIFY, false);
 
-		switch (RendererAPI::Current())
+		switch (RendererAPI::GetAPI())
 		{
-			case RendererAPIType::OpenGL:
+			case RendererAPI::API::OpenGL:
 			{
 				glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 				break;

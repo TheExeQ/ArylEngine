@@ -34,7 +34,7 @@ Editor::~Editor()
 void Editor::OnAttach()
 {
 	// ENTT REFLECTION TESTING
-	//if (false)
+	if (false)
 	{
 		auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
@@ -75,6 +75,52 @@ void Editor::OnAttach()
 		YL_CORE_TRACE(comp.floatValue);
 		YL_CORE_TRACE(comp.boolValue);
 	}
+
+	// RENDERING TESTING
+	//if (false)
+	{
+		glGenVertexArrays(1, &myVertexArray);
+		glBindVertexArray(myVertexArray);
+
+		float vertices[3 * 3] = {
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.0f,  0.5f, 0.0f
+		};
+
+		myVertexBuffer.reset(Aryl::VertexBuffer::Create(vertices, sizeof(vertices)));
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+
+		uint32_t indices[3] = { 0, 1, 2 };
+		myIndexBuffer.reset(Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+
+		std::string vertexSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) in vec3 a_Position;
+			out vec3 v_Position;
+			void main()
+			{
+				v_Position = a_Position;
+				gl_Position = vec4(a_Position, 1.0);	
+			}
+		)";
+
+		std::string fragmentSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) out vec4 color;
+			in vec3 v_Position;
+			void main()
+			{
+				color = vec4(v_Position * 0.5 + 0.5, 1.0);
+			}
+		)";
+
+		myShader.reset(Aryl::Shader::Create(vertexSrc, fragmentSrc));
+	}
 }
 
 void Editor::OnDetach()
@@ -99,7 +145,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	ArylNetExample();
+	//ArylNetExample();
 
 	return false;
 }
@@ -116,38 +162,9 @@ void Editor::TempOpenGLPreFrame()
 
 void Editor::TempOpenGLTesting()
 {
-	static unsigned int vertexArray = 0, vertexBuffer = 0, indexBuffer = 0;
-
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-	float vertices[3 * 3] =
-	{
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
-	};
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-
-	glGenBuffers(1, &indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-	unsigned int indices[3] =
-	{
-		0, 1, 2
-	};
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glBindVertexArray(vertexArray);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+	myShader->Bind();
+	glBindVertexArray(myVertexArray);
+	glDrawElements(GL_TRIANGLES, myIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 char g_sendAddress[16] = "127.0.0.1";
