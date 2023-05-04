@@ -194,7 +194,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	//ArylNetExample();
+	ArylNetExample();
 
 	return false;
 }

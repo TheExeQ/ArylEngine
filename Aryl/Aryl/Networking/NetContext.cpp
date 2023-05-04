@@ -9,7 +9,7 @@ namespace Aryl
 		switch (NetAPI::Current())
 		{
 			case NetAPIType::None: return nullptr;
-			case NetAPIType::Asio: return Ref<AsioContext>();
+			case NetAPIType::Asio: return CreateRef<AsioContext>();
 			case NetAPIType::WinSock2: return nullptr;
 		}
 
