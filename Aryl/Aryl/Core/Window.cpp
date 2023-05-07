@@ -10,6 +10,8 @@
 
 #include "Aryl/Log/Log.h"
 
+#include "Aryl/Renderer/RenderCommand.h"
+
 #include <glfw/glfw3.h>
 
 namespace Aryl
@@ -225,7 +227,8 @@ namespace Aryl
 
 	void Window::BeginFrame()
 	{
-
+		Aryl::RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.20f, 1.00f });
+		Aryl::RenderCommand::Clear();
 	}
 
 	void Window::Present()

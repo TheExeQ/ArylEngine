@@ -11,6 +11,8 @@
 #include <Aryl/Renderer/Buffer.h>
 #include <Aryl/Renderer/VertexArray.h>
 
+#include <Aryl/Renderer/Renderer.h>
+
 #include <Aryl/Scene/Entity.h>
 
 class Editor : public Aryl::Layer

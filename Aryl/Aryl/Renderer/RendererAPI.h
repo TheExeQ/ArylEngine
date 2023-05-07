@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Aryl/Core/Base.h"
+
+#include "VertexArray.h"
+
 namespace Aryl 
 {
 	enum class PrimitiveType
@@ -17,17 +21,17 @@ namespace Aryl
 			Vulkan
 		};
 
-		virtual void Init() = 0;
-		virtual void Shutdown() = 0;
+		virtual void SetClearColor(glm::vec4 color) = 0;
+		virtual void Clear() = 0;
 
-		virtual void BeginFrame() = 0;
-		virtual void EndFrame() = 0;
+		virtual void DrawIndexed(Ref<VertexArray> vertexArray) = 0;
 
 		static API GetAPI() { return s_CurrentRendererAPI; }
 		static void SetAPI(API api) { s_CurrentRendererAPI = api; }
 
+		static Ref<RendererAPI> Create();
+
 	private:
 		inline static API s_CurrentRendererAPI = API::OpenGL;
 	};
-
 }

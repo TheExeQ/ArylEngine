@@ -12,9 +12,6 @@
 #include <Aryl/Input/KeyCodes.h>
 
 #include <ImGui.h>
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
-
 #include <entt/entt.hpp>
 
 #include <Aryl/Networking/Socket/UdpSocketBuilder.h>
@@ -174,7 +171,6 @@ void Editor::OnEvent(Aryl::Event& e)
 
 bool Editor::OnRender(Aryl::AppRenderEvent& e)
 {
-	TempOpenGLPreFrame();
 	TempOpenGLTesting();
 
 	return false;
@@ -188,25 +184,15 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 }
 
 //////////////////////
-////// RENDERER //////
+///// RENDERING //////
 //////////////////////
-
-void Editor::TempOpenGLPreFrame()
-{
-	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
-	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-	glClear(GL_COLOR_BUFFER_BIT);
-}
 
 void Editor::TempOpenGLTesting()
 {
 	myShader->Bind();
 
-	mySquareVertexArray->Bind();
-	glDrawElements(GL_TRIANGLES, mySquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
-	myVertexArray->Bind();
-	glDrawElements(GL_TRIANGLES, myVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	Aryl::Renderer::Submit(mySquareVertexArray);
+	Aryl::Renderer::Submit(myVertexArray);
 }
 
 char g_sendAddress[16] = "127.0.0.1";

@@ -1,13 +1,18 @@
 #pragma once
 
-#include "RendererAPI.h"
+#include "RenderCommand.h"
 
 namespace Aryl 
 {
 	class Renderer
 	{
 	public:
-		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
+		static void BeginScene();
+		static void EndScene();
+
+		static void Submit(Ref<VertexArray> vertexArray);
+
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	};
 }
