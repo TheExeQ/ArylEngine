@@ -9,6 +9,7 @@
 #include <Aryl/Renderer/Renderer.h>
 #include <Aryl/Renderer/Shader.h>
 #include <Aryl/Renderer/Buffer.h>
+#include <Aryl/Renderer/VertexArray.h>
 
 #include <Aryl/Scene/Entity.h>
 
@@ -44,10 +45,10 @@ private:
 	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
 	std::vector<std::string> myChatMessages;
 
-	unsigned int myVertexArray;
 	Ref<Aryl::Shader> myShader;
-	Ref<Aryl::VertexBuffer> myVertexBuffer;
-	Ref<Aryl::IndexBuffer> myIndexBuffer;
+	Ref<Aryl::VertexArray> myVertexArray;
+
+	Ref<Aryl::VertexArray> mySquareVertexArray;
 
 	inline static Editor* myInstance = nullptr;
 };

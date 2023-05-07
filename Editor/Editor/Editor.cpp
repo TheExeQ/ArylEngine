@@ -30,27 +30,6 @@ Editor::~Editor()
 	myInstance = nullptr;
 }
 
-static GLenum ShaderDataTypeToOpenGLBaseType(Aryl::ShaderDataType type)
-{
-	switch (type)
-	{
-		case Aryl::ShaderDataType::Float:    return GL_FLOAT;
-		case Aryl::ShaderDataType::Float2:   return GL_FLOAT;
-		case Aryl::ShaderDataType::Float3:   return GL_FLOAT;
-		case Aryl::ShaderDataType::Float4:   return GL_FLOAT;
-		case Aryl::ShaderDataType::Mat3:     return GL_FLOAT;
-		case Aryl::ShaderDataType::Mat4:     return GL_FLOAT;
-		case Aryl::ShaderDataType::Int:      return GL_INT;
-		case Aryl::ShaderDataType::Int2:     return GL_INT;
-		case Aryl::ShaderDataType::Int3:     return GL_INT;
-		case Aryl::ShaderDataType::Int4:     return GL_INT;
-		case Aryl::ShaderDataType::Bool:     return GL_BOOL;
-	}
-
-	YL_CORE_ASSERT(false, "Unknown ShaderDataType!");
-	return 0;
-}
-
 void Editor::OnAttach()
 {
 	// ENTT REFLECTION TESTING
@@ -99,42 +78,51 @@ void Editor::OnAttach()
 	// RENDERING TESTING
 	//if (false)
 	{
-		glGenVertexArrays(1, &myVertexArray);
-		glBindVertexArray(myVertexArray);
+		myVertexArray = Aryl::VertexArray::Create();
 
 		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 			 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
 		};
 
-		myVertexBuffer = Aryl::VertexBuffer::Create(vertices, sizeof(vertices));
+		auto vertexBuffer = Aryl::VertexBuffer::Create(vertices, sizeof(vertices));
 
-		{
-			Aryl::BufferLayout layout = {
-				{ Aryl::ShaderDataType::Float3, "a_Position" },
-				{ Aryl::ShaderDataType::Float4, "a_Color" }
-			};
+		Aryl::BufferLayout layout = {
+			{ Aryl::ShaderDataType::Float3, "a_Position" },
+			{ Aryl::ShaderDataType::Float4, "a_Color" }
+		};
 
-			myVertexBuffer->SetLayout(layout);
-		}
+		vertexBuffer->SetLayout(layout);
 
-		uint32_t index = 0;
-		const auto& layout = myVertexBuffer->GetLayout();
-		for (const auto& element : layout)
-		{
-			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
-				element.GetComponentCount(),
-				ShaderDataTypeToOpenGLBaseType(element.Type),
-				element.Normalized ? GL_TRUE : GL_FALSE,
-				layout.GetStride(),
-				(const void*)element.Offset);
-			index++;
-		}
+		myVertexArray->AddVertexBuffer(vertexBuffer);
 
 		uint32_t indices[3] = { 0, 1, 2 };
-		myIndexBuffer = Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+		auto indexBuffer = Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+
+		myVertexArray->SetIndexBuffer(indexBuffer);
+
+		// Square
+		{
+			mySquareVertexArray = Aryl::VertexArray::Create();
+
+			float sqaureVertices[4 * 7] = {
+				-0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				0.75f,  0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				-0.75f,  0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			};
+
+			auto squareVB = Aryl::VertexBuffer::Create(sqaureVertices, sizeof(sqaureVertices));
+
+			squareVB->SetLayout(layout);
+			mySquareVertexArray->AddVertexBuffer(squareVB);
+
+			uint32_t sqaureIndices[6] = { 0, 1, 2, 2, 3, 0 };
+			auto squareIB = Aryl::IndexBuffer::Create(sqaureIndices, sizeof(sqaureIndices) / sizeof(uint32_t));
+
+			mySquareVertexArray->SetIndexBuffer(squareIB);
+		}
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -194,7 +182,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 {
-	ArylNetExample();
+	//ArylNetExample();
 
 	return false;
 }
@@ -206,9 +194,6 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 void Editor::TempOpenGLPreFrame()
 {
 	static ImVec4 clear_color = ImVec4(0.2f, 0.2f, 0.20f, 1.00f);
-	int display_w, display_h;
-	glfwGetFramebufferSize(Aryl::Application::Get().GetWindow().GetNativeWindow(), &display_w, &display_h);
-	glViewport(0, 0, display_w, display_h);
 	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -216,8 +201,12 @@ void Editor::TempOpenGLPreFrame()
 void Editor::TempOpenGLTesting()
 {
 	myShader->Bind();
-	glBindVertexArray(myVertexArray);
-	glDrawElements(GL_TRIANGLES, myIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+	mySquareVertexArray->Bind();
+	glDrawElements(GL_TRIANGLES, mySquareVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+
+	myVertexArray->Bind();
+	glDrawElements(GL_TRIANGLES, myVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 char g_sendAddress[16] = "127.0.0.1";

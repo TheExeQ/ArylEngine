@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Shader.h"
 #include "RendererAPI.h"
 
 namespace Aryl 
