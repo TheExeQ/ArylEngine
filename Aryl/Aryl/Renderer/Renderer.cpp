@@ -2,9 +2,10 @@
 
 namespace Aryl
 {
-	void Renderer::BeginScene()
-	{
 
+	void Renderer::BeginScene(const Ref<Camera>& camera)
+	{
+		s_SceneData->ViewProjectionMatrix = camera->GetViewProjectionMatrix();
 	}
 
 	void Renderer::EndScene()
@@ -12,9 +13,13 @@ namespace Aryl
 
 	}
 
-	void Renderer::Submit(Ref<VertexArray> vertexArray)
+	void Renderer::Submit(Ref<Shader> shader, Ref<VertexArray> vertexArray)
 	{
+		shader->Bind();
+		shader->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+
 		vertexArray->Bind();
+
 		RenderCommand::DrawIndexed(vertexArray);
 	}
 }

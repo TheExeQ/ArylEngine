@@ -1,7 +1,8 @@
 #include "Shader.h"
 
 #include "Aryl/Renderer/Renderer.h"
-#include "Aryl/Platform/Rendering/OpenGL/OpenGLShader.h"
+
+#include "Platform/Rendering/OpenGL/OpenGLShader.h"
 
 namespace Aryl 
 {

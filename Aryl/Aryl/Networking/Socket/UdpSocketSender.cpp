@@ -3,7 +3,7 @@
 
 #include "Aryl/Networking/NetAPI.h"
 
-#include "Aryl/Platform/Networking/Asio/Socket/AsioUdpSocketSender.h"
+#include "Platform/Networking/Asio/Socket/AsioUdpSocketSender.h"
 
 namespace Aryl
 {

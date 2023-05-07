@@ -10,6 +10,7 @@
 #include <Aryl/Renderer/Shader.h>
 #include <Aryl/Renderer/Buffer.h>
 #include <Aryl/Renderer/VertexArray.h>
+#include <Aryl/Renderer/Camera/Camera.h>
 
 #include <Aryl/Renderer/Renderer.h>
 
@@ -28,7 +29,6 @@ public:
 	bool OnRender(Aryl::AppRenderEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
-	void TempOpenGLPreFrame();
 	void TempOpenGLTesting();
 
 	void ArylNetExample();
@@ -47,9 +47,9 @@ private:
 	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
 	std::vector<std::string> myChatMessages;
 
+	Ref<Aryl::Camera> myOrthoCamera;
 	Ref<Aryl::Shader> myShader;
 	Ref<Aryl::VertexArray> myVertexArray;
-
 	Ref<Aryl::VertexArray> mySquareVertexArray;
 
 	inline static Editor* myInstance = nullptr;

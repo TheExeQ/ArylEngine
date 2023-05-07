@@ -11,10 +11,10 @@
 #include <Aryl/Events/KeyEvent.h>
 #include <Aryl/Input/KeyCodes.h>
 
+#include <Aryl/Networking/Socket/UdpSocketBuilder.h>
+
 #include <ImGui.h>
 #include <entt/entt.hpp>
-
-#include <Aryl/Networking/Socket/UdpSocketBuilder.h>
 
 Editor::Editor()
 {
@@ -75,6 +75,8 @@ void Editor::OnAttach()
 	// RENDERING TESTING
 	//if (false)
 	{
+		myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f, 1.f, -1.0f, 1.0f);
+
 		myVertexArray = Aryl::VertexArray::Create();
 
 		float vertices[3 * 7] = {
@@ -127,6 +129,8 @@ void Editor::OnAttach()
 			layout(location = 0) in vec3 a_Position;
 			layout(location = 1) in vec4 a_Color;
 
+			uniform mat4 u_ViewProjection;
+
 			out vec3 v_Position;
 			out vec4 v_Color;
 
@@ -134,7 +138,7 @@ void Editor::OnAttach()
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);	
 			}
 		)";
 
@@ -189,10 +193,12 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 void Editor::TempOpenGLTesting()
 {
-	myShader->Bind();
+	Aryl::Renderer::BeginScene(myOrthoCamera);
 
-	Aryl::Renderer::Submit(mySquareVertexArray);
-	Aryl::Renderer::Submit(myVertexArray);
+	Aryl::Renderer::Submit(myShader, mySquareVertexArray);
+	Aryl::Renderer::Submit(myShader, myVertexArray);
+
+	Aryl::Renderer::EndScene();
 }
 
 char g_sendAddress[16] = "127.0.0.1";

@@ -4,8 +4,8 @@
 #include "Aryl/Networking/NetContext.h"
 #include "Aryl/Networking/Socket/UdpSocketBuilder.h"
 
-#include "Aryl/Platform/Networking/Asio/AsioContext.h"
-#include "Aryl/Platform/Networking/Asio/Socket/AsioUdpSocket.h"
+#include "Platform/Networking/Asio/AsioContext.h"
+#include "Platform/Networking/Asio/Socket/AsioUdpSocket.h"
 
 namespace Aryl
 {

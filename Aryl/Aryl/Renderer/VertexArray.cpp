@@ -1,7 +1,8 @@
 #include "VertexArray.h"
 
 #include "Aryl/Renderer/Renderer.h"
-#include "Aryl/Platform/Rendering/OpenGL/OpenGLVertexArray.h"
+
+#include "Platform/Rendering/OpenGL/OpenGLVertexArray.h"
 
 namespace Aryl 
 {
