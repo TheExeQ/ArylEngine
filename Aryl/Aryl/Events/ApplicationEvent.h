@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event.h"
+#include "Aryl/Core/TimeStep.h"
 
 #include <sstream>
 #include <vector>
@@ -86,12 +87,12 @@ namespace Aryl
 	class AppUpdateEvent : public Event
 	{
 	public:
-		AppUpdateEvent(float timestep)
+		AppUpdateEvent(Timestep timestep)
 			: m_timestep(timestep)
 		{
 		}
 
-		inline const float& GetTimestep() { return m_timestep; }
+		inline const Timestep& GetTimestep() { return m_timestep; }
 
 		EVENT_CLASS_TYPE(AppUpdate);
 		EVENT_CLASS_CATEGORY(EventCategoryApplication);
@@ -107,32 +108,6 @@ namespace Aryl
 
 		EVENT_CLASS_TYPE(AppRender);
 		EVENT_CLASS_CATEGORY(EventCategoryApplication);
-	};
-
-	class AppLogEvent : public Event
-	{
-	public:
-		AppLogEvent(const std::string& message, const std::string& severity)
-			: m_message(message), m_severity(severity)
-		{
-		}
-
-		inline const std::string& GetMessage() { return m_message; }
-		inline const std::string& GetSeverity() { return m_severity; }
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "AppLogEvent: " << m_message << ", " << m_severity;
-			return ss.str();
-		}
-
-		EVENT_CLASS_TYPE(AppLog);
-		EVENT_CLASS_CATEGORY(EventCategoryApplication);
-
-	private:
-		std::string m_message;
-		std::string m_severity;
 	};
 
 	class AppImGuiUpdateEvent : public Event

@@ -51,12 +51,12 @@ namespace Aryl
 		while (myIsRunning)
 		{
 			float time = (float)glfwGetTime();
-			myCurrentDeltaTime = time - myLastTotalTime;
-			myLastTotalTime = time;
+			Timestep timestep = time - myLastFrameTime;
+			myLastFrameTime = time;
 
 			// Update
 			{
-				AppUpdateEvent updateEvent(myCurrentDeltaTime);
+				AppUpdateEvent updateEvent(timestep);
 				OnEvent(updateEvent);
 			}
 
