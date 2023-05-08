@@ -1,0 +1,10 @@
+{
+  "registries": [
+    {
+      "kind": "git",
+      "repository": "https://github.com/theexeq/vcpkg",
+      "baseline": "398fd00d1aee031e130194df8e02a690ef5f4a13",
+      "packages": [ "optick" ]
+    }
+  ]
+}

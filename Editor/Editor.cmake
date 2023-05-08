@@ -22,5 +22,9 @@ target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 target_include_directories(${TARGET_NAME} PRIVATE "${EDITOR_PATH}")
 
 # Add link dependencies
-target_link_libraries(${TARGET_NAME} PRIVATE "Aryl")
-target_link_libraries(${TARGET_NAME} PRIVATE "Game")
+target_link_libraries(
+    ${TARGET_NAME} 
+    PRIVATE 
+    "Aryl" 
+    "Game"
+)
