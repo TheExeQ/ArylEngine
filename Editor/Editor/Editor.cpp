@@ -16,6 +16,11 @@
 #include <ImGui.h>
 #include <entt/entt.hpp>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <stb/stb_image.h>
+
 Editor::Editor()
 {
 	YL_ASSERT(!myInstance, "Editor already exists!");
@@ -130,6 +135,7 @@ void Editor::OnAttach()
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ViewProjection;
+			uniform mat4 u_ModelTransform;
 
 			out vec3 v_Position;
 			out vec4 v_Color;
@@ -138,7 +144,7 @@ void Editor::OnAttach()
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);	
+				gl_Position = u_ViewProjection * u_ModelTransform * vec4(a_Position, 1.0);	
 			}
 		)";
 

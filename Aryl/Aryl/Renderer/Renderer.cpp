@@ -13,10 +13,11 @@ namespace Aryl
 
 	}
 
-	void Renderer::Submit(Ref<Shader> shader, Ref<VertexArray> vertexArray)
+	void Renderer::Submit(Ref<Shader> shader, Ref<VertexArray> vertexArray, const glm::mat4& transform)
 	{
 		shader->Bind();
 		shader->UploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
+		shader->UploadUniformMat4("u_ModelTransform", transform);
 
 		vertexArray->Bind();
 
