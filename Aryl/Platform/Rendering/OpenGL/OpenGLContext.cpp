@@ -14,8 +14,12 @@ namespace Aryl
 	void OpenGLContext::Init()
 	{
 		glfwMakeContextCurrent(myWindowHandle);
+		glfwWindowHint(GLFW_DEPTH_BITS, 24);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		YL_CORE_ASSERT(status, "Failed to initialize Glad!");
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
 
 		YL_CORE_INFO("OpenGL Info:");
 		YL_CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));

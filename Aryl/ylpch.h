@@ -18,3 +18,5 @@
 
 #include <glm/glm.hpp>
 #include <Aryl/Log/Log.h>
+#include <Aryl/Core/Base.h>
+#include <Aryl/Core/Profiler.h>

@@ -7,12 +7,14 @@ set(TARGET_NAME "Aryl")
 
 # Add sources
 set(ARYL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}")
+set(ARYL_THIRDPARTY_PATH "${ARYL_PATH}/ThirdParty")
 
 # Add library
 add_library(${TARGET_NAME})
 set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Core)
 
 AddSources(${TARGET_NAME} ${ARYL_PATH})
+
 target_compile_definitions(${TARGET_NAME} 
 PUBLIC 
 GLFW_INCLUDE_NONE
@@ -28,6 +30,7 @@ target_precompile_headers(${TARGET_NAME} PRIVATE ${PCH_HEADER})
 
 # Include directories
 target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_PATH}")
+target_include_directories(${TARGET_NAME} PUBLIC "${ARYL_THIRDPARTY_PATH}/stb/include")
 
 # Add link dependencies
 find_package(imgui CONFIG REQUIRED)
@@ -37,6 +40,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
+find_package(Optick CONFIG REQUIRED)
 target_link_libraries(
     ${TARGET_NAME}
     PUBLIC
@@ -47,4 +51,5 @@ target_link_libraries(
     EnTT::EnTT
     spdlog::spdlog spdlog::spdlog_header_only
     asio::asio
+	Optick::OptickCore
 )

@@ -7,7 +7,8 @@ namespace Aryl
 	class Camera
 	{
 	public:
-		Camera(float left, float right, float bottom, float top);
+		Camera(float degFov, float aspectRatio, float nearZ, float farZ);
+		Camera(float left, float right, float bottom, float top, float nearZ, float farZ);
 
 		const glm::vec3& GetPosition() const { return myPosition; }
 		void SetPosition(const glm::vec3& position) { myPosition = position; RecalculateViewMatrix(); }

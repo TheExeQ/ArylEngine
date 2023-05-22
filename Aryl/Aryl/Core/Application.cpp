@@ -48,15 +48,20 @@ namespace Aryl
 
 	void Application::Run()
 	{
+		YL_PROFILE_THREAD("Main");
 		while (myIsRunning)
 		{
+			YL_PROFILE_FRAME("Frame");
+
 			float time = (float)glfwGetTime();
-			myCurrentDeltaTime = time - myLastTotalTime;
-			myLastTotalTime = time;
+			Timestep timestep = time - myLastFrameTime;
+			myLastFrameTime = time;
 
 			// Update
 			{
-				AppUpdateEvent updateEvent(myCurrentDeltaTime);
+				YL_PROFILE_SCOPE("Application::Update");
+
+				AppUpdateEvent updateEvent(timestep);
 				OnEvent(updateEvent);
 			}
 
@@ -67,12 +72,14 @@ namespace Aryl
 
 				// Render
 				{
+					YL_PROFILE_SCOPE("Application::Render");
 					AppRenderEvent renderEvent;
 					OnEvent(renderEvent);
 				}
 
 				if (myInfo.enableImGui)
 				{
+					YL_PROFILE_SCOPE("Application::ImGui");
 					myImGuiImplementation->Begin();
 
 					AppImGuiUpdateEvent imguiEvent{};

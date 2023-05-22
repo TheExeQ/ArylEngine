@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Aryl/Core/Base.h"
-
 #include "Aryl/Core/Window.h"
+#include "Aryl/Core/TimeStep.h"
 #include "Aryl/Core/Layer/Layer.h"
 #include "Aryl/Core/Layer/LayerStack.h"
 
-#include "Aryl/Events/ApplicationEvent.h"
 #include "Aryl/Log/Log.h"
+
+#include "Aryl/Events/ApplicationEvent.h"
 
 #include "Aryl/ImGui/ImGuiImplementation.h"
 
@@ -65,8 +66,7 @@ namespace Aryl
 		bool myIsRunning = false;
 		bool myIsMinimized = false;
 
-		float myCurrentDeltaTime = 0.f;
-		float myLastTotalTime = 0.f;
+		Timestep myLastFrameTime = 0.f;
 
 		LayerStack myLayerStack;
 

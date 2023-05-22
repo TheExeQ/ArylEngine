@@ -1,59 +1,62 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "arylengine",
   "version-semver": "1.0.0",
-  "builtin-baseline": "f14984af3738e69f197bf0e647a8dca12de92996",
+  "builtin-baseline": "398fd00d1aee031e130194df8e02a690ef5f4a13",
   "dependencies": [
     {
-        "name": "imgui",
-        "features": 
-        [
-            "docking-experimental",
-            "glfw-binding",
-            "opengl3-binding"
-        ]
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "glfw-binding",
+        "opengl3-binding"
+      ]
     },
     {
-        "name": "glad",
-        "features": 
-        [
-            "gl-api-46"
-        ]
+      "name": "glad",
+      "features": [
+        "gl-api-46"
+      ]
     },
     "glfw3",
     "glm",
     "entt",
     "spdlog",
-    "asio"
+    "asio",
+    "optick"
   ],
   "overrides": [
     {
-        "name": "imgui",
-        "version": "1.89.2"
+      "name": "imgui",
+      "version": "1.89.2"
     },
     {
-        "name": "glad",
-        "version": "0.1.36"
+      "name": "glad",
+      "version": "0.1.36"
     },
     {
-        "name": "glfw3",
-        "version": "3.3.8"
+      "name": "glfw3",
+      "version": "3.3.8"
     },
     {
-        "name": "glm",
-        "version": "0.9.9.8"
+      "name": "glm",
+      "version": "0.9.9.8"
     },
     {
-        "name": "entt",
-        "version": "3.11.1"
+      "name": "entt",
+      "version": "3.11.1"
     },
     {
-        "name": "spdlog",
-        "version": "1.11.0"
+      "name": "spdlog",
+      "version": "1.11.0"
     },
     {
-        "name": "asio",
-        "version": "1.24.0"
+      "name": "asio",
+      "version": "1.24.0"
+    },
+    {
+      "name": "optick",
+      "version": "1.4.0.0"
     }
   ]
 }

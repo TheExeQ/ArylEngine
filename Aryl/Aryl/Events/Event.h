@@ -12,7 +12,7 @@ namespace Aryl
 	{
 		None = 0,
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved, WindowDragDrop, ViewportResize,
-		AppUpdate, AppRender, AppLog, AppImGuiUpdate,
+		AppUpdate, AppRender, AppImGuiUpdate,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled,
 		OnScenePlay, OnSceneStop, OnSceneLoaded
