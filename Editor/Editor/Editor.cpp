@@ -80,7 +80,11 @@ void Editor::OnAttach()
 	// RENDERING TESTING
 	//if (false)
 	{
-		myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f, 1.f, -1.0f, 1.0f);
+		auto aspectRatio = 16.f / 9.f;
+
+		myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f * aspectRatio, 1.f * aspectRatio, -1.0f, 1.0f, 0.1f, 100.f);
+		myPerspCamera = CreateRef<Aryl::Camera>(90.f, aspectRatio, 0.1f, 100.0f);
+		myPerspCamera->SetPosition({ 0.f, 0.f, 1.f });
 
 		myVertexArray = Aryl::VertexArray::Create();
 
@@ -175,6 +179,7 @@ void Editor::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
 
+	dispatcher.Dispatch<Aryl::AppUpdateEvent>(YL_BIND_EVENT_FN(Editor::OnUpdate));
 	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(Editor::OnRender));
 	dispatcher.Dispatch<Aryl::AppImGuiUpdateEvent>(YL_BIND_EVENT_FN(Editor::OnImGuiUpdate));
 }
@@ -183,6 +188,11 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 {
 	TempOpenGLTesting();
 
+	return false;
+}
+
+bool Editor::OnUpdate(Aryl::AppUpdateEvent& e)
+{
 	return false;
 }
 

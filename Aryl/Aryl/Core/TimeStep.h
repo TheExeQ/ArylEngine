@@ -12,6 +12,7 @@ namespace Aryl
 		inline float GetMilliseconds() const { return myTime * 1000.0f; }
 
 		operator float() { return myTime; }
+		operator const float() const { return myTime; }
 
 	private:
 		float myTime = 0.0f;

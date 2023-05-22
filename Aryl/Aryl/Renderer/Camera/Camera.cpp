@@ -4,8 +4,14 @@
 
 namespace Aryl
 {
-	Camera::Camera(float left, float right, float bottom, float top)
-		: myProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f))
+	Camera::Camera(float degFov, float aspectRatio, float nearZ, float farZ)
+		: myProjectionMatrix(glm::perspective(glm::radians(degFov), aspectRatio, nearZ, farZ))
+	{
+		myViewProjectionMatrix = myProjectionMatrix * myViewMatrix;
+	}
+
+	Camera::Camera(float left, float right, float bottom, float top, float nearZ, float farZ)
+		: myProjectionMatrix(glm::ortho(left, right, bottom, top, nearZ, farZ))
 	{
 		myViewProjectionMatrix = myProjectionMatrix * myViewMatrix;
 	}

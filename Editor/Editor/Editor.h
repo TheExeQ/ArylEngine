@@ -27,6 +27,7 @@ public:
 
 	void OnEvent(Aryl::Event& e) override;
 	bool OnRender(Aryl::AppRenderEvent& e);
+	bool OnUpdate(Aryl::AppUpdateEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
 	void TempOpenGLTesting();
@@ -48,6 +49,7 @@ private:
 	std::vector<std::string> myChatMessages;
 
 	Ref<Aryl::Camera> myOrthoCamera;
+	Ref<Aryl::Camera> myPerspCamera;
 	Ref<Aryl::Shader> myShader;
 	Ref<Aryl::VertexArray> myVertexArray;
 	Ref<Aryl::VertexArray> mySquareVertexArray;
