@@ -48,10 +48,12 @@ private:
 	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
 	std::vector<std::string> myChatMessages;
 
+	glm::mat4 myCubeTransform;
+	glm::mat4 myPyramidTransform;
 	Ref<Aryl::Camera> myOrthoCamera;
 	Ref<Aryl::Camera> myPerspCamera;
 	Ref<Aryl::Shader> myShader;
-	Ref<Aryl::VertexArray> myVertexArray;
+	Ref<Aryl::VertexArray> myPyramidVertexArray;
 	Ref<Aryl::VertexArray> mySquareVertexArray;
 
 	inline static Editor* myInstance = nullptr;

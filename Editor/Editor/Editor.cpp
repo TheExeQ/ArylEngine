@@ -82,19 +82,29 @@ void Editor::OnAttach()
 	{
 		auto aspectRatio = 16.f / 9.f;
 
-		myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f * aspectRatio, 1.f * aspectRatio, -1.0f, 1.0f, 0.1f, 100.f);
-		myPerspCamera = CreateRef<Aryl::Camera>(90.f, aspectRatio, 0.1f, 100.0f);
-		myPerspCamera->SetPosition({ 0.f, 0.f, 1.f });
+		myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f * aspectRatio, 1.f * aspectRatio, -1.0f, 1.0f, 0.1f, 10000.f);
+		myOrthoCamera->SetPosition({ 0.f, 0.f, 200.f });
 
-		myVertexArray = Aryl::VertexArray::Create();
+		myPerspCamera = CreateRef<Aryl::Camera>(90.f, aspectRatio, 0.1f, 10000.0f);
+		myPerspCamera->SetPosition({ 0.f, 0.f, 200.f });
 
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+		myCubeTransform = glm::translate(glm::mat4(1.f), { 100.f, 0.f, 0.f });
+		myPyramidTransform = glm::translate(glm::mat4(1.f), { -100.f, 0.f, 0.f });
+
+		myPyramidVertexArray = Aryl::VertexArray::Create();
+
+		float pyramidVertices[5 * 7] = {
+			// Base
+			-50.f, -50.f, 50.f, 1.0f, 0.0f, 0.0f, 1.0f,
+			50.f, -50.f, 50.f, 0.0f, 1.0f, 0.0f, 1.0f,
+			50.f, -50.f, -50.f, 0.0f, 0.0f, 1.0f, 1.0f,
+			-50.f, -50.f, -50.f, 1.0f, 1.0f, 1.0f, 1.0f,
+
+			// Apex
+			0.0f, 50.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
 		};
 
-		auto vertexBuffer = Aryl::VertexBuffer::Create(vertices, sizeof(vertices));
+		auto vertexBuffer = Aryl::VertexBuffer::Create(pyramidVertices, sizeof(pyramidVertices));
 
 		Aryl::BufferLayout layout = {
 			{ Aryl::ShaderDataType::Float3, "a_Position" },
@@ -103,31 +113,80 @@ void Editor::OnAttach()
 
 		vertexBuffer->SetLayout(layout);
 
-		myVertexArray->AddVertexBuffer(vertexBuffer);
+		myPyramidVertexArray->AddVertexBuffer(vertexBuffer);
 
-		uint32_t indices[3] = { 0, 1, 2 };
-		auto indexBuffer = Aryl::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+		uint32_t pyramidIndices[18] = {
+			// Base
+			0, 1, 2,
+			2, 3, 0,
 
-		myVertexArray->SetIndexBuffer(indexBuffer);
+			// Front face
+			4, 0, 1,
+
+			// Left face
+			4, 1, 2,
+
+			// Right face
+			4, 2, 3,
+
+			// Back face
+			4, 3, 0
+		};
+
+		auto indexBuffer = Aryl::IndexBuffer::Create(pyramidIndices, sizeof(pyramidIndices) / sizeof(uint32_t));
+
+		myPyramidVertexArray->SetIndexBuffer(indexBuffer);
 
 		// Square
 		{
 			mySquareVertexArray = Aryl::VertexArray::Create();
 
-			float sqaureVertices[4 * 7] = {
-				-0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-				0.75f, -0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-				0.75f,  0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-				-0.75f,  0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+			float squareVertices[8 * 7] = {
+				// Front face
+				-50.f, -50.f, 50.f, 1.0f, 0.0f, 0.0f, 1.0f,
+				50.f, -50.f, 50.f, 0.0f, 1.0f, 0.0f, 1.0f,
+				50.f, 50.f, 50.f, 0.0f, 0.0f, 1.0f, 1.0f,
+				-50.f, 50.f, 50.f, 1.0f, 1.0f, 1.0f, 1.0f,
+
+				// Back face
+				-50.f, -50.f, -50.f, 1.0f, 0.0f, 1.0f, 1.0f,
+				50.f, -50.f, -50.f, 0.0f, 1.0f, 1.0f, 1.0f,
+				50.f, 50.f, -50.f, 1.0f, 1.0f, 0.0f, 1.0f,
+				-50.f, 50.f, -50.f, 0.0f, 0.0f, 0.0f, 1.0f,
 			};
 
-			auto squareVB = Aryl::VertexBuffer::Create(sqaureVertices, sizeof(sqaureVertices));
+			auto squareVB = Aryl::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 			squareVB->SetLayout(layout);
 			mySquareVertexArray->AddVertexBuffer(squareVB);
 
-			uint32_t sqaureIndices[6] = { 0, 1, 2, 2, 3, 0 };
-			auto squareIB = Aryl::IndexBuffer::Create(sqaureIndices, sizeof(sqaureIndices) / sizeof(uint32_t));
+			uint32_t squareIndices[36] = {
+				// Front face
+				0, 1, 2,
+				2, 3, 0,
+
+				// Back face
+				4, 5, 6,
+				6, 7, 4,
+
+				// Left face
+				7, 3, 0,
+				0, 4, 7,
+
+				// Right face
+				1, 5, 6,
+				6, 2, 1,
+
+				// Top face
+				3, 2, 6,
+				6, 7, 3,
+
+				// Bottom face
+				0, 1, 5,
+				5, 4, 0
+			};
+
+			auto squareIB = Aryl::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 
 			mySquareVertexArray->SetIndexBuffer(squareIB);
 		}
@@ -193,6 +252,12 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnUpdate(Aryl::AppUpdateEvent& e)
 {
+	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
+	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+
+	myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
+	myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+
 	return false;
 }
 
@@ -209,10 +274,10 @@ bool Editor::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 void Editor::TempOpenGLTesting()
 {
-	Aryl::Renderer::BeginScene(myOrthoCamera);
+	Aryl::Renderer::BeginScene(myPerspCamera);
 
-	Aryl::Renderer::Submit(myShader, mySquareVertexArray);
-	Aryl::Renderer::Submit(myShader, myVertexArray);
+	Aryl::Renderer::Submit(myShader, mySquareVertexArray, myCubeTransform);
+	Aryl::Renderer::Submit(myShader, myPyramidVertexArray, myPyramidTransform);
 
 	Aryl::Renderer::EndScene();
 }
