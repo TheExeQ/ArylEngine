@@ -9,6 +9,7 @@
 #include <Aryl/Renderer/Renderer.h>
 #include <Aryl/Renderer/Shader.h>
 #include <Aryl/Renderer/Buffer.h>
+#include <Aryl/Renderer/Texture.h>
 #include <Aryl/Renderer/VertexArray.h>
 #include <Aryl/Renderer/Camera/Camera.h>
 
@@ -52,6 +53,7 @@ private:
 	glm::mat4 myPyramidTransform;
 	Ref<Aryl::Camera> myOrthoCamera;
 	Ref<Aryl::Camera> myPerspCamera;
+	Ref<Aryl::Texture2D> myTexture;
 	Ref<Aryl::Shader> myShader;
 	Ref<Aryl::VertexArray> myPyramidVertexArray;
 	Ref<Aryl::VertexArray> mySquareVertexArray;

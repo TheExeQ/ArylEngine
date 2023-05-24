@@ -19,8 +19,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <stb/stb_image.h>
-
 Editor::Editor()
 {
 	YL_ASSERT(!myInstance, "Editor already exists!");
@@ -93,22 +91,22 @@ void Editor::OnAttach()
 
 		myPyramidVertexArray = Aryl::VertexArray::Create();
 
-		float pyramidVertices[5 * 7] = {
+		float pyramidVertices[5 * 5] = {
 			// Base
-			-50.f, -50.f, 50.f, 1.0f, 0.0f, 0.0f, 1.0f,
-			50.f, -50.f, 50.f, 0.0f, 1.0f, 0.0f, 1.0f,
-			50.f, -50.f, -50.f, 0.0f, 0.0f, 1.0f, 1.0f,
-			-50.f, -50.f, -50.f, 1.0f, 1.0f, 1.0f, 1.0f,
+			-50.f, -50.f, 50.f, 0.0f, 0.0f, 
+			50.f, -50.f, 50.f, 1.0f, 0.0f, 
+			50.f, -50.f, -50.f, 1.0f, 1.0f, 
+			-50.f, -50.f, -50.f, 0.0f, 1.0f, 
 
 			// Apex
-			0.0f, 50.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+			0.0f, 50.f, 0.0f, 0.0f, 0.0f
 		};
 
 		auto vertexBuffer = Aryl::VertexBuffer::Create(pyramidVertices, sizeof(pyramidVertices));
 
 		Aryl::BufferLayout layout = {
 			{ Aryl::ShaderDataType::Float3, "a_Position" },
-			{ Aryl::ShaderDataType::Float4, "a_Color" }
+			{ Aryl::ShaderDataType::Float2, "a_TexCoords" }
 		};
 
 		vertexBuffer->SetLayout(layout);
@@ -141,18 +139,18 @@ void Editor::OnAttach()
 		{
 			mySquareVertexArray = Aryl::VertexArray::Create();
 
-			float squareVertices[8 * 7] = {
+			float squareVertices[8 * 5] = {
 				// Front face
-				-50.f, -50.f, 50.f, 1.0f, 0.0f, 0.0f, 1.0f,
-				50.f, -50.f, 50.f, 0.0f, 1.0f, 0.0f, 1.0f,
-				50.f, 50.f, 50.f, 0.0f, 0.0f, 1.0f, 1.0f,
-				-50.f, 50.f, 50.f, 1.0f, 1.0f, 1.0f, 1.0f,
+				-50.f, -50.f, 50.f, 0.0f, 0.0f,
+				50.f, -50.f, 50.f, 1.0f, 0.0f,
+				50.f, 50.f, 50.f, 1.0f, 1.0f,
+				-50.f, 50.f, 50.f, 0.0f, 1.0f,
 
 				// Back face
-				-50.f, -50.f, -50.f, 1.0f, 0.0f, 1.0f, 1.0f,
-				50.f, -50.f, -50.f, 0.0f, 1.0f, 1.0f, 1.0f,
-				50.f, 50.f, -50.f, 1.0f, 1.0f, 0.0f, 1.0f,
-				-50.f, 50.f, -50.f, 0.0f, 0.0f, 0.0f, 1.0f,
+				-50.f, -50.f, -50.f, 0.0f, 0.0f,
+				50.f, -50.f, -50.f, 1.0f, 0.0f,
+				50.f, 50.f, -50.f, 1.0f, 1.0f,
+				-50.f, 50.f, -50.f, 0.0f, 1.0f
 			};
 
 			auto squareVB = Aryl::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
@@ -195,18 +193,16 @@ void Editor::OnAttach()
 			#version 330 core
 			
 			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec4 a_Color;
+			layout(location = 1) in vec2 a_TexCoords;
 
 			uniform mat4 u_ViewProjection;
 			uniform mat4 u_ModelTransform;
 
-			out vec3 v_Position;
-			out vec4 v_Color;
+			out vec2 v_TexCoords;
 
 			void main()
 			{
-				v_Position = a_Position;
-				v_Color = a_Color;
+				v_TexCoords = a_TexCoords;
 				gl_Position = u_ViewProjection * u_ModelTransform * vec4(a_Position, 1.0);	
 			}
 		)";
@@ -216,17 +212,21 @@ void Editor::OnAttach()
 			
 			layout(location = 0) out vec4 color;
 
-			in vec3 v_Position;
-			in vec4 v_Color;
+			in vec2 v_TexCoords;
+
+			uniform sampler2D u_Texture;
 
 			void main()
 			{
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
-				color = v_Color;
+				color = texture(u_Texture, v_TexCoords);
 			}
 		)";
 
 		myShader = Aryl::Shader::Create(vertexSrc, fragmentSrc);
+
+		//myTexture = Aryl::Texture2D::Create("test.png");
+		//myShader->Bind();
+		//myShader->UploadUniformInt("u_Texture", 0);
 	}
 }
 
@@ -252,11 +252,11 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnUpdate(Aryl::AppUpdateEvent& e)
 {
-	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
-	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
+	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
-	myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
-	myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+	//myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
+	//myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
 	return false;
 }
