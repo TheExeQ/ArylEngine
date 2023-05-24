@@ -227,7 +227,7 @@ namespace Aryl
 
 	void Window::BeginFrame()
 	{
-		Aryl::RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.20f, 1.00f });
+		Aryl::RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.2f, 1.0f });
 		Aryl::RenderCommand::Clear();
 	}
 

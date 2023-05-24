@@ -38,7 +38,7 @@ namespace Aryl
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Temporarily disabled.
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Temporarily disabled.
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 		ImFontConfig fontCfg;
@@ -163,7 +163,7 @@ namespace Aryl
 		Application& app = Application::Get();
 		myWindowPtr = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 
-		const char* glsl_version = "#version 130";
+		const char* glsl_version = "#version 330";
 
 		// #SAMUEL_TODO: Fix for support for different apis
 		{
@@ -206,10 +206,10 @@ namespace Aryl
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-
-			Application& app = Application::Get();
+			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
 
