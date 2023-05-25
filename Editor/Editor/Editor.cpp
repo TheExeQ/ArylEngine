@@ -86,54 +86,12 @@ void Editor::OnAttach()
 		myPerspCamera = CreateRef<Aryl::Camera>(90.f, aspectRatio, 0.1f, 10000.0f);
 		myPerspCamera->SetPosition({ 0.f, 0.f, 200.f });
 
-		myCubeTransform = glm::translate(glm::mat4(1.f), { 100.f, 0.f, 0.f });
-		myPyramidTransform = glm::translate(glm::mat4(1.f), { -100.f, 0.f, 0.f });
-
-		myPyramidVertexArray = Aryl::VertexArray::Create();
-
-		float pyramidVertices[5 * 5] = {
-			// Base
-			-50.f, -50.f, 50.f, 0.0f, 0.0f, 
-			50.f, -50.f, 50.f, 1.0f, 0.0f, 
-			50.f, -50.f, -50.f, 1.0f, 1.0f, 
-			-50.f, -50.f, -50.f, 0.0f, 1.0f, 
-
-			// Apex
-			0.0f, 50.f, 0.0f, 0.0f, 0.0f
-		};
-
-		auto vertexBuffer = Aryl::VertexBuffer::Create(pyramidVertices, sizeof(pyramidVertices));
+		myCubeTransform = glm::mat4(1.f);
 
 		Aryl::BufferLayout layout = {
 			{ Aryl::ShaderDataType::Float3, "a_Position" },
 			{ Aryl::ShaderDataType::Float2, "a_TexCoords" }
 		};
-
-		vertexBuffer->SetLayout(layout);
-
-		myPyramidVertexArray->AddVertexBuffer(vertexBuffer);
-
-		uint32_t pyramidIndices[18] = {
-			// Base
-			0, 1, 2,
-			2, 3, 0,
-
-			// Front face
-			4, 0, 1,
-
-			// Left face
-			4, 1, 2,
-
-			// Right face
-			4, 2, 3,
-
-			// Back face
-			4, 3, 0
-		};
-
-		auto indexBuffer = Aryl::IndexBuffer::Create(pyramidIndices, sizeof(pyramidIndices) / sizeof(uint32_t));
-
-		myPyramidVertexArray->SetIndexBuffer(indexBuffer);
 
 		// Square
 		{
@@ -224,9 +182,11 @@ void Editor::OnAttach()
 
 		myShader = Aryl::Shader::Create(vertexSrc, fragmentSrc);
 
-		//myTexture = Aryl::Texture2D::Create("test.png");
-		//myShader->Bind();
-		//myShader->UploadUniformInt("u_Texture", 0);
+		myTexture = Aryl::Texture2D::Create("test.png");
+		myTexture->Bind();
+
+		myShader->Bind();
+		myShader->UploadUniformInt("u_Texture", 0);
 	}
 }
 
@@ -252,11 +212,7 @@ bool Editor::OnRender(Aryl::AppRenderEvent& e)
 
 bool Editor::OnUpdate(Aryl::AppUpdateEvent& e)
 {
-	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
-	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
-
-	//myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(15.f) * e.GetTimestep(), { 1.f, 0.f, 0.f });
-	//myPyramidTransform = glm::rotate(myPyramidTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
 	return false;
 }
@@ -277,7 +233,6 @@ void Editor::TempOpenGLTesting()
 	Aryl::Renderer::BeginScene(myPerspCamera);
 
 	Aryl::Renderer::Submit(myShader, mySquareVertexArray, myCubeTransform);
-	Aryl::Renderer::Submit(myShader, myPyramidVertexArray, myPyramidTransform);
 
 	Aryl::Renderer::EndScene();
 }

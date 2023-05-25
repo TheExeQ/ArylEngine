@@ -19,7 +19,9 @@ namespace Aryl
 		YL_CORE_ASSERT(status, "Failed to initialize Glad!");
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
 		glDepthFunc(GL_LESS);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		YL_CORE_INFO("OpenGL Info:");
 		YL_CORE_INFO("  Vendor: {0}", (const char*)glGetString(GL_VENDOR));

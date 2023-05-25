@@ -50,12 +50,10 @@ private:
 	std::vector<std::string> myChatMessages;
 
 	glm::mat4 myCubeTransform;
-	glm::mat4 myPyramidTransform;
 	Ref<Aryl::Camera> myOrthoCamera;
 	Ref<Aryl::Camera> myPerspCamera;
 	Ref<Aryl::Texture2D> myTexture;
 	Ref<Aryl::Shader> myShader;
-	Ref<Aryl::VertexArray> myPyramidVertexArray;
 	Ref<Aryl::VertexArray> mySquareVertexArray;
 
 	inline static Editor* myInstance = nullptr;
