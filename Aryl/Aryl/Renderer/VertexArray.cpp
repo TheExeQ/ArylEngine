@@ -2,7 +2,7 @@
 
 #include "Aryl/Renderer/Renderer.h"
 
-#include "Platform/Rendering/OpenGL/OpenGLVertexArray.h"
+#include "Platform/Renderer/OpenGL/OpenGLVertexArray.h"
 
 namespace Aryl 
 {

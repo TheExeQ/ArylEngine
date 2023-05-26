@@ -1,7 +1,7 @@
 #include "RendererAPI.h"
 
 #include "Aryl/Renderer/Renderer.h"
-#include "Platform/Rendering/OpenGL/OpenGLRendererAPI.h"
+#include "Platform/Renderer/OpenGL/OpenGLRendererAPI.h"
 
 namespace Aryl 
 {

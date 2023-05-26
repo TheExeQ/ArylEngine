@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt/entt.hpp>
+
 #define UNPACK(...) __VA_ARGS__
 #define YL_COMPONENT(componentStruct, componentName) \
     UNPACK componentStruct; \

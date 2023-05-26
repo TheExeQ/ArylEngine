@@ -1,8 +1,8 @@
 #include "UdpSocketBuilder.h"
 
-#include "Aryl/Networking/NetAPI.h"
+#include "Aryl/Network/NetAPI.h"
 
-#include "Platform/Networking/Asio/Socket/AsioUdpSocketBuilder.h"
+#include "Platform/Network/Asio/Socket/AsioUdpSocketBuilder.h"
 
 namespace Aryl
 {

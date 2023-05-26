@@ -12,7 +12,7 @@
 
 #include "Aryl/ImGui/ImGuiImplementation.h"
 
-#include "Aryl/Networking/NetManager.h"
+#include "Aryl/Network/NetManager.h"
 
 #include <glfw/glfw3.h>
 

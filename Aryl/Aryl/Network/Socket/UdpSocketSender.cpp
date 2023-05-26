@@ -1,9 +1,9 @@
 #pragma once
 #include "UdpSocketSender.h"
 
-#include "Aryl/Networking/NetAPI.h"
+#include "Aryl/Network/NetAPI.h"
 
-#include "Platform/Networking/Asio/Socket/AsioUdpSocketSender.h"
+#include "Platform/Network/Asio/Socket/AsioUdpSocketSender.h"
 
 namespace Aryl
 {

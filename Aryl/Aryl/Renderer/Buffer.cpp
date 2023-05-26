@@ -2,7 +2,7 @@
 
 #include "Renderer.h"
 
-#include "Platform/Rendering/OpenGL/OpenGLBuffer.h"
+#include "Platform/Renderer/OpenGL/OpenGLBuffer.h"
 
 namespace Aryl 
 {

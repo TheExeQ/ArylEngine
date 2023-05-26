@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Aryl/Networking/NetPacket.h"
-#include "Aryl/Networking/NetContext.h"
-#include "Aryl/Networking/Interfaces/IPv4/IPv4Endpoint.h"
+#include "Aryl/Network/NetPacket.h"
+#include "Aryl/Network/NetContext.h"
+#include "Aryl/Network/Interfaces/IPv4/IPv4Endpoint.h"
 
 #include <thread>
 #include <string>

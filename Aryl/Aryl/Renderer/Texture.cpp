@@ -2,7 +2,7 @@
 
 #include "Aryl/Renderer/Renderer.h"
 
-#include "Platform/Rendering/OpenGL/OpenGLTexture.h"
+#include "Platform/Renderer/OpenGL/OpenGLTexture.h"
 
 namespace Aryl
 {

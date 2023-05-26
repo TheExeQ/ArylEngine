@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Aryl/Networking/NetContext.h"
+#include "Aryl/Network/NetContext.h"
 
 #include <asio.hpp>
 

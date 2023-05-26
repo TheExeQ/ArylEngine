@@ -1,7 +1,7 @@
 #include "RendererContext.h"
 #include "RendererAPI.h"
 
-#include "Platform/Rendering/OpenGL/OpenGLContext.h"
+#include "Platform/Renderer/OpenGL/OpenGLContext.h"
 
 namespace Aryl
 {

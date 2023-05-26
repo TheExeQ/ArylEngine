@@ -1,11 +1,11 @@
 #pragma once
 #include "Aryl/Core/Base.h"
 
-#include "Aryl/Networking/NetContext.h"
-#include "Aryl/Networking/Socket/UdpSocketBuilder.h"
+#include "Aryl/Network/NetContext.h"
+#include "Aryl/Network/Socket/UdpSocketBuilder.h"
 
-#include "Platform/Networking/Asio/AsioContext.h"
-#include "Platform/Networking/Asio/Socket/AsioUdpSocket.h"
+#include "Platform/Network/Asio/AsioContext.h"
+#include "Platform/Network/Asio/Socket/AsioUdpSocket.h"
 
 namespace Aryl
 {

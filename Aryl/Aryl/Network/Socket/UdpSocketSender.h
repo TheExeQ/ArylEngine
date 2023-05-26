@@ -1,10 +1,10 @@
 #pragma once
 #include "Aryl/Core/Base.h"
-#include "Aryl/Networking/Socket/UdpSocket.h"
+#include "Aryl/Network/Socket/UdpSocket.h"
 
-#include "Aryl/Networking/NetPacket.h"
-#include "Aryl/Networking/Interfaces/IPv4/IPv4Address.h"
-#include "Aryl/Networking/Interfaces/IPv4/IPv4Endpoint.h"
+#include "Aryl/Network/NetPacket.h"
+#include "Aryl/Network/Interfaces/IPv4/IPv4Address.h"
+#include "Aryl/Network/Interfaces/IPv4/IPv4Endpoint.h"
 
 #include <queue>
 
