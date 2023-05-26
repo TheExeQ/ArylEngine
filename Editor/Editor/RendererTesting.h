@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Aryl/Events/KeyEvent.h>
 #include <Aryl/Events/ApplicationEvent.h>
 
 #include <Aryl/Renderer/Renderer.h>
@@ -8,6 +9,8 @@
 #include <Aryl/Renderer/Texture.h>
 #include <Aryl/Renderer/VertexArray.h>
 #include <Aryl/Renderer/Camera/Camera.h>
+
+#include <unordered_map>
 
 class RendererTesting
 {
@@ -22,6 +25,8 @@ public:
 	void TempOpenGLTesting();
 
 private:
+	std::unordered_map<std::string, Ref<Aryl::Texture2D>> myTextureCache;
+
 	glm::mat4 myCubeTransform;
 	Ref<Aryl::Camera> myOrthoCamera;
 	Ref<Aryl::Camera> myPerspCamera;

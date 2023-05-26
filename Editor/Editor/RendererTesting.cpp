@@ -3,26 +3,39 @@
 #include <Aryl/Core/Base.h>
 #include <Aryl/Core/Application.h>
 
-#include <Aryl/Components/Components.h>
-#include <Aryl/Scene/Entity.h>
 #include <Aryl/Scene/Scene.h>
+#include <Aryl/Scene/Entity.h>
 #include <Aryl/Scene/SceneManager.h>
+#include <Aryl/Components/Components.h>
 
-#include <Aryl/Events/KeyEvent.h>
 #include <Aryl/Input/KeyCodes.h>
+#include <Aryl/Events/KeyEvent.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 RendererTesting::RendererTesting()
 {
+	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+	{
+		auto newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+
+		registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { 100.f, 0.f, 0.f };
+		registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test.png";
+
+		newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+
+		registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { -100.f, 0.f, 0.f };
+		registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test2.png";
+	}
+
 	auto aspectRatio = 16.f / 9.f;
 
 	myOrthoCamera = CreateRef<Aryl::Camera>(-1.0f * aspectRatio, 1.f * aspectRatio, -1.0f, 1.0f, 0.1f, 10000.f);
-	myOrthoCamera->SetPosition({ 0.f, 0.f, 200.f });
+	myOrthoCamera->SetPosition({ 0.f, 0.f, 500.f });
 
 	myPerspCamera = CreateRef<Aryl::Camera>(90.f, aspectRatio, 0.1f, 10000.0f);
-	myPerspCamera->SetPosition({ 0.f, 0.f, 200.f });
+	myPerspCamera->SetPosition({ 0.f, 0.f, 500.f });
 
 	myCubeTransform = glm::mat4(1.f);
 
@@ -120,8 +133,17 @@ RendererTesting::RendererTesting()
 
 	myShader = Aryl::Shader::Create(vertexSrc, fragmentSrc);
 
-	myTexture = Aryl::Texture2D::Create("test.png");
-	myTexture->Bind();
+	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
+	{
+		auto path = registry.get<Aryl::SpriteRendererComponent>(ent).spritePath;
+		auto pathStr = path.string();
+
+		if (myTextureCache.find(pathStr) == myTextureCache.end())
+		{
+			myTextureCache[pathStr] = Aryl::Texture2D::Create(path);
+			myTextureCache.at(pathStr)->Bind();
+		}
+	}
 
 	myShader->Bind();
 	myShader->UploadUniformInt("u_Texture", 0);
@@ -148,14 +170,24 @@ bool RendererTesting::OnRender(Aryl::AppRenderEvent& e)
 
 bool RendererTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
-	myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
+	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
 	return false;
 }
 
 void RendererTesting::TempOpenGLTesting()
 {
+	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+
 	Aryl::Renderer::BeginScene(myPerspCamera);
-	Aryl::Renderer::Submit(myShader, mySquareVertexArray, myCubeTransform);
+
+	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
+	{
+		auto path = registry.get<Aryl::SpriteRendererComponent>(ent).spritePath.string();
+		myTextureCache.at(path)->Bind();
+
+		Aryl::Renderer::Submit(myShader, mySquareVertexArray, glm::translate(glm::mat4(1.f), registry.get<Aryl::TransformComponent>(ent).position));
+	}
+
 	Aryl::Renderer::EndScene();
 }
