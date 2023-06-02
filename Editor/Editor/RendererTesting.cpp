@@ -149,10 +149,6 @@ RendererTesting::RendererTesting()
 	myShader->UploadUniformInt("u_Texture", 0);
 }
 
-RendererTesting::~RendererTesting()
-{
-}
-
 void RendererTesting::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
@@ -161,7 +157,7 @@ void RendererTesting::OnEvent(Aryl::Event& e)
 	dispatcher.Dispatch<Aryl::AppRenderEvent>(YL_BIND_EVENT_FN(RendererTesting::OnRender));
 }
 
-bool RendererTesting::OnRender(Aryl::AppRenderEvent& e)
+bool RendererTesting::OnRender(Aryl::AppRenderEvent& e) const
 {
 	TempOpenGLTesting();
 
@@ -175,13 +171,13 @@ bool RendererTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 	return false;
 }
 
-void RendererTesting::TempOpenGLTesting()
+void RendererTesting::TempOpenGLTesting() const
 {
 	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 
 	Aryl::Renderer::BeginScene(myPerspCamera);
 
-	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
+	for (const auto ent : registry.view<Aryl::SpriteRendererComponent>())
 	{
 		auto path = registry.get<Aryl::SpriteRendererComponent>(ent).spritePath.string();
 		myTextureCache.at(path)->Bind();

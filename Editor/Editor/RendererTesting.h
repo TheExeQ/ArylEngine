@@ -16,13 +16,13 @@ class RendererTesting
 {
 public:
 	RendererTesting();
-	~RendererTesting();
+	~RendererTesting() = default;
 
 	void OnEvent(Aryl::Event& e);
-	bool OnRender(Aryl::AppRenderEvent& e);
+	bool OnRender(Aryl::AppRenderEvent& e) const;
 	bool OnUpdate(Aryl::AppUpdateEvent& e);
 
-	void TempOpenGLTesting();
+	void TempOpenGLTesting() const;
 
 private:
 	std::unordered_map<std::string, Ref<Aryl::Texture2D>> myTextureCache;

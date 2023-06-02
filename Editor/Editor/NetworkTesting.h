@@ -11,14 +11,10 @@ class NetworkTesting
 {
 public:
 	NetworkTesting();
-	~NetworkTesting();
+	~NetworkTesting() = default;
 
-	void OnAttach();
-	void OnDetach();
 	void OnEvent(Aryl::Event& e);
-
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
-
 	void ArylNetExample();
 
 	void SetupSender(Aryl::IPv4Endpoint endpoint);

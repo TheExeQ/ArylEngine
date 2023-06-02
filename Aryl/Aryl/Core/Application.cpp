@@ -53,7 +53,7 @@ namespace Aryl
 		{
 			YL_PROFILE_FRAME("Frame");
 
-			float time = (float)glfwGetTime();
+			float time = static_cast<float>(glfwGetTime());
 			Timestep timestep = time - myLastFrameTime;
 			myLastFrameTime = time;
 

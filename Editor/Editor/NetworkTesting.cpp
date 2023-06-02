@@ -65,10 +65,6 @@ NetworkTesting::NetworkTesting()
 	}
 }
 
-NetworkTesting::~NetworkTesting()
-{
-}
-
 void NetworkTesting::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
@@ -110,7 +106,7 @@ void NetworkTesting::ArylNetExample()
 		SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address(hostAddress), hostPort), [this](Aryl::NetPacket packet) {
 			if (packet.header.id == Aryl::NetMessageType::StringMessage)
 			{
-				std::string str((const char*)packet.data.data());
+				std::string str(reinterpret_cast<const char*>(packet.data.data()));
 				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
 			}
 			});
