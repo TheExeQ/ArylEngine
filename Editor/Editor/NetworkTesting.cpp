@@ -19,11 +19,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Aryl/Network/Host/Client.h"
+#include "Aryl/Network/Host/Host.h"
+
 NetworkTesting::NetworkTesting()
 {
 	// ENTT REFLECTION TESTING
-	if (false)
+	if (true)
 	{
+		Aryl::HostSettings hostSettings;
+		hostSettings.preferredPort = 44000;
+		
+		Aryl::Application::Get().GetNetworkContext()->InitServer(hostSettings);
+		auto client = Aryl::Application::Get().GetNetworkContext()->InitClient();
+
+		client->Endpoint = Aryl::IPv4Endpoint(Aryl::IPv4Address("127.0.0.1"), hostSettings.preferredPort);
+		
 		auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
 		registry.emplace<Aryl::TestComponent>(myTestingEntity.GetId());
@@ -116,7 +127,7 @@ void NetworkTesting::ArylNetExample()
 			});
 	}
 
-	if (mySender)
+	//if (mySender)
 	{
 		ImGui::SameLine();
 		if (ImGui::Button("Ping"))
@@ -130,7 +141,9 @@ void NetworkTesting::ArylNetExample()
 			packet->data.resize(data.size() + 1);
 			std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
 
-			mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
+			Aryl::Application::Get().GetNetworkContext()->GetClient()->SendMessage(packet);
+			
+			//mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
 		}
 	}
 
@@ -176,6 +189,7 @@ void NetworkTesting::ArylNetExample()
 
 void NetworkTesting::SetupSender(Aryl::IPv4Endpoint endpoint)
 {
+	return;
 	if (mySender)
 	{
 		mySender->Stop();
@@ -196,6 +210,7 @@ void NetworkTesting::SetupSender(Aryl::IPv4Endpoint endpoint)
 
 void NetworkTesting::SetupReceiver(Aryl::IPv4Endpoint endpoint, std::function<void(Aryl::NetPacket)> callback)
 {
+	return;
 	if (myReceiver)
 	{
 		bool hasSender = mySender != nullptr;

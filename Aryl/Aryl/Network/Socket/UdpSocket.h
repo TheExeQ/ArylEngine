@@ -4,9 +4,6 @@
 #include "Aryl/Network/NetContext.h"
 #include "Aryl/Network/Interfaces/IPv4/IPv4Endpoint.h"
 
-#include <thread>
-#include <string>
-
 namespace Aryl
 {
 	class UdpSocket

@@ -16,6 +16,8 @@
 
 RendererTesting::RendererTesting()
 {
+	auto curPath = std::filesystem::current_path();
+	
 	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 	{
 		auto newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
