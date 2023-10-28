@@ -12,7 +12,8 @@ namespace Aryl
 
 	struct NetPacketHeader
 	{
-		NetMessageType id = NetMessageType::Unknown;
+		uint32_t id = 0;
+		NetMessageType messageType = NetMessageType::Unknown;
 		uint32_t size = 0;
 	};
 
@@ -69,7 +70,7 @@ namespace Aryl
 		// Override for std::cout compatibility - produces friendly description of message
 		friend std::ostream& operator << (std::ostream& os, const NetPacket& msg)
 		{
-			os << "ID:" << (int)msg.header.id << " Size:" << msg.header.size;
+			os << "ID:" << (int)msg.header.messageType << " Size:" << msg.header.size;
 			return os;
 		}
 
@@ -104,25 +105,4 @@ namespace Aryl
 			return msg;
 		}
 	};
-
-	//struct NetPacket
-	//{
-	//public:
-	//	NetPacket() = default;
-	//	~NetPacket() = default;
-	//
-	//	void SetData(uint8_t* data, uint32_t size);
-
-	//	const PacketBuffer& GetData() const;
-	//	IPv4Endpoint GetSender() const;
-	//	IPv4Endpoint GetReceiver() const;
-
-	//private:
-	//	friend class UdpSocketReceiver;
-	//	friend class UdpSocketSender;
-
-	//	IPv4Endpoint mySender;
-	//	IPv4Endpoint myReceiver;
-	//	PacketBuffer myData = {};
-	//};
 }

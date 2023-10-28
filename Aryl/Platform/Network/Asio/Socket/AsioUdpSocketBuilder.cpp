@@ -8,7 +8,7 @@ namespace Aryl
 
 		auto& io_context = ((AsioContext*)myContext.get())->GetIoContext();
 		udp::resolver resolver(io_context);
-		udp::resolver::results_type endpoints = resolver.resolve(myAddress.GetAddressString(), std::to_string(myPort));
+		udp::resolver::results_type endpoints = resolver.resolve(myAddress.ToString(), std::to_string(myPort));
 
 		if (!myAddress.IsValid())
 		{
@@ -23,7 +23,7 @@ namespace Aryl
 		}
 		catch (std::system_error err)
 		{
-			YL_CORE_ERROR("Could not bind to: {0}:{1}", myAddress.GetAddressString(), myPort);
+			YL_CORE_ERROR("Could not bind to: {0}:{1}", myAddress.ToString(), myPort);
 			return nullptr;
 		}
 

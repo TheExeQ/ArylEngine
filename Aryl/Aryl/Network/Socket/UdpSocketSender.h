@@ -38,5 +38,7 @@ namespace Aryl
 
 	private:
 		uint32_t Run();
+
+		std::unordered_map<std::string, uint32_t> myPacketIdMap;
 	};
 }

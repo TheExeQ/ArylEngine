@@ -13,6 +13,8 @@ public:
 	NetworkTesting();
 	~NetworkTesting();
 
+	void ReflectionTesting();
+	
 	void OnAttach();
 	void OnDetach();
 	void OnEvent(Aryl::Event& e);
@@ -21,15 +23,6 @@ public:
 
 	void ArylNetExample();
 
-	void SetupSender(Aryl::IPv4Endpoint endpoint);
-	void SetupReceiver(Aryl::IPv4Endpoint endpoint, std::function<void(Aryl::NetPacket)> callback);
-
 private:
 	Aryl::Entity myTestingEntity;
-
-	Ref<Aryl::UdpSocketSender> mySender;
-	Ref<Aryl::UdpSocketReceiver> myReceiver;
-
-	std::unordered_map<std::string, Aryl::IPv4Endpoint> myConnectedClients;
-	std::vector<std::string> myChatMessages;
 };

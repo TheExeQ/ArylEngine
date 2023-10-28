@@ -8,6 +8,6 @@ namespace Aryl
 		Connect,
 		Disconnect,
 		StringMessage,
-		ComponentSync,
+		SyncWorld,
 	};
 }

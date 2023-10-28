@@ -9,15 +9,17 @@ namespace Aryl
     class Host
     {
     public:
-        Host(HostSettings hostSettings);
+        Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate);
         ~Host();
 
-        bool SendMessage(Ref<NetPacket> packet);
+        bool SendMessage(const Ref<NetPacket>& packet) const;
+        void Connect(const IPv4Endpoint& endpoint);
 
-        IPv4Endpoint Endpoint;
+        // IPv4Endpoint GetListenEndpoint();
         
     protected:
-        void HandleMessage(NetPacket packet);
+        virtual void HandleMessage(const NetPacket& packet);
+        IPv4Endpoint myEndpoint;
 
     private:
         Ref<UdpSocketSender> mySender = nullptr;

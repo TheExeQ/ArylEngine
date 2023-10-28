@@ -18,18 +18,18 @@ RendererTesting::RendererTesting()
 {
 	auto curPath = std::filesystem::current_path();
 	
-	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
-	{
-		auto newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
-
-		registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { 100.f, 0.f, 0.f };
-		registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test.png";
-
-		newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
-
-		registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { -100.f, 0.f, 0.f };
-		registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test2.png";
-	}
+	// auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+	// {
+	// 	auto newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+	//
+	// 	registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { 100.f, 0.f, 0.f };
+	// 	registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test.png";
+	//
+	// 	newEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+	//
+	// 	registry.emplace<Aryl::TransformComponent>(newEntity.GetId()).position = { -100.f, 0.f, 0.f };
+	// 	registry.emplace<Aryl::SpriteRendererComponent>(newEntity.GetId()).spritePath = "test2.png";
+	// }
 
 	auto aspectRatio = 16.f / 9.f;
 
@@ -135,18 +135,6 @@ RendererTesting::RendererTesting()
 
 	myShader = Aryl::Shader::Create(vertexSrc, fragmentSrc);
 
-	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
-	{
-		auto path = registry.get<Aryl::SpriteRendererComponent>(ent).spritePath;
-		auto pathStr = path.string();
-
-		if (myTextureCache.find(pathStr) == myTextureCache.end())
-		{
-			myTextureCache[pathStr] = Aryl::Texture2D::Create(path);
-			myTextureCache.at(pathStr)->Bind();
-		}
-	}
-
 	myShader->Bind();
 	myShader->UploadUniformInt("u_Texture", 0);
 }
@@ -174,6 +162,19 @@ bool RendererTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
 	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
+	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
+	{
+		auto path = registry.get<Aryl::SpriteRendererComponent>(ent).spritePath;
+		auto pathStr = path.string();
+
+		if (myTextureCache.find(pathStr) == myTextureCache.end())
+		{
+			myTextureCache[pathStr] = Aryl::Texture2D::Create(path);
+			myTextureCache.at(pathStr)->Bind();
+		}
+	}
+	
 	return false;
 }
 

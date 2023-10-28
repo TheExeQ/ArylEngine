@@ -11,7 +11,7 @@ namespace Aryl
 		~IPv4Address() = default;
 
 		bool IsValid() const { return !myAddress.empty(); }
-		std::string GetAddressString() const { return myAddress; };
+		std::string ToString() const { return myAddress; };
 
 	private:
 		std::string myAddress;

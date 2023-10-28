@@ -1,11 +1,13 @@
 ﻿#include "Host.h"
 
+#include "Client.h"
+#include "Server.h"
 #include "Aryl/Core/Application.h"
 #include "Aryl/Network/Socket/UdpSocketBuilder.h"
 
 namespace Aryl
 {
-    Host::Host(HostSettings hostSettings)
+    Host::Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate)
     {
         if (!mySender)
         {
@@ -26,7 +28,7 @@ namespace Aryl
             Ref<UdpSocketBuilder> builder = UdpSocketBuilder::Create(Application::Get().GetNetworkContext());
 
             IPv4Endpoint hostEndpoint = IPv4Endpoint(IPv4Address("0.0.0.0"), hostSettings.preferredPort);
-            
+
             builder->BoundToAddress(hostEndpoint.GetAddress());
             builder->BoundToPort(hostEndpoint.GetPort());
 
@@ -34,8 +36,8 @@ namespace Aryl
 
             if (socket)
             {
-                myReceiver = UdpSocketReceiver::Create(socket, YL_BIND_EVENT_FN(Host::HandleMessage));
-                YL_CORE_TRACE("Starting UDP receiver on {0}:{1}", hostEndpoint.GetAddress().GetAddressString(),
+                myReceiver = UdpSocketReceiver::Create(socket, handleMessageDelegate);
+                YL_CORE_TRACE("Starting UDP receiver on {0}:{1}", hostEndpoint.GetAddress().ToString(),
                               hostEndpoint.GetPort());
             }
         }
@@ -47,10 +49,10 @@ namespace Aryl
         {
             myReceiver->Stop();
 
-            if (mySender) 
+            if (mySender)
             {
                 Ref<NetPacket> packet = CreateRef<NetPacket>();
-                packet->header.id = NetMessageType::Disconnect;
+                packet->header.messageType = NetMessageType::Disconnect;
 
                 SendMessage(packet);
             }
@@ -65,25 +67,42 @@ namespace Aryl
         }
     }
 
-    bool Host::SendMessage(Ref<NetPacket> packet)
+    bool Host::SendMessage(const Ref<NetPacket>& packet) const
     {
-        YL_CORE_INFO("[Host] Send Message");
         if (mySender)
         {
-            return mySender->Send(packet, Endpoint);
+            return mySender->Send(packet, myEndpoint);
         }
         return false;
     }
 
-    void Host::HandleMessage(NetPacket packet)
+    void Host::Connect(const IPv4Endpoint& endpoint)
     {
-        YL_CORE_INFO("[Host] Handle Incoming");
+        myEndpoint = endpoint;
 
+        {
+            const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
+            connectPacket->header.messageType = NetMessageType::Connect;
+
+            SendMessage(connectPacket);
+        }
+    }
+
+    void Host::HandleMessage(const NetPacket& packet)
+    {
         // TESTING
-        if (packet.header.id == Aryl::NetMessageType::StringMessage)
+        if (packet.header.messageType == NetMessageType::Connect)
+        {
+            YL_CORE_TRACE("New connection from {0} (ID: {1})", packet.endpoint.ToString(), packet.header.id);
+        }
+        if (packet.header.messageType == NetMessageType::Disconnect)
+        {
+            YL_CORE_TRACE("{0} disconnected (ID: {1})", packet.endpoint.ToString(), packet.header.id);
+        }
+        if (packet.header.messageType == NetMessageType::StringMessage)
         {
             std::string str((const char*)packet.data.data());
-            YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
+            YL_CORE_TRACE(str + " from {0} (ID: {1})", packet.endpoint.ToString(), packet.header.id);
         }
     }
 }

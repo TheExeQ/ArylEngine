@@ -21,19 +21,22 @@
 
 Editor::Editor()
 {
-	YL_ASSERT(!myInstance, "Editor already exists!");
-	myInstance = this;
+    YL_ASSERT(!myInstance, "Editor already exists!");
+    myInstance = this;
 }
 
 Editor::~Editor()
 {
-	myInstance = nullptr;
+    myInstance = nullptr;
 }
 
 void Editor::OnAttach()
 {
-	myNetworkTest = CreateRef<NetworkTesting>();
-	myRendererTest = CreateRef<RendererTesting>();
+    myNetworkTest = CreateRef<NetworkTesting>();
+    if (!Aryl::Application::Get().IsHeadless())
+    {
+        myRendererTest = CreateRef<RendererTesting>();
+    }
 }
 
 void Editor::OnDetach()
@@ -42,8 +45,11 @@ void Editor::OnDetach()
 
 void Editor::OnEvent(Aryl::Event& e)
 {
-	Aryl::EventDispatcher dispatcher(e);
+    Aryl::EventDispatcher dispatcher(e);
 
-	myNetworkTest->OnEvent(e);
-	myRendererTest->OnEvent(e);
+    myNetworkTest->OnEvent(e);
+    if (myRendererTest)
+    {
+        myRendererTest->OnEvent(e);
+    }
 }

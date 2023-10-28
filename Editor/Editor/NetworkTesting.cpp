@@ -24,60 +24,67 @@
 
 NetworkTesting::NetworkTesting()
 {
-	// ENTT REFLECTION TESTING
-	if (true)
+	if (Aryl::Application::Get().IsHeadless())
 	{
 		Aryl::HostSettings hostSettings;
 		hostSettings.preferredPort = 44000;
-		
 		Aryl::Application::Get().GetNetworkContext()->InitServer(hostSettings);
-		auto client = Aryl::Application::Get().GetNetworkContext()->InitClient();
-
-		client->Endpoint = Aryl::IPv4Endpoint(Aryl::IPv4Address("127.0.0.1"), hostSettings.preferredPort);
-		
-		auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
-		myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
-		registry.emplace<Aryl::TestComponent>(myTestingEntity.GetId());
-
-		Aryl::RegisterReflection();
-
-		auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
-
-		YL_CORE_TRACE(comp.intValue);
-		YL_CORE_TRACE(comp.floatValue);
-		YL_CORE_TRACE(comp.boolValue);
-
-		auto type = entt::resolve(entt::hashed_string(typeid(Aryl::TestComponent).name()));
-		if (type)
-		{
-			auto data = type.data(entt::hashed_string("intValue"));
-			auto data2 = type.data(entt::hashed_string("floatValue"));
-			auto data3 = type.data(entt::hashed_string("boolValue"));
-
-			auto type_id = entt::type_id<Aryl::TestComponent>().hash();
-			auto storage = registry.storage(type_id);
-
-			YL_CORE_TRACE("TypeId: {0}", type_id);
-
-			if (storage)
-			{
-				auto compontentPtr = storage->get(myTestingEntity.GetId());
-				auto componentAny = type.from_void(compontentPtr);
-
-				if (data) { data.set(componentAny, 5); }
-				if (data2) { data2.set(componentAny, 4.3f); }
-				if (data3) { data3.set(componentAny, true); }
-			}
-		}
-
-		YL_CORE_TRACE(comp.intValue);
-		YL_CORE_TRACE(comp.floatValue);
-		YL_CORE_TRACE(comp.boolValue);
 	}
+	else
+	{
+		Aryl::Application::Get().GetNetworkContext()->InitClient();
+
+	}
+	
+	// ReflectionTesting();
 }
 
 NetworkTesting::~NetworkTesting()
 {
+}
+
+void NetworkTesting::ReflectionTesting()
+{
+	// ENTT REFLECTION TESTING
+
+	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
+	myTestingEntity = Aryl::Entity(registry.create(), Aryl::SceneManager::GetActiveScene().get());
+	registry.emplace<Aryl::TestComponent>(myTestingEntity.GetId());
+
+	Aryl::RegisterReflection();
+
+	auto& comp = myTestingEntity.GetComponent<Aryl::TestComponent>();
+
+	YL_CORE_TRACE(comp.intValue);
+	YL_CORE_TRACE(comp.floatValue);
+	YL_CORE_TRACE(comp.boolValue);
+
+	auto type = entt::resolve(entt::hashed_string(typeid(Aryl::TestComponent).name()));
+	if (type)
+	{
+		auto data = type.data(entt::hashed_string("intValue"));
+		auto data2 = type.data(entt::hashed_string("floatValue"));
+		auto data3 = type.data(entt::hashed_string("boolValue"));
+
+		auto type_id = entt::type_id<Aryl::TestComponent>().hash();
+		auto storage = registry.storage(type_id);
+
+		YL_CORE_TRACE("TypeId: {0}", type_id);
+
+		if (storage)
+		{
+			auto compontentPtr = storage->get(myTestingEntity.GetId());
+			auto componentAny = type.from_void(compontentPtr);
+
+			if (data) { data.set(componentAny, 5); }
+			if (data2) { data2.set(componentAny, 4.3f); }
+			if (data3) { data3.set(componentAny, true); }
+		}
+	}
+
+	YL_CORE_TRACE(comp.intValue);
+	YL_CORE_TRACE(comp.floatValue);
+	YL_CORE_TRACE(comp.boolValue);
 }
 
 void NetworkTesting::OnEvent(Aryl::Event& e)
@@ -95,80 +102,34 @@ bool NetworkTesting::OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e)
 
 void NetworkTesting::ArylNetExample()
 {
-	static char hostAddress[16] = "127.0.0.1";
-	static char currentHostAddress[16] = "127.0.0.1";
-	static int hostPort = 44000;
-	static int currentHostPort = hostPort;
-
-	static char sendAddress[16] = "127.0.0.1";
-	static int sendPort = 44000;
-
+	static char serverIp[16] = "127.0.0.1";
+	static int serverPort = 44000;
+	static bool hasConnected = false;
+	
 	ImGui::Begin("ArylNet");
-	ImGui::InputText("Host Address", hostAddress, sizeof(hostAddress));
-	ImGui::InputInt("Host Port", &hostPort);
-	ImGui::NewLine();
-	ImGui::InputText("Send Address", sendAddress, sizeof(sendAddress));
-	ImGui::InputInt("Send Port", &sendPort);
+	ImGui::InputText("Server Address", serverIp, sizeof(serverIp));
+	ImGui::InputInt("Server Port", &serverPort);
 
-	if (ImGui::Button("Sender"))
+	if (ImGui::Button("Connect") && !hasConnected)
 	{
-		SetupSender(Aryl::IPv4Endpoint(Aryl::IPv4Address(hostAddress), 0));
+		auto client = Aryl::Application::Get().GetNetworkContext()->GetClient();
+		client->Connect(Aryl::IPv4Endpoint(Aryl::IPv4Address(serverIp), serverPort));
+		hasConnected = true;
 	}
-
-	ImGui::SameLine();
-	if (ImGui::Button("Receiver"))
+	
+	if (ImGui::Button("Ping"))
 	{
-		SetupReceiver(Aryl::IPv4Endpoint(Aryl::IPv4Address(hostAddress), hostPort), [this](Aryl::NetPacket packet) {
-			if (packet.header.id == Aryl::NetMessageType::StringMessage)
-			{
-				std::string str((const char*)packet.data.data());
-				YL_CORE_TRACE(str + " from {0}:{1}", packet.endpoint.GetAddress().GetAddressString(), packet.endpoint.GetPort());
-			}
-			});
+		std::string data = "Ping";
+
+		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+
+		packet->header.messageType = Aryl::NetMessageType::StringMessage;
+
+		packet->data.resize(data.size() + 1);
+		std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
+
+		Aryl::Application::Get().GetNetworkContext()->GetClient()->SendMessage(packet);
 	}
-
-	//if (mySender)
-	{
-		ImGui::SameLine();
-		if (ImGui::Button("Ping"))
-		{
-			std::string data = "Ping";
-
-			Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-
-			packet->header.id = Aryl::NetMessageType::StringMessage;
-
-			packet->data.resize(data.size() + 1);
-			std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
-
-			Aryl::Application::Get().GetNetworkContext()->GetClient()->SendMessage(packet);
-			
-			//mySender->Send(packet, Aryl::IPv4Endpoint(Aryl::IPv4Address(sendAddress), sendPort));
-		}
-	}
-
-	ImGui::NewLine();
-
-	// Debug info
-
-	if (myReceiver || mySender)
-	{
-		ImGui::TextColored({ 0.f, 1.f, 0.f, 1.f }, "Connected");
-		if (myReceiver)
-		{
-			std::string text = "Receiver Active on port: " + std::to_string(currentHostPort);
-			ImGui::TextColored({ 0.f, 0.5f, 0.f, 1.f }, text.c_str());
-		}
-		if (mySender)
-		{
-			ImGui::TextColored({ 0.f, 0.5f, 0.f, 1.f }, "Sender Active");
-		}
-	}
-	else
-	{
-		ImGui::TextColored({ 1.f, 0.f, 0.f, 1.f }, "Disconnected");
-	}
-
 	ImGui::End();
 
 	if (!myTestingEntity.IsNull())
@@ -184,69 +145,5 @@ void NetworkTesting::ArylNetExample()
 			// Notify server/client of changes
 		}
 		ImGui::End();
-	}
-}
-
-void NetworkTesting::SetupSender(Aryl::IPv4Endpoint endpoint)
-{
-	return;
-	if (mySender)
-	{
-		mySender->Stop();
-		mySender = nullptr;
-	}
-
-	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-	builder->BoundToAddress(endpoint.GetAddress());
-	builder->BoundToPort(0);
-
-	auto socket = builder->Build();
-
-	if (socket)
-	{
-		mySender = Aryl::UdpSocketSender::Create(socket);
-	}
-}
-
-void NetworkTesting::SetupReceiver(Aryl::IPv4Endpoint endpoint, std::function<void(Aryl::NetPacket)> callback)
-{
-	return;
-	if (myReceiver)
-	{
-		bool hasSender = mySender != nullptr;
-		if (!hasSender)
-		{
-			Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-			builder->BoundToAddress(endpoint.GetAddress());
-			builder->BoundToPort(0);
-
-			mySender = Aryl::UdpSocketSender::Create(builder->Build());
-		}
-		myReceiver->Stop();
-
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
-		packet->header.id = Aryl::NetMessageType::Disconnect;
-
-		mySender->Send(packet, endpoint);
-
-		myReceiver = nullptr;
-
-		if (!hasSender)
-		{
-			mySender->Stop();
-			mySender = nullptr;
-		}
-	}
-
-	Ref<Aryl::UdpSocketBuilder> builder = Aryl::UdpSocketBuilder::Create(Aryl::Application::Get().GetNetworkContext());
-	builder->BoundToAddress(endpoint.GetAddress());
-	builder->BoundToPort(endpoint.GetPort());
-
-	auto socket = builder->Build();
-
-	if (socket)
-	{
-		myReceiver = Aryl::UdpSocketReceiver::Create(socket, callback);
-		YL_CORE_TRACE("Starting UDP server on {0}:{1}", endpoint.GetAddress().GetAddressString(), endpoint.GetPort());
 	}
 }

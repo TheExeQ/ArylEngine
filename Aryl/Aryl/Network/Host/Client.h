@@ -8,5 +8,8 @@ namespace Aryl
     public:
         Client(HostSettings hostSettings);
         ~Client();
+        
+    protected:
+        void HandleMessage(const NetPacket& packet) override;
     };
 }

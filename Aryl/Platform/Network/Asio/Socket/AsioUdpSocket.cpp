@@ -16,14 +16,14 @@ namespace Aryl
 			asio::ip::udp::endpoint remote_endpoint;
 
 			remote_endpoint = asio::ip::udp::endpoint(
-				asio::ip::address::from_string(endpoint.GetAddress().GetAddressString()), endpoint.GetPort());
+				asio::ip::address::from_string(endpoint.GetAddress().ToString()), endpoint.GetPort());
 
 			std::error_code err;
 			mySocket.send_to(asio::buffer((void*)data.data(), data.size()), remote_endpoint, 0, err);
 
 			if (err)
 			{
-				YL_CORE_ERROR("Failed to send to {0}:{1}", endpoint.GetAddress().GetAddressString(), endpoint.GetPort());
+				YL_CORE_ERROR("Failed to send to {0}:{1}", endpoint.GetAddress().ToString(), endpoint.GetPort());
 				YL_CORE_ERROR("Error {0}: {1}", err.value(), err.message());
 			}
 		}
