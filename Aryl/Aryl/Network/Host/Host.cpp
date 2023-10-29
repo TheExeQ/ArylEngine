@@ -67,11 +67,17 @@ namespace Aryl
         }
     }
 
-    bool Host::SendMessage(const Ref<NetPacket>& packet) const
+    bool Host::SendMessage(const Ref<NetPacket>& packet)
     {
-        if (mySender)
+        if (mySender && myConnectionsMap.find(myEndpoint.ToString()) != myConnectionsMap.end())
         {
-            return mySender->Send(packet, myEndpoint);
+            NetConnection& connection = myConnectionsMap.at(myEndpoint.ToString());
+            packet->header.id = connection.sendId;
+            
+            if (mySender->Send(packet, myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint))
+            {
+                connection.sendId++;
+            }
         }
         return false;
     }
@@ -79,16 +85,9 @@ namespace Aryl
     void Host::Connect(const IPv4Endpoint& endpoint)
     {
         myEndpoint = endpoint;
-
-        {
-            const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
-            connectPacket->header.messageType = NetMessageType::Connect;
-
-            SendMessage(connectPacket);
-        }
     }
 
-    void Host::HandleMessage(const NetPacket& packet)
+    void Host::HandleMessage(NetPacket& packet)
     {
         // TESTING
         if (packet.header.messageType == NetMessageType::Connect)

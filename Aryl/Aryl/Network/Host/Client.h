@@ -8,8 +8,10 @@ namespace Aryl
     public:
         Client(HostSettings hostSettings);
         ~Client();
+
+        void Connect(const IPv4Endpoint& endpoint) override;
         
     protected:
-        void HandleMessage(const NetPacket& packet) override;
+        void HandleMessage(NetPacket& packet) override;
     };
 }

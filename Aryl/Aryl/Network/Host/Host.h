@@ -6,22 +6,27 @@
 
 namespace Aryl
 {
+    struct NetConnection
+    {
+        IPv4Endpoint listenEndpoint;
+        uint32_t sendId = 0;
+    };
+    
     class Host
     {
     public:
         Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate);
         ~Host();
 
-        bool SendMessage(const Ref<NetPacket>& packet) const;
-        void Connect(const IPv4Endpoint& endpoint);
+        bool SendMessage(const Ref<NetPacket>& packet);
+        virtual void Connect(const IPv4Endpoint& endpoint);
 
-        // IPv4Endpoint GetListenEndpoint();
-        
     protected:
-        virtual void HandleMessage(const NetPacket& packet);
+        virtual void HandleMessage(NetPacket& packet);
+        
+        std::unordered_map<std::string, NetConnection> myConnectionsMap;
         IPv4Endpoint myEndpoint;
 
-    private:
         Ref<UdpSocketSender> mySender = nullptr;
         Ref<UdpSocketReceiver> myReceiver = nullptr;
     };

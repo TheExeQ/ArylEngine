@@ -11,13 +11,8 @@
 #include <Aryl/Events/KeyEvent.h>
 #include <Aryl/Input/KeyCodes.h>
 
-#include <Aryl/Network/Socket/UdpSocketBuilder.h>
-
 #include <ImGui.h>
 #include <entt/entt.hpp>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "Aryl/Network/Host/Client.h"
 #include "Aryl/Network/Host/Host.h"
@@ -33,7 +28,6 @@ NetworkTesting::NetworkTesting()
 	else
 	{
 		Aryl::Application::Get().GetNetworkContext()->InitClient();
-
 	}
 	
 	// ReflectionTesting();
@@ -116,20 +110,37 @@ void NetworkTesting::ArylNetExample()
 		client->Connect(Aryl::IPv4Endpoint(Aryl::IPv4Address(serverIp), serverPort));
 		hasConnected = true;
 	}
-	
-	if (ImGui::Button("Ping"))
+
+	ImGui::NewLine();
+
+	static glm::vec3 position;
+	ImGui::InputFloat3("Pos", &position.x);
+	if (ImGui::Button("Move") && hasConnected)
 	{
-		std::string data = "Ping";
+		const Ref<Aryl::NetPacket> movementPacket = CreateRef<Aryl::NetPacket>();
+		movementPacket->header.messageType = Aryl::NetMessageType::PlayerMovement;
 
-		Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+		(*movementPacket) << position.z;
+		(*movementPacket) << position.y;
+		(*movementPacket) << position.x;
 
-		packet->header.messageType = Aryl::NetMessageType::StringMessage;
-
-		packet->data.resize(data.size() + 1);
-		std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
-
-		Aryl::Application::Get().GetNetworkContext()->GetClient()->SendMessage(packet);
+		auto client = Aryl::Application::Get().GetNetworkContext()->GetClient();
+		client->SendMessage(movementPacket);
 	}
+	
+	// if (ImGui::Button("Ping"))
+	// {
+	// 	std::string data = "Ping";
+	//
+	// 	Ref<Aryl::NetPacket> packet = CreateRef<Aryl::NetPacket>();
+	//
+	// 	packet->header.messageType = Aryl::NetMessageType::StringMessage;
+	//
+	// 	packet->data.resize(data.size() + 1);
+	// 	std::memcpy(packet->data.data(), data.c_str(), packet->data.size());
+	//
+	// 	Aryl::Application::Get().GetNetworkContext()->GetClient()->SendMessage(packet);
+	// }
 	ImGui::End();
 
 	if (!myTestingEntity.IsNull())
