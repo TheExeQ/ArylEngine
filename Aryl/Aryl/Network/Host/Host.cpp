@@ -75,7 +75,7 @@ namespace Aryl
             packet->header.id = connection.sendId;
 
             auto ep = myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint;
-            YL_INFO("Sending msg_type:{0} to {1}", (int)packet->header.messageType, packet->endpoint.ToString());
+            YL_INFO("Sending msg_type:{0} to {1}", (int)packet->header.messageType, ep.ToString());
             
             if (mySender->Send(packet, ep))
             {

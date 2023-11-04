@@ -51,7 +51,7 @@ namespace Aryl
         
         if (packet.header.messageType == NetMessageType::Connect)
         {
-            static int imageVariation = 1;
+            static int imageVariation = 2;
 
             uint32_t port;
             packet >> port;

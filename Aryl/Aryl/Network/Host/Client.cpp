@@ -42,7 +42,7 @@ namespace Aryl
     void Client::HandleMessage(NetPacket& packet)
     {
         Host::HandleMessage(packet);
-        static int imageVariation = 1;
+        static int imageVariation = 2;
 
         if (packet.header.messageType == NetMessageType::SyncWorld)
         {
