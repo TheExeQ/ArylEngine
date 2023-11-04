@@ -73,8 +73,11 @@ namespace Aryl
         {
             NetConnection& connection = myConnectionsMap.at(myEndpoint.ToString());
             packet->header.id = connection.sendId;
+
+            auto ep = myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint;
+            YL_INFO("Sending msg_type:{0} to {1}", (int)packet->header.messageType, packet->endpoint.ToString());
             
-            if (mySender->Send(packet, myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint))
+            if (mySender->Send(packet, ep))
             {
                 connection.sendId++;
             }

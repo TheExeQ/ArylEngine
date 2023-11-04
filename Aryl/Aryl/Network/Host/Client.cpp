@@ -14,6 +14,13 @@ namespace Aryl
 
     Client::~Client()
     {
+        if (myConnectionsMap.size() > 0)
+        {
+            const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
+            connectPacket->header.messageType = NetMessageType::Disconnect;
+            
+            SendMessage(connectPacket);
+        }
     }
 
     void Client::Connect(const IPv4Endpoint& endpoint)
@@ -80,6 +87,15 @@ namespace Aryl
             registry.emplace<TransformComponent>(newEntity.GetId()).position = {0.f, 0.f, 0.f};
             registry.emplace<SpriteRendererComponent>(newEntity.GetId()).spritePath = std::string("test") +
                 std::to_string(((uint32_t)newEntity.GetId()) % imageVariation) + ".png";
+        }
+
+        if (packet.header.messageType == NetMessageType::RemoveEntity)
+        {
+            uint32_t entId;
+            packet >> entId;
+            
+            auto& registry = SceneManager::GetActiveScene()->GetRegistry();
+            registry.remove<SpriteRendererComponent>((entt::entity)entId);
         }
 
         if (packet.header.messageType == NetMessageType::SyncEntity)

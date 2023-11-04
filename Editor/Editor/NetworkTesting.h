@@ -1,10 +1,7 @@
 #pragma once
 
 #include <Aryl/Events/ApplicationEvent.h>
-
-#include <Aryl/Network/Socket/UdpSocketSender.h>
-#include <Aryl/Network/Socket/UdpSocketReceiver.h>
-
+#include "Aryl/Events/KeyEvent.h"
 #include <Aryl/Scene/Entity.h>
 
 class NetworkTesting
@@ -19,10 +16,14 @@ public:
 	void OnDetach();
 	void OnEvent(Aryl::Event& e);
 
+	bool OnKeyDown(Aryl::KeyPressedEvent& e);
+	bool OnUpdate(Aryl::AppUpdateEvent& e);
 	bool OnImGuiUpdate(Aryl::AppImGuiUpdateEvent& e);
 
 	void ArylNetExample();
 
 private:
+	glm::vec2 myMovementDirection;
+	
 	Aryl::Entity myTestingEntity;
 };

@@ -27,6 +27,28 @@ namespace Aryl
 
         static std::unordered_map<std::string, entt::entity> clientActors;
 
+        if (packet.header.messageType == NetMessageType::Disconnect && clientActors.find(packet.endpoint.ToString()) != clientActors.end())
+        {
+            myConnectionsMap.erase(packet.endpoint.ToString());
+            
+            const Ref<NetPacket> newEntPacket = CreateRef<NetPacket>();
+            newEntPacket->header.messageType = NetMessageType::RemoveEntity;
+
+            (*newEntPacket) << ((uint32_t)clientActors[packet.endpoint.ToString()]);
+            
+            for (auto connection : myConnectionsMap)
+            {
+                uint32_t splitPoint = connection.first.find(':') + 1;
+                std::string p_str = connection.first.substr(splitPoint, connection.first.size() - splitPoint);
+                uint32_t p = atoi(p_str.c_str());
+
+                IPv4Endpoint ep(connection.second.listenEndpoint.GetAddress(), p);
+                if (ep.ToString() == packet.endpoint.ToString()) { continue; }
+                Connect(ep);
+                SendMessage(newEntPacket);
+            }
+        }
+        
         if (packet.header.messageType == NetMessageType::Connect)
         {
             static int imageVariation = 1;
@@ -86,19 +108,20 @@ namespace Aryl
 
         if (packet.header.messageType == NetMessageType::PlayerMovement)
         {
-            float x, y, z;
+            float x, y;
             packet >> x;
             packet >> y;
-            packet >> z;
 
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
             entt::entity clientEntity = clientActors.at(packet.endpoint.ToString());
-            registry.get<TransformComponent>(clientEntity).position = {x, y, z};
+            auto& pos = registry.get<TransformComponent>(clientEntity).position;
+            pos.x += x;
+            pos.y += y;
 
             const Ref<NetPacket> syncPacket = CreateRef<NetPacket>();
             syncPacket->header.messageType = NetMessageType::SyncEntity;
 
-            (*syncPacket) << z << y << x;
+            (*syncPacket) << pos.z << pos.y << pos.x;
             (*syncPacket) << clientEntity;
 
             for (auto connection : myConnectionsMap)

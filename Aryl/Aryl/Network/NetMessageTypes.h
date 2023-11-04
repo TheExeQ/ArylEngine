@@ -9,6 +9,7 @@ namespace Aryl
 		Disconnect,
 		StringMessage,
 		CreateEntity,
+		RemoveEntity,
 		SyncWorld,
 		SyncEntity,
 		PlayerMovement,
