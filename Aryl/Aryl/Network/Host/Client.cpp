@@ -98,19 +98,19 @@ namespace Aryl
             registry.remove<SpriteRendererComponent>((entt::entity)entId);
         }
 
-        if (packet.header.messageType == NetMessageType::SyncEntity)
-        {
-            uint32_t ent;
-            float x, y, z;
-
-            packet >> ent;
-            packet >> x;
-            packet >> y;
-            packet >> z;
-
-            auto& registry = SceneManager::GetActiveScene()->GetRegistry();
-            registry.emplace_or_replace<TransformComponent>((entt::entity)ent, glm::vec3(x, y, z), glm::quat(),
-                                                            glm::vec3(1.f));
-        }
+        // if (packet.header.messageType == NetMessageType::SyncEntity)
+        // {
+        //     uint32_t ent;
+        //     float x, y, z;
+        //
+        //     packet >> ent;
+        //     packet >> x;
+        //     packet >> y;
+        //     packet >> z;
+        //
+        //     auto& registry = SceneManager::GetActiveScene()->GetRegistry();
+        //     registry.emplace_or_replace<TransformComponent>((entt::entity)ent, glm::vec3(x, y, z), glm::quat(),
+        //                                                     glm::vec3(1.f));
+        // }
     }
 }

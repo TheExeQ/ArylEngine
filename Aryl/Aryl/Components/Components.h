@@ -21,6 +21,12 @@ namespace Aryl
 		glm::vec3 scale;
 	};
 
+	struct ObjectMovement
+	{
+		glm::vec2 direction;
+		float lerp_time;
+	};
+
 	struct SpriteRendererComponent
 	{
 		std::filesystem::path spritePath;

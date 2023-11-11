@@ -85,56 +85,12 @@ void NetworkTesting::OnEvent(Aryl::Event& e)
 {
 	Aryl::EventDispatcher dispatcher(e);
 
-	dispatcher.Dispatch<Aryl::KeyPressedEvent>(YL_BIND_EVENT_FN(NetworkTesting::OnKeyDown));
 	dispatcher.Dispatch<Aryl::AppUpdateEvent>(YL_BIND_EVENT_FN(NetworkTesting::OnUpdate));
 	dispatcher.Dispatch<Aryl::AppImGuiUpdateEvent>(YL_BIND_EVENT_FN(NetworkTesting::OnImGuiUpdate));
 }
 
-bool NetworkTesting::OnKeyDown(Aryl::KeyPressedEvent& e)
-{
-	switch (e.GetKeyCode())
-	{
-	case YL_KEY_W:
-		{
-			myMovementDirection.y = 1.f;
-			break;
-		}
-	case YL_KEY_A:
-		{
-			myMovementDirection.x = -1.f;
-			break;
-		}
-	case YL_KEY_S:
-		{
-			myMovementDirection.y = -1.f;
-			break;
-		}
-	case YL_KEY_D:
-		{
-			myMovementDirection.x = 1.f;
-			break;
-		}
-	}
-	return false;
-}
-
 bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
-	static float speed = 10.f;
-	
-	if (glm::length(myMovementDirection) > 0.f && !Aryl::Application::Get().IsHeadless())
-	{
-		const Ref<Aryl::NetPacket> movementPacket = CreateRef<Aryl::NetPacket>();
-		movementPacket->header.messageType = Aryl::NetMessageType::PlayerMovement;
-
-		(*movementPacket) << myMovementDirection.y * speed;
-		(*movementPacket) << myMovementDirection.x * speed;
-
-		auto client = Aryl::Application::Get().GetNetworkContext()->GetClient();
-		client->SendMessage(movementPacket);
-		myMovementDirection = glm::vec3(0.f);
-	}
-
 	return false;
 }
 

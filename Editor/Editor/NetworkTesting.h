@@ -23,7 +23,5 @@ public:
 	void ArylNetExample();
 
 private:
-	glm::vec2 myMovementDirection;
-	
 	Aryl::Entity myTestingEntity;
 };

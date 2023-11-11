@@ -11,7 +11,5 @@ namespace Aryl
 		CreateEntity,
 		RemoveEntity,
 		SyncWorld,
-		SyncEntity,
-		PlayerMovement,
 	};
 }
