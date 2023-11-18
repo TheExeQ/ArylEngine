@@ -49,7 +49,6 @@ namespace Aryl
 	void Window::Shutdown()
 	{
 		Release();
-		glfwTerminate();
 	}
 
 	void Window::Invalidate()
@@ -57,14 +56,6 @@ namespace Aryl
 		if (myWindow)
 		{
 			Release();
-		}
-
-		if (!myHasBeenInitialized)
-		{
-			if (!glfwInit())
-			{
-				YL_CORE_ERROR("Failed to initialize GLFW!");
-			}
 		}
 
 		glfwSetErrorCallback(GLFWErrorCallback);

@@ -26,14 +26,17 @@ namespace Aryl
         std::lock_guard lock(myEnttMutex);
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
         {
+            if (registry.view<ObjectMovement>().size() > 9) return;
+
             auto newEntity = Entity(registry.create(), SceneManager::GetActiveScene().get());
 
+            bool alter = (uint32_t)newEntity.GetId() % 2 == 0;
             glm::vec3 start, target;
-            float lerpTime = 2.f;
+            float lerpTime = (alter) ? 4.f : 2.f;
             start = {0.f, 0.f, 0.f};
-            target = {500.f, 0.f, 0.f};
+            target = {(alter) ? 500.f : -500.f, 0.f, 0.f};
 
-            registry.emplace<TransformComponent>(newEntity.GetId()).position = start;
+            registry.emplace<TransformComponent>(newEntity.GetId()) = {start, glm::quat(), {0.5f, 0.5f, 0.5f}};
             registry.emplace<ObjectMovement>(newEntity.GetId()) = {start, target, 0.f, lerpTime};
 
             const Ref<NetPacket> newEntPacket = CreateRef<NetPacket>();
@@ -49,6 +52,21 @@ namespace Aryl
 
     void Server::RemoveEntities(std::vector<entt::entity> entities)
     {
+        const Ref<NetPacket> delEntPacket = CreateRef<NetPacket>();
+        delEntPacket->header.messageType = NetMessageType::RemoveEntity;
+
+        auto& registry = SceneManager::GetActiveScene()->GetRegistry();
+        for (auto ent : entities)
+        {
+            registry.remove<SpriteRendererComponent>(ent);
+            registry.remove<ObjectMovement>(ent);
+            
+            (*delEntPacket) << ent;
+        }
+
+        (*delEntPacket) << entities.size();
+
+        MulticastPacket(delEntPacket);
     }
 
     void Server::MulticastPacket(Ref<NetPacket> packet, const IPv4Endpoint* ignoreEP)
@@ -85,16 +103,22 @@ namespace Aryl
                 const Ref<NetPacket> syncPacket = CreateRef<NetPacket>();
                 syncPacket->header.messageType = NetMessageType::SyncWorld;
 
-                auto spriteView = registry.view<SpriteRendererComponent>();
+                auto entities = registry.view<ObjectMovement>();
 
-                for (auto ent : spriteView)
+                for (auto ent : entities)
                 {
                     auto transform = registry.get<TransformComponent>(ent);
+                    auto movement = registry.get<ObjectMovement>(ent);
+
+                    (*syncPacket) << movement.lerp_time << movement.current_lerp_time;
+                    (*syncPacket) << movement.target.z << movement.target.y << movement.target.x;
+                    (*syncPacket) << movement.start.z << movement.start.y << movement.start.x;
+                    
                     (*syncPacket) << transform.position.z << transform.position.y << transform.position.x;
                     (*syncPacket) << ent;
                 }
 
-                (*syncPacket) << spriteView.size();
+                (*syncPacket) << entities.size();
                 (*syncPacket) << registry.size();
 
                 Connect(packet.endpoint);

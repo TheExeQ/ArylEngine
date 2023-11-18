@@ -1,6 +1,7 @@
 #include "NetworkTesting.h"
 
 #include <Aryl/Core/Base.h>
+#include "Aryl/Core/Random.h"
 #include <Aryl/Core/Application.h>
 
 #include <Aryl/Components/Components.h>
@@ -31,7 +32,7 @@ NetworkTesting::NetworkTesting()
     {
         Aryl::Application::Get().GetNetworkContext()->InitClient();
     }
-
+    
     // ReflectionTesting();
 }
 
@@ -95,13 +96,14 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
     if (Aryl::Application::Get().IsHeadless())
     {
-        static double timer = 10;
+        constexpr double max_timer = 1;
+        static double timer = max_timer;
         
         timer -= e.GetTimestep();
         if (timer < 0)
         {
             Aryl::Application::Get().GetNetworkContext()->GetServer()->CreateEntity();
-            timer = 10;
+            timer = max_timer;
         }
     }
 
@@ -117,23 +119,49 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 
     if (host)
     {
-        std::lock_guard<std::mutex> lock(host->myEnttMutex);
+        std::lock_guard lock(host->myEnttMutex);
 
         auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
         auto entities = registry.view<Aryl::ObjectMovement>();
 
+        std::vector<entt::entity> deleteEnts;
+        
         for (auto ent : entities)
         {
             auto& comp = registry.get<Aryl::ObjectMovement>(ent);
             comp.current_lerp_time += e.GetTimestep();
             if (comp.current_lerp_time > comp.lerp_time)
             {
-                glm::vec3 temp = comp.start;
+                Aryl::Random::SetSeed(comp.start.x + comp.start.y + comp.start.z + comp.target.x + comp.target.y + comp.target.z);
+
+                const float targetX = Aryl::Random::GetRandomFloat(-1.f, 1.f);
+                const float targetY = Aryl::Random::GetRandomFloat(-1.f, 1.f);
+                
                 comp.start = comp.target;
-                comp.target = temp;
+                comp.target = glm::vec3(750.f * targetX, 500.f * targetY, 0.f);
                 comp.current_lerp_time = 0.f;
             }
             registry.get<Aryl::TransformComponent>(ent).position = glm::mix(comp.start, comp.target, comp.current_lerp_time / comp.lerp_time);
+
+            for (auto ent2 : entities)
+            {
+                if (ent != ent2)
+                {
+                    float distance = glm::distance(registry.get<Aryl::TransformComponent>(ent).position,
+                                                   registry.get<Aryl::TransformComponent>(ent2).position);
+
+                    if (distance <= 100.0f)
+                    {
+                        deleteEnts.emplace_back(ent);
+                        deleteEnts.emplace_back(ent2);
+                    }
+                }
+            }
+        }
+
+        if (Aryl::Application::Get().IsHeadless() && !deleteEnts.empty())
+        {
+            reinterpret_cast<Aryl::Server*>(host)->RemoveEntities(deleteEnts);
         }
     }
     

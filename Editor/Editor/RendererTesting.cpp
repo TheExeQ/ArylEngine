@@ -14,6 +14,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Aryl/Network/Host/Client.h"
+
 RendererTesting::RendererTesting()
 {
 	auto curPath = std::filesystem::current_path();
@@ -162,6 +164,7 @@ bool RendererTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
 	//myCubeTransform = glm::rotate(myCubeTransform, glm::radians(30.f) * e.GetTimestep(), { 0.f, 1.f, 0.f });
 
+	std::lock_guard lock(Aryl::Application::Get().GetNetworkContext()->GetClient()->myEnttMutex);
 	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 	for (auto ent : registry.view<Aryl::SpriteRendererComponent>())
 	{
@@ -180,6 +183,7 @@ bool RendererTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 
 void RendererTesting::TempOpenGLTesting()
 {
+	std::lock_guard lock(Aryl::Application::Get().GetNetworkContext()->GetClient()->myEnttMutex);
 	auto& registry = Aryl::SceneManager::GetActiveScene()->GetRegistry();
 
 	Aryl::Renderer::BeginScene(myPerspCamera);

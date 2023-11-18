@@ -46,11 +46,12 @@ namespace Aryl
 
         if (packet.header.messageType == NetMessageType::SyncWorld)
         {
+            std::lock_guard lock(myEnttMutex);
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
 
-            size_t entityCount, spriteCount;
+            size_t entityCount, objCount;
             packet >> entityCount;
-            packet >> spriteCount;
+            packet >> objCount;
 
             registry.clear();
 
@@ -59,28 +60,32 @@ namespace Aryl
                 registry.create();
             }
 
-            for (int i = 0; i < spriteCount; ++i)
+            for (int i = 0; i < objCount; ++i)
             {
                 uint32_t ent;
-                float x, y, z;
-
+                glm::vec3 pos, start, target;
+                float curLerp, targetLerp;
+                
                 packet >> ent;
-                packet >> x;
-                packet >> y;
-                packet >> z;
-
+                packet >> pos.x >> pos.y >> pos.z;
+                
+                packet >> start.x >> start.y >> start.z;
+                packet >> target.x >> target.y >> target.z;
+                packet >> curLerp >> targetLerp;
+                
                 registry.emplace_or_replace<SpriteRendererComponent>((entt::entity)ent,
                                                                      std::string("test") + std::to_string(
                                                                          ent % imageVariation) + ".png");
-                registry.emplace_or_replace<TransformComponent>((entt::entity)ent, glm::vec3(x, y, z), glm::quat(),
-                                                                glm::vec3(1.f));
+                registry.emplace_or_replace<TransformComponent>((entt::entity)ent, pos, glm::quat(),
+                                                                glm::vec3(0.5f));
 
-                // YL_INFO("{0}: [{1}, {2}, {3}]", ent, x, y, z);
+                registry.emplace_or_replace<ObjectMovement>((entt::entity)ent, start, target, curLerp, targetLerp);
             }
         }
 
         if (packet.header.messageType == NetMessageType::CreateEntity)
         {
+            std::lock_guard lock(myEnttMutex);
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
             auto newEntity = Entity(registry.create(), SceneManager::GetActiveScene().get());
 
@@ -91,7 +96,7 @@ namespace Aryl
             packet >> target.x >> target.y >> target.z;
             packet >> lerpTime;
 
-            registry.emplace<TransformComponent>(newEntity.GetId()).position = start;
+            registry.emplace<TransformComponent>(newEntity.GetId()) = {start, glm::quat(), {0.5f, 0.5f, 0.5f}};
             registry.emplace<ObjectMovement>(newEntity.GetId()) = {start, target, 0.f, lerpTime};
             registry.emplace<SpriteRendererComponent>(newEntity.GetId()).spritePath = std::string("test") +
                 std::to_string(((uint32_t)newEntity.GetId()) % imageVariation) + ".png";
@@ -99,26 +104,19 @@ namespace Aryl
 
         if (packet.header.messageType == NetMessageType::RemoveEntity)
         {
-            uint32_t entId;
-            packet >> entId;
+            std::lock_guard lock(myEnttMutex);
+            size_t entCount;
+            packet >> entCount;
 
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
-            registry.remove<SpriteRendererComponent>((entt::entity)entId);
-        }
+            for (int i = 0; i < entCount; ++i)
+            {
+                uint32_t entId;
+                packet >> entId;
 
-        // if (packet.header.messageType == NetMessageType::SyncEntity)
-        // {
-        //     uint32_t ent;
-        //     float x, y, z;
-        //
-        //     packet >> ent;
-        //     packet >> x;
-        //     packet >> y;
-        //     packet >> z;
-        //
-        //     auto& registry = SceneManager::GetActiveScene()->GetRegistry();
-        //     registry.emplace_or_replace<TransformComponent>((entt::entity)ent, glm::vec3(x, y, z), glm::quat(),
-        //                                                     glm::vec3(1.f));
-        // }
+                registry.remove<SpriteRendererComponent>((entt::entity)entId);
+                registry.remove<ObjectMovement>((entt::entity)entId);
+            }
+        }
     }
 }
