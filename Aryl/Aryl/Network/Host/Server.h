@@ -18,7 +18,6 @@ namespace Aryl
         
     protected:
         void HandleMessage(NetPacket& packet) override;
-
         void MulticastPacket(Ref<NetPacket> packet, const IPv4Endpoint* ignoreEP = nullptr);
     };
 }

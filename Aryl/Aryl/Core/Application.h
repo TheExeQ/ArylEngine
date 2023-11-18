@@ -66,7 +66,7 @@ namespace Aryl
 		bool myIsRunning = false;
 		bool myIsMinimized = false;
 
-		Timestep myLastFrameTime = 0.f;
+		Timestep myLastFrameTime = 0;
 
 		LayerStack myLayerStack;
 

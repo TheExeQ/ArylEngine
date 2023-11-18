@@ -21,6 +21,8 @@ namespace Aryl
         bool SendMessage(const Ref<NetPacket>& packet);
         virtual void Connect(const IPv4Endpoint& endpoint);
 
+        std::mutex myEnttMutex;
+        
     protected:
         virtual void HandleMessage(NetPacket& packet);
         

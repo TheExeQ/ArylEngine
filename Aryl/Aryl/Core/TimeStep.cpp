@@ -2,7 +2,7 @@
 
 namespace Aryl 
 {
-	Timestep::Timestep(float time)
+	Timestep::Timestep(double time)
 		: myTime(time)
 	{
 

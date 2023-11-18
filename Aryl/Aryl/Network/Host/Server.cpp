@@ -23,18 +23,25 @@ namespace Aryl
 
     void Server::CreateEntity()
     {
-        static int imageVariation = 2;
-
+        std::lock_guard lock(myEnttMutex);
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
         {
             auto newEntity = Entity(registry.create(), SceneManager::GetActiveScene().get());
 
-            registry.emplace<TransformComponent>(newEntity.GetId()).position = {0.f, 0.f, 0.f};
-            registry.emplace<SpriteRendererComponent>(newEntity.GetId()).spritePath = std::string("test") +
-                std::to_string(((uint32_t)newEntity.GetId()) % imageVariation) + ".png";
+            glm::vec3 start, target;
+            float lerpTime = 2.f;
+            start = {0.f, 0.f, 0.f};
+            target = {500.f, 0.f, 0.f};
+
+            registry.emplace<TransformComponent>(newEntity.GetId()).position = start;
+            registry.emplace<ObjectMovement>(newEntity.GetId()) = {start, target, 0.f, lerpTime};
 
             const Ref<NetPacket> newEntPacket = CreateRef<NetPacket>();
             newEntPacket->header.messageType = NetMessageType::CreateEntity;
+
+            (*newEntPacket) << lerpTime;
+            (*newEntPacket) << target.z << target.y << target.x;
+            (*newEntPacket) << start.z << start.y << start.x;
 
             MulticastPacket(newEntPacket);
         }
@@ -53,7 +60,7 @@ namespace Aryl
             uint32_t p = atoi(p_str.c_str());
 
             IPv4Endpoint ep(connection.second.listenEndpoint.GetAddress(), p);
-            if (ep.ToString() == ignoreEP->ToString()) { continue; }
+            if (ignoreEP && ep.ToString() == ignoreEP->ToString()) { continue; }
             Connect(ep);
             SendMessage(packet);
         }
@@ -63,8 +70,9 @@ namespace Aryl
     {
         Host::HandleMessage(packet);
 
+        std::lock_guard lock(myEnttMutex);
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
-        
+
         if (packet.header.messageType == NetMessageType::Connect)
         {
             uint32_t port;

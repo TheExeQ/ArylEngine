@@ -18,7 +18,7 @@ namespace Aryl
         {
             const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
             connectPacket->header.messageType = NetMessageType::Disconnect;
-            
+
             SendMessage(connectPacket);
         }
     }
@@ -84,7 +84,15 @@ namespace Aryl
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
             auto newEntity = Entity(registry.create(), SceneManager::GetActiveScene().get());
 
-            registry.emplace<TransformComponent>(newEntity.GetId()).position = {0.f, 0.f, 0.f};
+            glm::vec3 start, target;
+            float lerpTime;
+
+            packet >> start.x >> start.y >> start.z;
+            packet >> target.x >> target.y >> target.z;
+            packet >> lerpTime;
+
+            registry.emplace<TransformComponent>(newEntity.GetId()).position = start;
+            registry.emplace<ObjectMovement>(newEntity.GetId()) = {start, target, 0.f, lerpTime};
             registry.emplace<SpriteRendererComponent>(newEntity.GetId()).spritePath = std::string("test") +
                 std::to_string(((uint32_t)newEntity.GetId()) % imageVariation) + ".png";
         }
@@ -93,7 +101,7 @@ namespace Aryl
         {
             uint32_t entId;
             packet >> entId;
-            
+
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
             registry.remove<SpriteRendererComponent>((entt::entity)entId);
         }

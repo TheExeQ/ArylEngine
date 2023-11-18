@@ -6,16 +6,16 @@ namespace Aryl
 	{
 	public:
 		Timestep() {}
-		Timestep(float time);
+		Timestep(double time);
 
-		inline float GetSeconds() const { return myTime; }
-		inline float GetMilliseconds() const { return myTime * 1000.0f; }
+		inline double GetSeconds() const { return myTime; }
+		inline double GetMilliseconds() const { return myTime * 1000; }
 
-		operator float() { return myTime; }
-		operator const float() const { return myTime; }
+		operator double() { return myTime; }
+		operator const double() const { return myTime; }
 
 	private:
-		float myTime = 0.0f;
+		double myTime = 0;
 	};
 
 }

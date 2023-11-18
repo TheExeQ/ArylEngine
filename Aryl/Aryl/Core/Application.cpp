@@ -53,7 +53,8 @@ namespace Aryl
 		{
 			YL_PROFILE_FRAME("Frame");
 
-			float time = (float)glfwGetTime();
+			auto currentTimePoint = std::chrono::high_resolution_clock::now();
+			const auto time = (IsHeadless()) ? std::chrono::duration_cast<std::chrono::duration<double>>(currentTimePoint.time_since_epoch()).count() : glfwGetTime();
 			Timestep timestep = time - myLastFrameTime;
 			myLastFrameTime = time;
 

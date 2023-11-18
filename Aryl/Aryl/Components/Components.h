@@ -23,8 +23,8 @@ namespace Aryl
 
 	struct ObjectMovement
 	{
-		glm::vec2 direction;
-		float lerp_time;
+		glm::vec3 start, target;
+		float current_lerp_time, lerp_time;
 	};
 
 	struct SpriteRendererComponent
