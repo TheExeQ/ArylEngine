@@ -70,7 +70,7 @@ namespace Aryl
 
             if (packet->header.packetType == NetPacketType::Reliable && !isReliablySent)
             {
-                s_ReliableFallback.ReliableFallback.emplace_back(NetReliableEntry{packet, myReliableTime, myReliableRetries});
+                // s_ReliableFallback.ReliableFallback.emplace_back(NetReliableEntry{packet, myReliableTime, myReliableRetries});
             }
             return true;
         }
