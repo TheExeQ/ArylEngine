@@ -41,6 +41,7 @@ namespace Aryl
 
             const Ref<NetPacket> newEntPacket = CreateRef<NetPacket>();
             newEntPacket->header.messageType = NetMessageType::CreateEntity;
+            newEntPacket->header.packetType = NetPacketType::Reliable;
 
             (*newEntPacket) << lerpTime;
             (*newEntPacket) << target.z << target.y << target.x;
@@ -54,6 +55,7 @@ namespace Aryl
     {
         const Ref<NetPacket> delEntPacket = CreateRef<NetPacket>();
         delEntPacket->header.messageType = NetMessageType::RemoveEntity;
+        delEntPacket->header.packetType = NetPacketType::Reliable;
 
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
         for (auto ent : entities)
@@ -86,8 +88,6 @@ namespace Aryl
 
     void Server::HandleMessage(NetPacket& packet)
     {
-        Host::HandleMessage(packet);
-
         std::lock_guard lock(myEnttMutex);
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
 
@@ -102,6 +102,7 @@ namespace Aryl
             {
                 const Ref<NetPacket> syncPacket = CreateRef<NetPacket>();
                 syncPacket->header.messageType = NetMessageType::SyncWorld;
+                syncPacket->header.packetType = NetPacketType::Reliable;
 
                 auto entities = registry.view<ObjectMovement>();
 
@@ -125,5 +126,7 @@ namespace Aryl
                 SendMessage(syncPacket);
             }
         }
+
+        Host::HandleMessage(packet);
     }
 }

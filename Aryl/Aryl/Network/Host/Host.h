@@ -6,12 +6,6 @@
 
 namespace Aryl
 {
-    struct NetConnection
-    {
-        IPv4Endpoint listenEndpoint;
-        uint32_t sendId = 0;
-    };
-    
     class Host
     {
     public:

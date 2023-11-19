@@ -13,6 +13,7 @@ namespace Aryl
 	struct NetPacketHeader
 	{
 		uint32_t id = 0;
+		NetPacketType packetType = NetPacketType::Unreliable;
 		NetMessageType messageType = NetMessageType::Unknown;
 		uint32_t size = 0;
 	};

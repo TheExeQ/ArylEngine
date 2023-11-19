@@ -62,14 +62,14 @@ namespace Aryl
             YL_PROFILE_FRAME("Frame");
 
             const auto time = glfwGetTime();
-            Timestep timestep = time - myLastFrameTime;
-            myLastFrameTime = time;
-
+            myTime.myDeltaTime = time - myTime.myLastFrameTime;
+            myTime.myLastFrameTime = time;
+            
             // Update
             {
                 YL_PROFILE_SCOPE("Application::Update");
 
-                AppUpdateEvent updateEvent(timestep);
+                AppUpdateEvent updateEvent(myTime.myDeltaTime);
                 OnEvent(updateEvent);
             }
 

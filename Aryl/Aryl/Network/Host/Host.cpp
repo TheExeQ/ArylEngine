@@ -7,6 +7,8 @@
 
 namespace Aryl
 {
+    NetReliableHandler s_ReliableFallback;
+    
     Host::Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate)
     {
         if (!mySender)
@@ -75,7 +77,7 @@ namespace Aryl
             packet->header.id = connection.sendId;
 
             auto ep = myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint;
-            YL_INFO("Sending msg_type:{0} to {1}", (int)packet->header.messageType, ep.ToString());
+            YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, (int)packet->header.messageType, ep.ToString());
             
             if (mySender->Send(packet, ep))
             {
@@ -101,10 +103,15 @@ namespace Aryl
         {
             YL_CORE_TRACE("{0} disconnected (ID: {1})", packet.endpoint.ToString(), packet.header.id);
         }
-        if (packet.header.messageType == NetMessageType::StringMessage)
+        if (packet.header.packetType == NetPacketType::Reliable)
         {
-            std::string str((const char*)packet.data.data());
-            YL_CORE_TRACE(str + " from {0} (ID: {1})", packet.endpoint.ToString(), packet.header.id);
+            const Ref<NetPacket> ackPacket = CreateRef<NetPacket>();
+            ackPacket->header.messageType = NetMessageType::Acknowledgement;
+
+            (*ackPacket) << packet.header.id;
+            
+            SendMessage(ackPacket);
+            YL_CORE_TRACE("Acknowledgement (ID: {0})", packet.header.id);
         }
     }
 }

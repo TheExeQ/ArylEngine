@@ -21,7 +21,7 @@ namespace Aryl
 			myStopping = true;
 		}
 
-		bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver);
+		bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent = false);
 		Ref<UdpSocket> GetSocket() { return mySocket; };
 
 		static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
@@ -30,6 +30,8 @@ namespace Aryl
 		virtual void Update() {};
 
 		std::queue<Ref<NetPacket>> mySendQueue;
+		int myReliableRetries = 3;
+		float myReliableTime = 5.f;
 		
 		bool myStopping = false;
 		std::thread myThread;

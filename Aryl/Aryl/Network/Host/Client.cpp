@@ -32,6 +32,7 @@ namespace Aryl
 
             const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
             connectPacket->header.messageType = NetMessageType::Connect;
+            connectPacket->header.packetType = NetPacketType::Reliable;
 
             (*connectPacket) << myReceiver->GetSocket()->GetEndpoint().GetPort();
 
@@ -41,7 +42,6 @@ namespace Aryl
 
     void Client::HandleMessage(NetPacket& packet)
     {
-        Host::HandleMessage(packet);
         static int imageVariation = 2;
 
         if (packet.header.messageType == NetMessageType::SyncWorld)
@@ -118,5 +118,7 @@ namespace Aryl
                 registry.remove<ObjectMovement>((entt::entity)entId);
             }
         }
+        
+        Host::HandleMessage(packet);
     }
 }

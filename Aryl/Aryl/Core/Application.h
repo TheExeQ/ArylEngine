@@ -19,64 +19,70 @@
 #include <string>
 #include <filesystem>
 
+#include "Time.h"
+
 namespace Aryl
 {
-	struct ApplicationInfo
-	{
-		ApplicationInfo(const std::string& aTitle = "Aryl", WindowMode aWindowMode = WindowMode::Windowed, uint32_t aWidth = 1280, uint32_t aHeight = 720, bool aUseVSync = true, bool aEnableImGui = true)
-			: title(aTitle), width(aWidth), height(aHeight), useVSync(aUseVSync), enableImGui(aEnableImGui), windowMode(aWindowMode)
-		{
-		}
+    struct ApplicationInfo
+    {
+        ApplicationInfo(const std::string& aTitle = "Aryl", WindowMode aWindowMode = WindowMode::Windowed,
+                        uint32_t aWidth = 1280, uint32_t aHeight = 720, bool aUseVSync = true, bool aEnableImGui = true)
+            : title(aTitle), width(aWidth), height(aHeight), useVSync(aUseVSync), enableImGui(aEnableImGui),
+              windowMode(aWindowMode)
+        {
+        }
 
-		std::string title;
-		WindowMode windowMode;
-		uint32_t width;
-		uint32_t height;
-		bool useVSync;
-		bool enableImGui;
-		bool headless = false;
-		bool isRuntime = false;
+        std::string title;
+        WindowMode windowMode;
+        uint32_t width;
+        uint32_t height;
+        bool useVSync;
+        bool enableImGui;
+        bool headless = false;
+        bool isRuntime = false;
 
-		std::string version = "1.0";
-	};
+        std::string version = "1.0";
+    };
 
-	class Application
-	{
-	public:
-		Application(const ApplicationInfo& info = ApplicationInfo());
-		virtual ~Application();
+    class Application
+    {
+    public:
+        Application(const ApplicationInfo& info = ApplicationInfo());
+        virtual ~Application();
 
-		void Run();
-		void OnEvent(Event& event);
+        void Run();
+        void OnEvent(Event& event);
 
-		void PushLayer(Layer* layer);
-		void PopLayer(Layer* layer);
+        void PushLayer(Layer* layer);
+        void PopLayer(Layer* layer);
 
-		Ref<NetContext> GetNetworkContext() const { return myNetManager->GetContext(); };
+        Ref<NetContext> GetNetworkContext() const { return myNetManager->GetContext(); };
 
-		inline bool IsHeadless() const { return myWindow == nullptr; }
+        inline bool IsHeadless() const { return myWindow == nullptr; }
 
-		inline Window& GetWindow() const { return *myWindow; }
-		inline static Application& Get() { return *myInstance; }
+        inline Window& GetWindow() const { return *myWindow; }
+        inline static Application& Get() { return *myInstance; }
 
-	private:
-		bool OnWindowCloseEvent(WindowCloseEvent& e);
-		bool OnWindowResizeEvent(WindowResizeEvent& e);
+        const Time& GetTime() const { return myTime; }
 
-		bool myIsRunning = false;
-		bool myIsMinimized = false;
+    private:
+        bool OnWindowCloseEvent(WindowCloseEvent& e);
+        bool OnWindowResizeEvent(WindowResizeEvent& e);
 
-		Timestep myLastFrameTime = 0;
+        bool myIsRunning = false;
+        bool myIsMinimized = false;
 
-		LayerStack myLayerStack;
+        Time myTime;
 
-		Scope<Window> myWindow = nullptr;
-		Scope<ImGuiImplementation> myImGuiImplementation;
-		Scope<NetManager> myNetManager;
+        LayerStack myLayerStack;
 
-		ApplicationInfo myInfo;
-		inline static Application* myInstance;
-	};
+        Scope<Window> myWindow = nullptr;
+        Scope<ImGuiImplementation> myImGuiImplementation;
+        Scope<NetManager> myNetManager;
 
-	static Application* CreateApplication(const std::filesystem::path& appPath);
+        ApplicationInfo myInfo;
+        inline static Application* myInstance;
+    };
+
+    static Application* CreateApplication(const std::filesystem::path& appPath);
 }

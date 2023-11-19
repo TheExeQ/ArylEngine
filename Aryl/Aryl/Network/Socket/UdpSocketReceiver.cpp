@@ -7,47 +7,70 @@
 
 namespace Aryl
 {
-	UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
-		: mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate)
-	{
+    extern NetReliableHandler s_ReliableFallback;
 
-	}
+    UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
+        : mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate)
+    {
+    }
 
-	uint32_t UdpSocketReceiver::Run()
-	{
-		while (!myStopping)
-		{
-			if (myOnDataReceivedDelegate)
-			{
-				PacketBuffer buffer;
-				IPv4Endpoint sender;
+    uint32_t UdpSocketReceiver::Run()
+    {
+        while (!myStopping)
+        {
+            if (myOnDataReceivedDelegate)
+            {
+                PacketBuffer buffer;
+                IPv4Endpoint sender;
 
-				mySocket->ReceieveFrom(buffer, sender);
+                mySocket->ReceieveFrom(buffer, sender);
 
-				NetPacket packet;
-				packet.deserialize(buffer);
+                NetPacket packet;
+                packet.deserialize(buffer);
 
-				packet.endpoint = sender;
+                if (packet.header.messageType == NetMessageType::Acknowledgement)
+                {
+                    std::lock_guard lock(s_ReliableFallback.Mutex);
 
-				myOnDataReceivedDelegate(packet);
-			}
+                    uint32_t id;
+                    packet >> id;
+                    
+                    auto idMatches = [id](const NetReliableEntry& entry)
+                    {
+                        return entry.Packet->header.id == id;
+                    };
 
-			Update();
-		}
+                    auto it = std::find_if(s_ReliableFallback.ReliableFallback.begin(),
+                                           s_ReliableFallback.ReliableFallback.end(), idMatches);
 
-		return 0;
-	}
+                    if (it != s_ReliableFallback.ReliableFallback.end())
+                    {
+                        s_ReliableFallback.ReliableFallback.erase(it);
+                    }
+                }
 
-	Ref<UdpSocketReceiver> UdpSocketReceiver::Create(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
-	{
-		switch (NetAPI::Current())
-		{
-			case NetAPIType::None: return nullptr;
-			case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket, onDataReceivedDelegate);
-			case NetAPIType::WinSock2: return nullptr;
-		}
+                packet.endpoint = sender;
 
-		YL_CORE_ASSERT(false, "Unknown NetAPI");
-		return nullptr;
-	}
+                myOnDataReceivedDelegate(packet);
+            }
+
+            Update();
+        }
+
+        return 0;
+    }
+
+    Ref<UdpSocketReceiver> UdpSocketReceiver::Create(Ref<UdpSocket> socket,
+                                                     std::function<void(NetPacket)> onDataReceivedDelegate)
+    {
+        switch (NetAPI::Current())
+        {
+        case NetAPIType::None: return nullptr;
+        case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket, onDataReceivedDelegate);
+        case NetAPIType::WinSock2: return nullptr;
+        }
+
+        YL_CORE_ASSERT(false, "Unknown NetAPI");
+        return nullptr;
+    }
 }
