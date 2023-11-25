@@ -7,7 +7,8 @@
 
 namespace Aryl
 {
-    NetReliableHandler s_ReliableFallback;
+    NetReliableHandler g_ReliableFallback;
+    std::mutex g_ReliableFallbackMutex;
     
     Host::Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate)
     {
@@ -111,7 +112,7 @@ namespace Aryl
             (*ackPacket) << packet.header.id;
             
             SendMessage(ackPacket);
-            YL_CORE_TRACE("Acknowledgement (ID: {0})", packet.header.id);
+            YL_CORE_TRACE("Sending Acknowledgement (ID: {0})", packet.header.id);
         }
     }
 }

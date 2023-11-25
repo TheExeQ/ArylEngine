@@ -7,7 +7,8 @@
 
 namespace Aryl
 {
-    extern NetReliableHandler s_ReliableFallback;
+    extern NetReliableHandler g_ReliableFallback;
+    extern std::mutex g_ReliableFallbackMutex;
 
     UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
         : mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate)
@@ -30,7 +31,7 @@ namespace Aryl
 
                 if (packet.header.messageType == NetMessageType::Acknowledgement)
                 {
-                    std::lock_guard lock(s_ReliableFallback.Mutex);
+                    std::lock_guard lock(g_ReliableFallbackMutex);
 
                     uint32_t id;
                     packet >> id;
@@ -40,13 +41,14 @@ namespace Aryl
                         return entry.Packet->header.id == id;
                     };
 
-                    auto it = std::find_if(s_ReliableFallback.ReliableFallback.begin(),
-                                           s_ReliableFallback.ReliableFallback.end(), idMatches);
+                    auto it = std::find_if(g_ReliableFallback.ReliableFallback.begin(),
+                                           g_ReliableFallback.ReliableFallback.end(), idMatches);
 
-                    if (it != s_ReliableFallback.ReliableFallback.end())
+                    if (it != g_ReliableFallback.ReliableFallback.end())
                     {
-                        s_ReliableFallback.ReliableFallback.erase(it);
+                        g_ReliableFallback.ReliableFallback.erase(it);
                     }
+                    YL_CORE_TRACE("Received Acknowledgement (ID: {0})", id);
                 }
 
                 packet.endpoint = sender;

@@ -15,11 +15,13 @@ namespace Aryl
         bool SendMessage(const Ref<NetPacket>& packet);
         virtual void Connect(const IPv4Endpoint& endpoint);
 
+        const SenderStats& GetSenderStats() { return mySender->GetStats(); }
+
         std::mutex myEnttMutex;
-        
+
     protected:
         virtual void HandleMessage(NetPacket& packet);
-        
+
         std::unordered_map<std::string, NetConnection> myConnectionsMap;
         IPv4Endpoint myEndpoint;
 

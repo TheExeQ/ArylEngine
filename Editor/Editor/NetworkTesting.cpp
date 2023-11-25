@@ -32,7 +32,7 @@ NetworkTesting::NetworkTesting()
     {
         Aryl::Application::Get().GetNetworkContext()->InitClient();
     }
-    
+
     // ReflectionTesting();
 }
 
@@ -96,9 +96,9 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
     if (Aryl::Application::Get().IsHeadless())
     {
-        constexpr double max_timer = 1;
+        constexpr double max_timer = 5;
         static double timer = max_timer;
-        
+
         timer -= e.GetTimestep();
         if (timer < 0)
         {
@@ -125,23 +125,25 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
         auto entities = registry.view<Aryl::ObjectMovement>();
 
         std::vector<entt::entity> deleteEnts;
-        
+
         for (auto ent : entities)
         {
             auto& comp = registry.get<Aryl::ObjectMovement>(ent);
             comp.current_lerp_time += e.GetTimestep();
             if (comp.current_lerp_time > comp.lerp_time)
             {
-                Aryl::Random::SetSeed(comp.start.x + comp.start.y + comp.start.z + comp.target.x + comp.target.y + comp.target.z);
+                Aryl::Random::SetSeed(
+                    comp.start.x + comp.start.y + comp.start.z + comp.target.x + comp.target.y + comp.target.z);
 
                 const float targetX = Aryl::Random::GetRandomFloat(-1.f, 1.f);
                 const float targetY = Aryl::Random::GetRandomFloat(-1.f, 1.f);
-                
+
                 comp.start = comp.target;
                 comp.target = glm::vec3(750.f * targetX, 500.f * targetY, 0.f);
                 comp.current_lerp_time = 0.f;
             }
-            registry.get<Aryl::TransformComponent>(ent).position = glm::mix(comp.start, comp.target, comp.current_lerp_time / comp.lerp_time);
+            registry.get<Aryl::TransformComponent>(ent).position = glm::mix(
+                comp.start, comp.target, comp.current_lerp_time / comp.lerp_time);
 
             for (auto ent2 : entities)
             {
@@ -164,7 +166,7 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
             reinterpret_cast<Aryl::Server*>(host)->RemoveEntities(deleteEnts);
         }
     }
-    
+
     return false;
 }
 
@@ -184,12 +186,19 @@ void NetworkTesting::ArylNetExample()
     ImGui::InputText("Server Address", serverIp, sizeof(serverIp));
     ImGui::InputInt("Server Port", &serverPort);
 
+    auto client = Aryl::Application::Get().GetNetworkContext()->GetClient();
     if (ImGui::Button("Connect") && !hasConnected)
     {
-        auto client = Aryl::Application::Get().GetNetworkContext()->GetClient();
         client->Connect(Aryl::IPv4Endpoint(Aryl::IPv4Address(serverIp), serverPort));
         hasConnected = true;
     }
+    ImGui::End();
+
+    auto& sendStats = client->GetSenderStats();
+
+    ImGui::Begin("Net Stats");
+    ImGui::Text("Packet Loss: %.2f%%", sendStats.PacketLoss);
+    ImGui::Text("Bits Sent This Frame: %d", sendStats.BitsSentThisFrame);
     ImGui::End();
 
     if (!myTestingEntity.IsNull())

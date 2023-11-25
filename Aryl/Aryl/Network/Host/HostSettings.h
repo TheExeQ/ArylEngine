@@ -20,7 +20,6 @@ namespace Aryl
     struct NetReliableHandler
     {
         std::vector<NetReliableEntry> ReliableFallback;
-        std::mutex Mutex;
     };
     
     struct NetConnection

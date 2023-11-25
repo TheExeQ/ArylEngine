@@ -10,37 +10,45 @@
 
 namespace Aryl
 {
-	class UdpSocketSender
-	{
-	public:
-		UdpSocketSender(Ref<UdpSocket> socket);
-		virtual ~UdpSocketSender() { myThread.join(); };
+    struct SenderStats
+    {
+        int BitsSentThisFrame = 0;
+    };
 
-		void Stop()
-		{
-			myStopping = true;
-		}
+    class UdpSocketSender
+    {
+    public:
+        UdpSocketSender(Ref<UdpSocket> socket);
+        virtual ~UdpSocketSender() { myThread.join(); };
 
-		bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent = false);
-		Ref<UdpSocket> GetSocket() { return mySocket; };
+        void Stop()
+        {
+            myStopping = true;
+        }
 
-		static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
+        bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent = false);
+        Ref<UdpSocket> GetSocket() { return mySocket; };
+        const SenderStats& GetStats() const { return myStats; };
 
-	protected:
-		virtual void Update() {};
+        static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
 
-		std::queue<Ref<NetPacket>> mySendQueue;
-		int myReliableRetries = 3;
-		float myReliableTime = 5.f;
-		
-		bool myStopping = false;
-		std::thread myThread;
+    protected:
+        virtual void Update();
 
-		Ref<UdpSocket> mySocket = nullptr;
+        SenderStats myStats;
+        std::queue<Ref<NetPacket>> mySendQueue;
+        int myLostPacketsCount = 0;
+        int myReliableRetries = 3;
+        float myReliableTime = 5.f;
 
-	private:
-		uint32_t Run();
+        bool myStopping = false;
+        std::thread myThread;
 
-		std::unordered_map<std::string, uint32_t> myPacketIdMap;
-	};
+        Ref<UdpSocket> mySocket = nullptr;
+
+    private:
+        uint32_t Run();
+
+        std::unordered_map<std::string, uint32_t> myPacketIdMap;
+    };
 }

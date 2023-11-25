@@ -10,6 +10,8 @@ namespace Aryl
 
 	void AsioUdpSocketSender::Update()
 	{
+		UdpSocketSender::Update();
+		
 		if (!mySendQueue.empty())
 		{
 			auto message = mySendQueue.front();

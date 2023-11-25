@@ -8,7 +8,8 @@
 
 namespace Aryl
 {
-    extern NetReliableHandler s_ReliableFallback;
+    extern NetReliableHandler g_ReliableFallback;
+    extern std::mutex g_ReliableFallbackMutex;
 
     UdpSocketSender::UdpSocketSender(Ref<UdpSocket> socket)
         : mySocket(socket), myThread([this]() { Run(); })
@@ -22,22 +23,27 @@ namespace Aryl
             auto start_time = std::chrono::high_resolution_clock::now();
             Update();
 
-            std::lock_guard lock(s_ReliableFallback.Mutex);
-            
-            s_ReliableFallback.ReliableFallback.erase(
-                std::remove_if(s_ReliableFallback.ReliableFallback.begin(), s_ReliableFallback.ReliableFallback.end(), [](const NetReliableEntry& entry)
+            std::lock_guard lock(g_ReliableFallbackMutex);
+
+            auto& reliableFallbackVec = g_ReliableFallback.ReliableFallback;
+            for (auto it = reliableFallbackVec.begin(); it != reliableFallbackVec.end();)
+            {
+                if (it->Retries <= 0)
                 {
-                    return entry.Retries <= 0;
-                }),
-                s_ReliableFallback.ReliableFallback.end()
-            );
+                    it = reliableFallbackVec.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
 
             auto end_time = std::chrono::high_resolution_clock::now();
 
             std::chrono::duration<double> duration = end_time - start_time;
             const double delta_time_seconds = duration.count();
-            
-            for (auto& entry : s_ReliableFallback.ReliableFallback)
+
+            for (auto& entry : g_ReliableFallback.ReliableFallback)
             {
                 entry.Time -= delta_time_seconds;
                 if (entry.Time < 0.f)
@@ -51,6 +57,10 @@ namespace Aryl
         }
 
         return 0;
+    }
+
+    void UdpSocketSender::Update()
+    {
     }
 
     bool UdpSocketSender::Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent)
@@ -70,7 +80,9 @@ namespace Aryl
 
             if (packet->header.packetType == NetPacketType::Reliable && !isReliablySent)
             {
-                // s_ReliableFallback.ReliableFallback.emplace_back(NetReliableEntry{packet, myReliableTime, myReliableRetries});
+                g_ReliableFallback.ReliableFallback.emplace_back(NetReliableEntry{
+                    packet, myReliableTime, myReliableRetries
+                });
             }
             return true;
         }
