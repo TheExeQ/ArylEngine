@@ -88,6 +88,9 @@ namespace Aryl
 
     void Server::HandleMessage(NetPacket& packet)
     {
+        Connect(packet.endpoint);
+        if (!ShouldProcessMessage(packet)) { return; }
+        
         std::lock_guard lock(myEnttMutex);
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
 
@@ -96,7 +99,7 @@ namespace Aryl
             uint32_t port;
             packet >> port;
             IPv4Endpoint clientListenEndpoint(packet.endpoint.GetAddress(), port);
-            myConnectionsMap[packet.endpoint.ToString()] = NetConnection({clientListenEndpoint, 0});
+            myConnectionsMap[packet.endpoint.ToString()] = NetConnection({clientListenEndpoint});
 
             // Sync World
             {

@@ -28,7 +28,7 @@ namespace Aryl
         Host::Connect(endpoint);
 
         {
-            myConnectionsMap[endpoint.ToString()] = NetConnection({endpoint, 0});
+            myConnectionsMap[endpoint.ToString()] = NetConnection({endpoint});
 
             const Ref<NetPacket> connectPacket = CreateRef<NetPacket>();
             connectPacket->header.messageType = NetMessageType::Connect;
@@ -40,8 +40,18 @@ namespace Aryl
         }
     }
 
+    void Client::PingServer()
+    {
+        const Ref<NetPacket> pingPacket = CreateRef<NetPacket>();
+        pingPacket->header.messageType = NetMessageType::Ping;
+        pingPacket->header.packetType = NetPacketType::Reliable;
+        SendMessage(pingPacket);
+    }
+
     void Client::HandleMessage(NetPacket& packet)
     {
+        if (!ShouldProcessMessage(packet)) { return; }
+
         static int imageVariation = 2;
 
         if (packet.header.messageType == NetMessageType::SyncWorld)
@@ -65,14 +75,14 @@ namespace Aryl
                 uint32_t ent;
                 glm::vec3 pos, start, target;
                 float curLerp, targetLerp;
-                
+
                 packet >> ent;
                 packet >> pos.x >> pos.y >> pos.z;
-                
+
                 packet >> start.x >> start.y >> start.z;
                 packet >> target.x >> target.y >> target.z;
                 packet >> curLerp >> targetLerp;
-                
+
                 registry.emplace_or_replace<SpriteRendererComponent>((entt::entity)ent,
                                                                      std::string("test") + std::to_string(
                                                                          ent % imageVariation) + ".png");
@@ -118,7 +128,7 @@ namespace Aryl
                 registry.remove<ObjectMovement>((entt::entity)entId);
             }
         }
-        
+
         Host::HandleMessage(packet);
     }
 }

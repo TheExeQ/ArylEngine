@@ -10,11 +10,6 @@
 
 namespace Aryl
 {
-    struct SenderStats
-    {
-        int BitsSentThisFrame = 0;
-    };
-
     class UdpSocketSender
     {
     public:
@@ -28,14 +23,12 @@ namespace Aryl
 
         bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent = false);
         Ref<UdpSocket> GetSocket() { return mySocket; };
-        const SenderStats& GetStats() const { return myStats; };
 
         static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
 
     protected:
         virtual void Update();
 
-        SenderStats myStats;
         std::queue<Ref<NetPacket>> mySendQueue;
         int myLostPacketsCount = 0;
         int myReliableRetries = 3;

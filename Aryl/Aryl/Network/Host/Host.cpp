@@ -1,7 +1,5 @@
 ﻿#include "Host.h"
 
-#include "Client.h"
-#include "Server.h"
 #include "Aryl/Core/Application.h"
 #include "Aryl/Network/Socket/UdpSocketBuilder.h"
 
@@ -9,7 +7,7 @@ namespace Aryl
 {
     NetReliableHandler g_ReliableFallback;
     std::mutex g_ReliableFallbackMutex;
-    
+
     Host::Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate)
     {
         if (!mySender)
@@ -68,6 +66,19 @@ namespace Aryl
             mySender->Stop();
             mySender = nullptr;
         }
+
+        std::unique_lock lock(myEnttMutex, std::try_to_lock);
+        std::unique_lock lock2(myNetStatsMutex, std::try_to_lock);
+
+        if (!lock.owns_lock())
+        {
+            lock.lock();
+        }
+
+        if (!lock2.owns_lock())
+        {
+            lock2.lock();
+        }
     }
 
     bool Host::SendMessage(const Ref<NetPacket>& packet)
@@ -78,10 +89,22 @@ namespace Aryl
             packet->header.id = connection.sendId;
 
             auto ep = myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint;
-            YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, (int)packet->header.messageType, ep.ToString());
-            
+            // YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, (int)packet->header.messageType,
+            //         ep.ToString());
+
             if (mySender->Send(packet, ep))
             {
+                std::lock_guard lock(myNetStatsMutex);
+                myNetStats.bitsSent += (sizeof(packet->header) + packet->data.size()) * 8;
+
+                if (packet->header.packetType == NetPacketType::Reliable)
+                {
+                    myNetStats.pingAckId = packet->header.id;
+
+                    const auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+                    myNetStats.pingAckTime = std::chrono::duration<float>(duration).count();
+                }
+
                 connection.sendId++;
             }
         }
@@ -95,6 +118,23 @@ namespace Aryl
 
     void Host::HandleMessage(NetPacket& packet)
     {
+        {
+            std::lock_guard lock(myNetStatsMutex);
+            myNetStats.bitsReceived += (sizeof(packet.header) + packet.size()) * 8;
+
+            if (packet.header.messageType == NetMessageType::Acknowledgement)
+            {
+                uint32_t id;
+                packet >> id;
+
+                if (myNetStats.pingAckId == id)
+                {
+                    const auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
+                    myNetStats.ping = std::chrono::duration<float>(duration).count() - myNetStats.pingAckTime;
+                }
+            }
+        }
+
         // TESTING
         if (packet.header.messageType == NetMessageType::Connect)
         {
@@ -106,13 +146,57 @@ namespace Aryl
         }
         if (packet.header.packetType == NetPacketType::Reliable)
         {
-            const Ref<NetPacket> ackPacket = CreateRef<NetPacket>();
-            ackPacket->header.messageType = NetMessageType::Acknowledgement;
-
-            (*ackPacket) << packet.header.id;
-            
-            SendMessage(ackPacket);
-            YL_CORE_TRACE("Sending Acknowledgement (ID: {0})", packet.header.id);
+            SendAck(packet);
         }
+    }
+
+    bool Host::ShouldProcessMessage(NetPacket& packet)
+    {
+        if (myConnectionsMap.find(myEndpoint.ToString()) == myConnectionsMap.end())
+        {
+            return true;
+        }
+
+        NetConnection& connection = myConnectionsMap.at(myEndpoint.ToString());
+        if (packet.header.id > connection.receiveId)
+        {
+            const auto missedIds = packet.header.id - connection.receiveId - 1u;
+            for (int i = 0; i < missedIds; ++i)
+            {
+                uint32_t missedId = packet.header.id - (i + 1);
+                myMissedIds.emplace_back(missedId);
+                YL_CORE_WARN("Missed packet: [{0}] {1}", packet.header.id, missedId);
+            }
+            connection.receiveId = packet.header.id;
+            return true;
+        }
+        else if (const auto it = std::find(myMissedIds.begin(), myMissedIds.end(), packet.header.id); it != myMissedIds.
+            end())
+        {
+            myMissedIds.erase(it);
+            YL_CORE_WARN("Ran missed packet: {0}", packet.header.id);
+            return true;
+        }
+
+        SendAck(packet);
+        YL_CORE_WARN("Ignoring packet: {0}", packet.header.id);
+        return false;
+    }
+
+    void Host::OnPacketLost(uint32_t id)
+    {
+        myNetStats.packetsLostCount++;
+        myNetStats.packetLoss = myNetStats.packetsLostCount / id;
+    }
+
+    void Host::SendAck(NetPacket& packet)
+    {
+        const Ref<NetPacket> ackPacket = CreateRef<NetPacket>();
+        ackPacket->header.messageType = NetMessageType::Acknowledgement;
+
+        (*ackPacket) << packet.header.id;
+
+        SendMessage(ackPacket);
+        YL_CORE_TRACE("Sending Acknowledgement (ID: {0})", packet.header.id);
     }
 }

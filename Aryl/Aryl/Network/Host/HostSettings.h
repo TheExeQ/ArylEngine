@@ -25,6 +25,7 @@ namespace Aryl
     struct NetConnection
     {
         IPv4Endpoint listenEndpoint;
-        uint32_t sendId = 0;
+        uint32_t sendId = 1;
+        uint32_t receiveId = 0;
     };
 }

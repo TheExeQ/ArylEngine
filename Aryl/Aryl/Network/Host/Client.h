@@ -10,6 +10,7 @@ namespace Aryl
         ~Client();
 
         void Connect(const IPv4Endpoint& endpoint) override;
+        void PingServer();
         
     protected:
         void HandleMessage(NetPacket& packet) override;

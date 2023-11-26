@@ -13,6 +13,7 @@ namespace Aryl
 		Unknown,
 		Connect,
 		Disconnect,
+		Ping,
 		Acknowledgement,
 		StringMessage,
 		CreateEntity,

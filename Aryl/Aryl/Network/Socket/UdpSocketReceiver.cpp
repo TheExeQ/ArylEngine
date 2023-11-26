@@ -35,6 +35,7 @@ namespace Aryl
 
                     uint32_t id;
                     packet >> id;
+                    packet << id;
                     
                     auto idMatches = [id](const NetReliableEntry& entry)
                     {
