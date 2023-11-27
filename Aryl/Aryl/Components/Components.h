@@ -14,6 +14,11 @@ namespace Aryl
 		std::string tag;
 	};
 
+	struct NetComponent
+	{
+		entt::entity netId = entt::null;
+	};
+
 	struct TransformComponent
 	{
 		glm::vec3 position;

@@ -83,13 +83,14 @@ namespace Aryl
                 packet >> target.x >> target.y >> target.z;
                 packet >> curLerp >> targetLerp;
 
-                registry.emplace_or_replace<SpriteRendererComponent>((entt::entity)ent,
+                registry.emplace_or_replace<SpriteRendererComponent>(static_cast<entt::entity>(ent),
                                                                      std::string("test") + std::to_string(
                                                                          ent % imageVariation) + ".png");
-                registry.emplace_or_replace<TransformComponent>((entt::entity)ent, pos, glm::quat(),
+                registry.emplace_or_replace<TransformComponent>(static_cast<entt::entity>(ent), pos, glm::quat(),
                                                                 glm::vec3(0.5f));
 
-                registry.emplace_or_replace<ObjectMovement>((entt::entity)ent, start, target, curLerp, targetLerp);
+                registry.emplace_or_replace<ObjectMovement>(static_cast<entt::entity>(ent), start, target, curLerp,
+                                                            targetLerp);
             }
         }
 
@@ -97,19 +98,23 @@ namespace Aryl
         {
             std::lock_guard lock(myEnttMutex);
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
-            auto newEntity = Entity(registry.create(), SceneManager::GetActiveScene().get());
+            auto newId = registry.create();
 
+            entt::entity ent;
             glm::vec3 start, target;
             float lerpTime;
+
+            packet >> ent;
+            myServerToClientEntityMap[static_cast<uint32_t>(ent)] = static_cast<uint32_t>(newId);
 
             packet >> start.x >> start.y >> start.z;
             packet >> target.x >> target.y >> target.z;
             packet >> lerpTime;
 
-            registry.emplace<TransformComponent>(newEntity.GetId()) = {start, glm::quat(), {0.5f, 0.5f, 0.5f}};
-            registry.emplace<ObjectMovement>(newEntity.GetId()) = {start, target, 0.f, lerpTime};
-            registry.emplace<SpriteRendererComponent>(newEntity.GetId()).spritePath = std::string("test") +
-                std::to_string(((uint32_t)newEntity.GetId()) % imageVariation) + ".png";
+            registry.emplace<TransformComponent>(newId) = TransformComponent{start, glm::quat(), {0.5f, 0.5f, 0.5f}};
+            registry.emplace<ObjectMovement>(newId) = ObjectMovement{start, target, 0.f, lerpTime};
+            registry.emplace<SpriteRendererComponent>(newId).spritePath = std::string("test") +
+                std::to_string(static_cast<uint32_t>(ent) % imageVariation) + ".png";
         }
 
         if (packet.header.messageType == NetMessageType::RemoveEntity)
@@ -124,11 +129,47 @@ namespace Aryl
                 uint32_t entId;
                 packet >> entId;
 
-                registry.remove<SpriteRendererComponent>((entt::entity)entId);
-                registry.remove<ObjectMovement>((entt::entity)entId);
+                if (myServerToClientEntityMap.find(entId) != myServerToClientEntityMap.end())
+                {
+                    auto clientId = myServerToClientEntityMap.at(entId);
+
+                    registry.remove<SpriteRendererComponent>(static_cast<entt::entity>(clientId));
+                    registry.remove<ObjectMovement>(static_cast<entt::entity>(clientId));
+
+                    myServerToClientEntityMap.erase(entId);
+                }
+                else
+                {
+                    myQueuedDelete.emplace_back(entId);
+                }
             }
+
+            ProcessDeletions(myServerToClientEntityMap, myQueuedDelete);
         }
 
         Host::HandleMessage(packet);
+    }
+
+    void Client::ProcessDeletions(std::unordered_map<uint32_t, uint32_t>& map, std::vector<uint32_t>& vec)
+    {
+        for (auto it = vec.begin(); it != vec.end();)
+        {
+            if (map.find(*it) != map.end())
+            {
+                auto clientId = map.at(*it);
+
+                auto& registry = SceneManager::GetActiveScene()->GetRegistry();
+                registry.remove<SpriteRendererComponent>(static_cast<entt::entity>(clientId));
+                registry.remove<ObjectMovement>(static_cast<entt::entity>(clientId));
+                
+                map.erase(*it);
+
+                it = vec.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
     }
 }

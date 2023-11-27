@@ -24,6 +24,7 @@ namespace Aryl
     void Server::CreateEntity()
     {
         std::lock_guard lock(myEnttMutex);
+        
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
         {
             if (registry.view<ObjectMovement>().size() > 9) return;
@@ -46,7 +47,11 @@ namespace Aryl
             (*newEntPacket) << lerpTime;
             (*newEntPacket) << target.z << target.y << target.x;
             (*newEntPacket) << start.z << start.y << start.x;
+            
+            (*newEntPacket) << static_cast<uint32_t>(newEntity.GetId());
 
+            // YL_INFO("Create new entity, current count: {0}", registry.view<ObjectMovement>().size());
+            
             MulticastPacket(newEntPacket);
         }
     }
@@ -60,8 +65,7 @@ namespace Aryl
         auto& registry = SceneManager::GetActiveScene()->GetRegistry();
         for (auto ent : entities)
         {
-            registry.remove<SpriteRendererComponent>(ent);
-            registry.remove<ObjectMovement>(ent);
+            registry.destroy(ent);
             
             (*delEntPacket) << ent;
         }
@@ -69,6 +73,8 @@ namespace Aryl
         (*delEntPacket) << entities.size();
 
         MulticastPacket(delEntPacket);
+
+        // YL_INFO("Remove {0} entities", entities.size());
     }
 
     void Server::MulticastPacket(Ref<NetPacket> packet, const IPv4Endpoint* ignoreEP)

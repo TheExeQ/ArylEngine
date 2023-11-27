@@ -139,6 +139,11 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 
         for (auto ent : entities)
         {
+            if (std::find(deleteEnts.begin(), deleteEnts.end(), ent) != deleteEnts.end())
+            {
+                continue;
+            }
+            
             auto& comp = registry.get<Aryl::ObjectMovement>(ent);
             comp.current_lerp_time += e.GetTimestep();
             if (comp.current_lerp_time > comp.lerp_time)

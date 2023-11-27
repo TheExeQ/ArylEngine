@@ -39,7 +39,7 @@ namespace Aryl
                     
                     auto idMatches = [id](const NetReliableEntry& entry)
                     {
-                        return entry.Packet->header.id == id;
+                        return entry.Packet && entry.Packet->header.id == id;
                     };
 
                     auto it = std::find_if(g_ReliableFallback.ReliableFallback.begin(),

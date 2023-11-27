@@ -48,7 +48,7 @@ namespace Aryl
                 entry.Time -= delta_time_seconds;
                 if (entry.Time < 0.f)
                 {
-                    YL_CORE_INFO("Resending reliable packet: {0}", entry.Packet->header.id);
+                    // YL_CORE_INFO("Resending reliable packet: {0}", entry.Packet->header.id);
                     Send(entry.Packet, entry.Packet->endpoint, true);
                     entry.Time = myReliableTime;
                     entry.Retries--;

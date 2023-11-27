@@ -31,8 +31,8 @@ namespace Aryl
 
         std::queue<Ref<NetPacket>> mySendQueue;
         int myLostPacketsCount = 0;
-        int myReliableRetries = 3;
-        float myReliableTime = 5.f;
+        int myReliableRetries = 5;
+        float myReliableTime = 1.f;
 
         bool myStopping = false;
         std::thread myThread;
