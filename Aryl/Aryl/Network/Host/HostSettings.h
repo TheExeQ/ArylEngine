@@ -13,19 +13,20 @@ namespace Aryl
     struct NetReliableEntry
     {
         Ref<NetPacket> Packet;
+        IPv4Endpoint Endpoint;
         float Time = 2.f;
         int Retries = 3;
     };
     
     struct NetReliableHandler
     {
-        std::vector<NetReliableEntry> ReliableFallback;
+        std::unordered_map<std::string, std::vector<NetReliableEntry>> ReliableFallback;
     };
     
     struct NetConnection
     {
         IPv4Endpoint listenEndpoint;
-        uint32_t sendId = 1;
+        uint32_t sendId = 0;
         uint32_t receiveId = 0;
     };
 }

@@ -105,7 +105,7 @@ namespace Aryl
             uint32_t port;
             packet >> port;
             IPv4Endpoint clientListenEndpoint(packet.endpoint.GetAddress(), port);
-            myConnectionsMap[packet.endpoint.ToString()] = NetConnection({clientListenEndpoint});
+            myConnectionsMap[packet.endpoint.ToString()] = NetConnection({clientListenEndpoint, 1});
 
             // Sync World
             {

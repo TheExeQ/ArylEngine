@@ -33,13 +33,14 @@ namespace Aryl
             builder->BoundToAddress(hostEndpoint.GetAddress());
             builder->BoundToPort(hostEndpoint.GetPort());
 
-            auto socket = builder->Build();
+            const auto socket = builder->Build();
+            const auto socketEP = socket->GetEndpoint();
 
             if (socket)
             {
                 myReceiver = UdpSocketReceiver::Create(socket, handleMessageDelegate);
-                YL_CORE_TRACE("Starting UDP receiver on {0}:{1}", hostEndpoint.GetAddress().ToString(),
-                              hostEndpoint.GetPort());
+                YL_CORE_TRACE("Starting UDP receiver on {0}:{1}", socketEP.GetAddress().ToString(),
+                              socketEP.GetPort());
             }
         }
     }
@@ -88,12 +89,11 @@ namespace Aryl
             NetConnection& connection = myConnectionsMap.at(myEndpoint.ToString());
             packet->header.id = connection.sendId;
 
-            auto ep = myConnectionsMap.at(myEndpoint.ToString()).listenEndpoint;
-            // YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, (int)packet->header.messageType,
-            //         ep.ToString());
-
-            if (mySender->Send(packet, ep))
+            if (const auto ep = connection.listenEndpoint; mySender->Send(packet, ep))
             {
+                // YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, static_cast<int>(packet->header.messageType),
+                //         ep.ToString());
+                
                 std::lock_guard lock(myNetStatsMutex);
                 myNetStats.bitsSent += (sizeof(packet->header) + packet->data.size()) * 8;
 
@@ -194,9 +194,10 @@ namespace Aryl
         const Ref<NetPacket> ackPacket = CreateRef<NetPacket>();
         ackPacket->header.messageType = NetMessageType::Acknowledgement;
 
+        (*ackPacket) << myReceiver->GetSocket()->GetEndpoint().GetPort();
         (*ackPacket) << packet.header.id;
 
         SendMessage(ackPacket);
-        YL_CORE_TRACE("Sending Acknowledgement (ID: {0})", packet.header.id);
+        // YL_CORE_TRACE("Sending Acknowledgement (ID: {0})", packet.header.id);
     }
 }

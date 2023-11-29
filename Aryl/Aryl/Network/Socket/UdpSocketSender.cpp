@@ -25,16 +25,19 @@ namespace Aryl
 
             std::lock_guard lock(g_ReliableFallbackMutex);
 
-            auto& reliableFallbackVec = g_ReliableFallback.ReliableFallback;
-            for (auto it = reliableFallbackVec.begin(); it != reliableFallbackVec.end();)
+            for (auto& [fst, snd] : g_ReliableFallback.ReliableFallback)
             {
-                if (it->Retries <= 0)
+                auto& reliableFallbackVec = snd;
+                for (auto it = reliableFallbackVec.begin(); it != reliableFallbackVec.end();)
                 {
-                    it = reliableFallbackVec.erase(it);
-                }
-                else
-                {
-                    ++it;
+                    if (it->Retries <= 0)
+                    {
+                        it = reliableFallbackVec.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
+                    }
                 }
             }
 
@@ -43,15 +46,18 @@ namespace Aryl
             std::chrono::duration<double> duration = end_time - start_time;
             const double delta_time_seconds = duration.count();
 
-            for (auto& entry : g_ReliableFallback.ReliableFallback)
+            for (auto& [fst, snd] : g_ReliableFallback.ReliableFallback)
             {
-                entry.Time -= delta_time_seconds;
-                if (entry.Time < 0.f)
+                for (auto& entry : snd)
                 {
-                    // YL_CORE_INFO("Resending reliable packet: {0}", entry.Packet->header.id);
-                    Send(entry.Packet, entry.Packet->endpoint, true);
-                    entry.Time = myReliableTime;
-                    entry.Retries--;
+                    entry.Time -= delta_time_seconds;
+                    if (entry.Time < 0.f)
+                    {
+                        YL_CORE_INFO("Resending reliable packet: {0}", entry.Packet->header.id);
+                        Send(entry.Packet, entry.Endpoint, true);
+                        entry.Time = myReliableTime;
+                        entry.Retries--;
+                    }
                 }
             }
         }
@@ -80,8 +86,9 @@ namespace Aryl
 
             if (packet->header.packetType == NetPacketType::Reliable && !isReliablySent)
             {
-                g_ReliableFallback.ReliableFallback.emplace_back(NetReliableEntry{
-                    packet, myReliableTime, myReliableRetries
+                // YL_CORE_TRACE("Add: {0} (ID: {1})", receiver.ToString(), packet->header.id);
+                g_ReliableFallback.ReliableFallback[receiver.ToString()].emplace_back(NetReliableEntry{
+                    CreateRef<NetPacket>(*packet), receiver, myReliableTime, myReliableRetries
                 });
             }
             return true;

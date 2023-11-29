@@ -33,23 +33,29 @@ namespace Aryl
                 {
                     std::lock_guard lock(g_ReliableFallbackMutex);
 
-                    uint32_t id;
+                    uint32_t id, rPort;
                     packet >> id;
+                    packet >> rPort;
                     packet << id;
-                    
-                    auto idMatches = [id](const NetReliableEntry& entry)
+                    packet << rPort;
+
+                    IPv4Endpoint rEP(sender.GetAddress(), rPort);
+
+                    auto idMatches = [id, rEP](const NetReliableEntry& entry)
                     {
-                        return entry.Packet && entry.Packet->header.id == id;
+                        return entry.Packet && entry.Packet->header.id == id && entry.Packet->endpoint.ToString() == rEP
+                            .ToString();
                     };
 
-                    auto it = std::find_if(g_ReliableFallback.ReliableFallback.begin(),
-                                           g_ReliableFallback.ReliableFallback.end(), idMatches);
+                    auto& vec = g_ReliableFallback.ReliableFallback.at(rEP.ToString());
 
-                    if (it != g_ReliableFallback.ReliableFallback.end())
+                    if (auto it = std::find_if(vec.begin(),
+                                               vec.end(), idMatches); it != vec.end())
                     {
-                        g_ReliableFallback.ReliableFallback.erase(it);
+                        // YL_CORE_TRACE("Del: {0} (ID: {1})", rEP.ToString(), id);
+                        vec.erase(it);
                     }
-                    YL_CORE_TRACE("Received Acknowledgement (ID: {0})", id);
+                    // YL_CORE_TRACE("Received Acknowledgement (ID: {0})", id);
                 }
 
                 packet.endpoint = sender;
