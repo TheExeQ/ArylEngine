@@ -51,6 +51,10 @@ namespace Aryl
             (*newEntPacket) << static_cast<uint32_t>(newEntity.GetId());
 
             // YL_INFO("Create new entity, current count: {0}", registry.view<ObjectMovement>().size());
+
+            {
+                YL_INFO("New Object: {0}", static_cast<uint32_t>(newEntity.GetId()));
+            }
             
             MulticastPacket(newEntPacket);
         }
@@ -73,6 +77,16 @@ namespace Aryl
         (*delEntPacket) << entities.size();
 
         MulticastPacket(delEntPacket);
+
+        {
+            auto entStr = std::string("");
+            for (auto ent : entities)
+            {
+                entStr += std::to_string(static_cast<uint32_t>(ent));
+                entStr += " ";
+            }
+            YL_INFO("Delete Objects: {0}", entStr);
+        }
 
         // YL_INFO("Remove {0} entities", entities.size());
     }
@@ -129,7 +143,6 @@ namespace Aryl
                 }
 
                 (*syncPacket) << entities.size();
-                (*syncPacket) << registry.size();
 
                 Connect(packet.endpoint);
                 SendMessage(syncPacket);

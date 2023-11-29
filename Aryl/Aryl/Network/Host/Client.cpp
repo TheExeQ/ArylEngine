@@ -59,16 +59,10 @@ namespace Aryl
             std::lock_guard lock(myEnttMutex);
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
 
-            size_t entityCount, objCount;
-            packet >> entityCount;
+            size_t objCount;
             packet >> objCount;
 
             registry.clear();
-
-            for (int i = 0; i < entityCount; ++i)
-            {
-                registry.create();
-            }
 
             for (int i = 0; i < objCount; ++i)
             {
@@ -76,20 +70,24 @@ namespace Aryl
                 glm::vec3 pos, start, target;
                 float curLerp, targetLerp;
 
+                auto newId = registry.create();
+                
                 packet >> ent;
                 packet >> pos.x >> pos.y >> pos.z;
+                
+                myServerToClientEntityMap[ent] = static_cast<uint32_t>(newId);
 
                 packet >> start.x >> start.y >> start.z;
                 packet >> target.x >> target.y >> target.z;
                 packet >> curLerp >> targetLerp;
 
-                registry.emplace_or_replace<SpriteRendererComponent>(static_cast<entt::entity>(ent),
+                registry.emplace_or_replace<SpriteRendererComponent>(newId,
                                                                      std::string("test") + std::to_string(
                                                                          ent % imageVariation) + ".png");
-                registry.emplace_or_replace<TransformComponent>(static_cast<entt::entity>(ent), pos, glm::quat(),
+                registry.emplace_or_replace<TransformComponent>(newId, pos, glm::quat(),
                                                                 glm::vec3(0.5f));
 
-                registry.emplace_or_replace<ObjectMovement>(static_cast<entt::entity>(ent), start, target, curLerp,
+                registry.emplace_or_replace<ObjectMovement>(newId, start, target, curLerp,
                                                             targetLerp);
             }
         }
@@ -115,6 +113,10 @@ namespace Aryl
             registry.emplace<ObjectMovement>(newId) = ObjectMovement{start, target, 0.f, lerpTime};
             registry.emplace<SpriteRendererComponent>(newId).spritePath = std::string("test") +
                 std::to_string(static_cast<uint32_t>(ent) % imageVariation) + ".png";
+
+            {
+                YL_INFO("New Object: {0}", static_cast<uint32_t>(ent));
+            }
         }
 
         if (packet.header.messageType == NetMessageType::RemoveEntity)
@@ -123,11 +125,15 @@ namespace Aryl
             size_t entCount;
             packet >> entCount;
 
+            std::vector<uint32_t> deleteEnts;
+            
             auto& registry = SceneManager::GetActiveScene()->GetRegistry();
             for (int i = 0; i < entCount; ++i)
             {
                 uint32_t entId;
                 packet >> entId;
+
+                deleteEnts.emplace_back(entId);
 
                 if (myServerToClientEntityMap.find(entId) != myServerToClientEntityMap.end())
                 {
@@ -144,6 +150,18 @@ namespace Aryl
                 }
             }
 
+            {
+                std::reverse(deleteEnts.begin(), deleteEnts.end());
+                
+                auto entStr = std::string("");
+                for (auto ent : deleteEnts)
+                {
+                    entStr += std::to_string(static_cast<uint32_t>(ent));
+                    entStr += " ";
+                }
+                YL_INFO("Delete Objects: {0}", entStr);
+            }
+            
             ProcessDeletions(myServerToClientEntityMap, myQueuedDelete);
         }
 
@@ -161,7 +179,7 @@ namespace Aryl
                 auto& registry = SceneManager::GetActiveScene()->GetRegistry();
                 registry.remove<SpriteRendererComponent>(static_cast<entt::entity>(clientId));
                 registry.remove<ObjectMovement>(static_cast<entt::entity>(clientId));
-                
+
                 map.erase(*it);
 
                 it = vec.erase(it);

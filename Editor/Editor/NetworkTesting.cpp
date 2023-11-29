@@ -95,7 +95,7 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
 {
     if (Aryl::Application::Get().IsHeadless())
     {
-        constexpr double max_timer = 5;
+        constexpr double max_timer = 1;
         static double timer = max_timer;
 
         timer -= e.GetTimestep();
