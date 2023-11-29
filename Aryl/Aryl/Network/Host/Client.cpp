@@ -47,7 +47,7 @@ namespace Aryl
         pingPacket->header.packetType = NetPacketType::Reliable;
         SendMessage(pingPacket);
     }
-
+    
     void Client::HandleMessage(NetPacket& packet)
     {
         if (!ShouldProcessMessage(packet)) { return; }
@@ -156,7 +156,7 @@ namespace Aryl
                 auto entStr = std::string("");
                 for (auto ent : deleteEnts)
                 {
-                    entStr += std::to_string(static_cast<uint32_t>(ent));
+                    entStr += std::to_string(ent);
                     entStr += " ";
                 }
                 YL_INFO("Delete Objects: {0}", entStr);

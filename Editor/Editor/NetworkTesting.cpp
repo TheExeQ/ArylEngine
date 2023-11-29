@@ -105,18 +105,18 @@ bool NetworkTesting::OnUpdate(Aryl::AppUpdateEvent& e)
             timer = max_timer;
         }
     }
-    // else
-    // {
-    //     constexpr double max_timer = 2;
-    //     static double timer = max_timer;
-    //
-    //     timer -= e.GetTimestep();
-    //     if (timer < 0)
-    //     {
-    //         Aryl::Application::Get().GetNetworkContext()->GetClient()->PingServer();
-    //         timer = max_timer;
-    //     }
-    // }
+    else
+    {
+        constexpr double max_timer = 1;
+        static double timer = max_timer;
+
+        timer -= e.GetTimestep();
+        if (timer < 0)
+        {
+            Aryl::Application::Get().GetNetworkContext()->GetClient()->PingServer();
+            timer = max_timer;
+        }
+    }
 
     Aryl::Host* host;
     if (Aryl::Application::Get().IsHeadless())
@@ -213,10 +213,10 @@ void NetworkTesting::ArylNetExample()
     auto& stats = client->GetStats();
     
     ImGui::Begin("Net Stats");
-    ImGui::Text("Ping: %d", stats.ping);
+    ImGui::Text("Ping: %d ms", stats.ping);
     ImGui::Text("Packet Loss: %.2f%%", stats.packetLoss);
-    ImGui::Text("Bits Sent This Frame: %d", stats.bitsSent);
-    ImGui::Text("Bits Received This Frame: %d", stats.bitsReceived);
+    ImGui::Text("Bits Sent: %d", stats.bitsSent);
+    ImGui::Text("Bits Received: %d", stats.bitsReceived);
     ImGui::End();
 
     if (!myTestingEntity.IsNull())

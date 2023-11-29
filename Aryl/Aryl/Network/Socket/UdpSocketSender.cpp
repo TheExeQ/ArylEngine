@@ -32,6 +32,7 @@ namespace Aryl
                 {
                     if (it->Retries <= 0)
                     {
+                        YL_CORE_WARN("Packet loss (Timeout) [ID: {0}]", it->Packet->header.id);
                         it = reliableFallbackVec.erase(it);
                     }
                     else

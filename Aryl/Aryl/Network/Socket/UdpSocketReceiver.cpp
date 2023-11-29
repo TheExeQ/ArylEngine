@@ -36,8 +36,8 @@ namespace Aryl
                     uint32_t id, rPort;
                     packet >> id;
                     packet >> rPort;
-                    packet << id;
                     packet << rPort;
+                    packet << id;
 
                     IPv4Endpoint rEP(sender.GetAddress(), rPort);
 

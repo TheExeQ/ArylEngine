@@ -93,16 +93,13 @@ namespace Aryl
             {
                 // YL_INFO("Sending ID:{0} msg_type:{1} to {2}", packet->header.id, static_cast<int>(packet->header.messageType),
                 //         ep.ToString());
-                
+
                 std::lock_guard lock(myNetStatsMutex);
                 myNetStats.bitsSent += (sizeof(packet->header) + packet->data.size()) * 8;
 
                 if (packet->header.packetType == NetPacketType::Reliable)
                 {
-                    myNetStats.pingAckId = packet->header.id;
-
-                    const auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-                    myNetStats.pingAckTime = std::chrono::duration<float>(duration).count();
+                    myNetStats.pingAckIds[packet->header.id] = std::chrono::high_resolution_clock::now();
                 }
 
                 connection.sendId++;
@@ -127,10 +124,12 @@ namespace Aryl
                 uint32_t id;
                 packet >> id;
 
-                if (myNetStats.pingAckId == id)
+                if (const auto it = myNetStats.pingAckIds.find(id); it != myNetStats.pingAckIds.end())
                 {
-                    const auto duration = std::chrono::high_resolution_clock::now().time_since_epoch();
-                    myNetStats.ping = std::chrono::duration<float>(duration).count() - myNetStats.pingAckTime;
+                    myNetStats.ping = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::high_resolution_clock::now() - it->second
+                    ).count();
+                    myNetStats.pingAckIds.erase(it);
                 }
             }
         }
@@ -165,7 +164,7 @@ namespace Aryl
             {
                 uint32_t missedId = packet.header.id - (i + 1);
                 myMissedIds.emplace_back(missedId);
-                YL_CORE_WARN("Missed packet: [{0}] {1}", packet.header.id, missedId);
+                YL_CORE_WARN("Missed packet: {0}", missedId);
             }
             connection.receiveId = packet.header.id;
             return true;
@@ -174,12 +173,12 @@ namespace Aryl
             end())
         {
             myMissedIds.erase(it);
-            YL_CORE_WARN("Ran missed packet: {0}", packet.header.id);
+            YL_CORE_WARN("Recovered packet: {0}", packet.header.id);
             return true;
         }
 
         SendAck(packet);
-        YL_CORE_WARN("Ignoring packet: {0}", packet.header.id);
+        YL_CORE_WARN("Ignoring packet (Already registered): {0}", packet.header.id);
         return false;
     }
 

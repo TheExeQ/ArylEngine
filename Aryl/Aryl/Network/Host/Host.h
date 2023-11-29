@@ -8,13 +8,12 @@ namespace Aryl
 {
     struct NetStatistics
     {
-        int ping = 0;
+        int64_t ping = 0;
         float packetLoss = 0.f;
         int bitsSent = 0;
         int bitsReceived = 0;
         
-        int pingAckId = 0;
-        float pingAckTime = 0.f;
+        std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> pingAckIds;
         int packetsLostCount = 0;
     };
 
