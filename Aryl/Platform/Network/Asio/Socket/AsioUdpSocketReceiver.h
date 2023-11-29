@@ -9,7 +9,7 @@ namespace Aryl
 	class AsioUdpSocketReceiver : public UdpSocketReceiver
 	{
 	public:
-		AsioUdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate = nullptr);
+		AsioUdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate = nullptr, Ref<NetReliableHandler> nrh = nullptr);
 		~AsioUdpSocketReceiver() = default;
 
 	protected:

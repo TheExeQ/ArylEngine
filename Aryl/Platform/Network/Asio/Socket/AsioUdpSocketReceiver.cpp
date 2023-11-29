@@ -2,8 +2,8 @@
 
 namespace Aryl
 {
-	AsioUdpSocketReceiver::AsioUdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
-		: UdpSocketReceiver(socket, onDataReceivedDelegate)
+	AsioUdpSocketReceiver::AsioUdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate, Ref<NetReliableHandler> nrh)
+		: UdpSocketReceiver(socket, onDataReceivedDelegate, nrh)
 	{
 
 	}

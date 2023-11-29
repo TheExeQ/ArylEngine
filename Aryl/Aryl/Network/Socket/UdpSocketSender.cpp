@@ -8,36 +8,36 @@
 
 namespace Aryl
 {
-    extern NetReliableHandler g_ReliableFallback;
-    extern std::mutex g_ReliableFallbackMutex;
-
-    UdpSocketSender::UdpSocketSender(Ref<UdpSocket> socket)
-        : mySocket(socket), myThread([this]() { Run(); })
+    UdpSocketSender::UdpSocketSender(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh)
+        : mySocket(socket), myThread([this]() { Run(); }), reliableFallback(nrh)
     {
     }
 
     uint32_t UdpSocketSender::Run()
     {
-        while (!myStopping)
+        while (!myStopping && reliableFallback)
         {
             auto start_time = std::chrono::high_resolution_clock::now();
             Update();
-
-            std::lock_guard lock(g_ReliableFallbackMutex);
-
-            for (auto& [fst, snd] : g_ReliableFallback.ReliableFallback)
+            
             {
-                auto& reliableFallbackVec = snd;
-                for (auto it = reliableFallbackVec.begin(); it != reliableFallbackVec.end();)
+                std::lock_guard lock(reliableFallback->Mutex);
+
+                for (auto& [fst, snd] : reliableFallback->ReliableFallback)
                 {
-                    if (it->Retries <= 0)
+                    auto& reliableFallbackVec = snd;
+                    for (auto it = reliableFallbackVec.begin(); it != reliableFallbackVec.end();)
                     {
-                        YL_CORE_WARN("Packet loss (Timeout) [ID: {0}]", it->Packet->header.id);
-                        it = reliableFallbackVec.erase(it);
-                    }
-                    else
-                    {
-                        ++it;
+                        if (it->Retries <= 0)
+                        {
+                            YL_CORE_WARN("Packet loss (Timeout) [ID: {0}]", it->Packet->header.id);
+
+                            it = reliableFallbackVec.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
+                        }
                     }
                 }
             }
@@ -47,7 +47,7 @@ namespace Aryl
             std::chrono::duration<double> duration = end_time - start_time;
             const double delta_time_seconds = duration.count();
 
-            for (auto& [fst, snd] : g_ReliableFallback.ReliableFallback)
+            for (auto& [fst, snd] : reliableFallback->ReliableFallback)
             {
                 for (auto& entry : snd)
                 {
@@ -85,10 +85,12 @@ namespace Aryl
         {
             mySendQueue.push(packet);
 
-            if (packet->header.packetType == NetPacketType::Reliable && !isReliablySent)
+            if (packet->header.packetType == NetPacketType::Reliable && !isReliablySent && reliableFallback)
             {
+                std::lock_guard lock(reliableFallback->Mutex);
+
                 // YL_CORE_TRACE("Add: {0} (ID: {1})", receiver.ToString(), packet->header.id);
-                g_ReliableFallback.ReliableFallback[receiver.ToString()].emplace_back(NetReliableEntry{
+                reliableFallback->ReliableFallback[receiver.ToString()].emplace_back(NetReliableEntry{
                     CreateRef<NetPacket>(*packet), receiver, myReliableTime, myReliableRetries
                 });
             }
@@ -98,12 +100,12 @@ namespace Aryl
         return false;
     }
 
-    Ref<UdpSocketSender> UdpSocketSender::Create(Ref<UdpSocket> socket)
+    Ref<UdpSocketSender> UdpSocketSender::Create(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh)
     {
         switch (NetAPI::Current())
         {
         case NetAPIType::None: return nullptr;
-        case NetAPIType::Asio: return CreateRef<AsioUdpSocketSender>(socket);
+        case NetAPIType::Asio: return CreateRef<AsioUdpSocketSender>(socket, nrh);
         case NetAPIType::WinSock2: return nullptr;
         }
 

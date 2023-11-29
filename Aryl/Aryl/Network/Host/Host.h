@@ -14,7 +14,7 @@ namespace Aryl
         int bitsReceived = 0;
         
         std::unordered_map<uint32_t, std::chrono::steady_clock::time_point> pingAckIds;
-        int packetsLostCount = 0;
+        uint32_t packetsLostCount = 0;
     };
 
     class Host
@@ -34,7 +34,6 @@ namespace Aryl
         virtual void HandleMessage(NetPacket& packet);
 
         bool ShouldProcessMessage(NetPacket& packet);
-        void OnPacketLost(uint32_t id);
 
         void SendAck(NetPacket& packet);
 
@@ -45,6 +44,8 @@ namespace Aryl
         std::mutex myNetStatsMutex;
 
         std::vector<uint32_t> myMissedIds;
+
+        Ref<NetReliableHandler> myNetReliableHandler = CreateRef<NetReliableHandler>();
         
         Ref<UdpSocketSender> mySender = nullptr;
         Ref<UdpSocketReceiver> myReceiver = nullptr;

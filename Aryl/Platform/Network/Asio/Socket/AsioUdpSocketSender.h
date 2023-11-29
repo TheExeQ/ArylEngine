@@ -9,7 +9,7 @@ namespace Aryl
 	class AsioUdpSocketSender : public UdpSocketSender
 	{
 	public:
-		AsioUdpSocketSender(Ref<UdpSocket> socket);
+		AsioUdpSocketSender(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh);
 		~AsioUdpSocketSender() = default;
 
 	protected:

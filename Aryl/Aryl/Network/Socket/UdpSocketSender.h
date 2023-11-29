@@ -13,7 +13,7 @@ namespace Aryl
     class UdpSocketSender
     {
     public:
-        UdpSocketSender(Ref<UdpSocket> socket);
+        UdpSocketSender(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh);
         virtual ~UdpSocketSender() { myThread.join(); };
 
         void Stop()
@@ -24,7 +24,7 @@ namespace Aryl
         bool Send(Ref<NetPacket> packet, IPv4Endpoint receiver, bool isReliablySent = false);
         Ref<UdpSocket> GetSocket() { return mySocket; };
 
-        static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket);
+        static Ref<UdpSocketSender> Create(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh);
 
     protected:
         virtual void Update();
@@ -42,6 +42,7 @@ namespace Aryl
     private:
         uint32_t Run();
 
+        Ref<NetReliableHandler> reliableFallback = nullptr;
         std::unordered_map<std::string, uint32_t> myPacketIdMap;
     };
 }

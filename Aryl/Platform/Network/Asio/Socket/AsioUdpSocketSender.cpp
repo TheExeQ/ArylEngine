@@ -2,8 +2,8 @@
 
 namespace Aryl
 {
-	AsioUdpSocketSender::AsioUdpSocketSender(Ref<UdpSocket> socket)
-		: UdpSocketSender(socket)
+	AsioUdpSocketSender::AsioUdpSocketSender(Ref<UdpSocket> socket, Ref<NetReliableHandler> nrh)
+		: UdpSocketSender(socket, nrh)
 	{
 
 	}

@@ -7,11 +7,8 @@
 
 namespace Aryl
 {
-    extern NetReliableHandler g_ReliableFallback;
-    extern std::mutex g_ReliableFallbackMutex;
-
-    UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate)
-        : mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate)
+    UdpSocketReceiver::UdpSocketReceiver(Ref<UdpSocket> socket, std::function<void(NetPacket)> onDataReceivedDelegate, Ref<NetReliableHandler> nrh)
+        : mySocket(socket), myThread([this]() { Run(); }), myOnDataReceivedDelegate(onDataReceivedDelegate), reliableFallback(nrh)
     {
     }
 
@@ -29,9 +26,9 @@ namespace Aryl
                 NetPacket packet;
                 packet.deserialize(buffer);
 
-                if (packet.header.messageType == NetMessageType::Acknowledgement)
+                if (packet.header.messageType == NetMessageType::Acknowledgement && reliableFallback)
                 {
-                    std::lock_guard lock(g_ReliableFallbackMutex);
+                    std::lock_guard lock(reliableFallback->Mutex);
 
                     uint32_t id, rPort;
                     packet >> id;
@@ -47,7 +44,7 @@ namespace Aryl
                             .ToString();
                     };
 
-                    auto& vec = g_ReliableFallback.ReliableFallback.at(rEP.ToString());
+                    auto& vec = reliableFallback->ReliableFallback.at(rEP.ToString());
 
                     if (auto it = std::find_if(vec.begin(),
                                                vec.end(), idMatches); it != vec.end())
@@ -70,12 +67,12 @@ namespace Aryl
     }
 
     Ref<UdpSocketReceiver> UdpSocketReceiver::Create(Ref<UdpSocket> socket,
-                                                     std::function<void(NetPacket)> onDataReceivedDelegate)
+                                                     std::function<void(NetPacket)> onDataReceivedDelegate, Ref<NetReliableHandler> nrh)
     {
         switch (NetAPI::Current())
         {
         case NetAPIType::None: return nullptr;
-        case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket, onDataReceivedDelegate);
+        case NetAPIType::Asio: return CreateRef<AsioUdpSocketReceiver>(socket, onDataReceivedDelegate, nrh);
         case NetAPIType::WinSock2: return nullptr;
         }
 

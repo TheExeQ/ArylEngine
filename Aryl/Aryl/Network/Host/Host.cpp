@@ -5,9 +5,6 @@
 
 namespace Aryl
 {
-    NetReliableHandler g_ReliableFallback;
-    std::mutex g_ReliableFallbackMutex;
-
     Host::Host(HostSettings hostSettings, const std::function<void(NetPacket)>& handleMessageDelegate)
     {
         if (!mySender)
@@ -20,7 +17,7 @@ namespace Aryl
 
             if (socket)
             {
-                mySender = UdpSocketSender::Create(socket);
+                mySender = UdpSocketSender::Create(socket, myNetReliableHandler);
             }
         }
 
@@ -38,7 +35,7 @@ namespace Aryl
 
             if (socket)
             {
-                myReceiver = UdpSocketReceiver::Create(socket, handleMessageDelegate);
+                myReceiver = UdpSocketReceiver::Create(socket, handleMessageDelegate, myNetReliableHandler);
                 YL_CORE_TRACE("Starting UDP receiver on {0}:{1}", socketEP.GetAddress().ToString(),
                               socketEP.GetPort());
             }
@@ -70,6 +67,7 @@ namespace Aryl
 
         std::unique_lock lock(myEnttMutex, std::try_to_lock);
         std::unique_lock lock2(myNetStatsMutex, std::try_to_lock);
+        std::unique_lock lock3(myNetReliableHandler->Mutex, std::try_to_lock);
 
         if (!lock.owns_lock())
         {
@@ -79,6 +77,11 @@ namespace Aryl
         if (!lock2.owns_lock())
         {
             lock2.lock();
+        }
+
+        if (!lock3.owns_lock())
+        {
+            lock3.lock();
         }
     }
 
@@ -167,12 +170,24 @@ namespace Aryl
                 YL_CORE_WARN("Missed packet: {0}", missedId);
             }
             connection.receiveId = packet.header.id;
+            myNetStats.packetsLostCount += missedIds;
+
+            myNetStats.packetLoss = static_cast<float>(myNetStats.packetsLostCount) / packet.header.id;
+
             return true;
         }
         else if (const auto it = std::find(myMissedIds.begin(), myMissedIds.end(), packet.header.id); it != myMissedIds.
             end())
         {
             myMissedIds.erase(it);
+
+            if (myNetStats.packetsLostCount > 0)
+            {
+                myNetStats.packetsLostCount--;
+            }
+            
+            myNetStats.packetLoss = static_cast<float>(myNetStats.packetsLostCount) / packet.header.id;
+
             YL_CORE_WARN("Recovered packet: {0}", packet.header.id);
             return true;
         }
@@ -180,12 +195,6 @@ namespace Aryl
         SendAck(packet);
         YL_CORE_WARN("Ignoring packet (Already registered): {0}", packet.header.id);
         return false;
-    }
-
-    void Host::OnPacketLost(uint32_t id)
-    {
-        myNetStats.packetsLostCount++;
-        myNetStats.packetLoss = myNetStats.packetsLostCount / id;
     }
 
     void Host::SendAck(NetPacket& packet)

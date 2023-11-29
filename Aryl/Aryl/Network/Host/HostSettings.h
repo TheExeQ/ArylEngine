@@ -17,12 +17,13 @@ namespace Aryl
         float Time = 2.f;
         int Retries = 3;
     };
-    
+
     struct NetReliableHandler
     {
+        std::mutex Mutex;
         std::unordered_map<std::string, std::vector<NetReliableEntry>> ReliableFallback;
     };
-    
+
     struct NetConnection
     {
         IPv4Endpoint listenEndpoint;
