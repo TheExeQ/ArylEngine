@@ -120,6 +120,19 @@ namespace Aryl
     {
         {
             std::lock_guard lock(myNetStatsMutex);
+            static auto timestamp = std::chrono::high_resolution_clock::now();
+            const auto now = std::chrono::high_resolution_clock::now();
+            const auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
+
+            YL_INFO("Timepoint {0}", duration.count());
+            
+            if (duration.count() > 1)
+            {
+                myNetStats.bitsSent = 0;
+                myNetStats.bitsReceived = 0;
+                timestamp = std::chrono::high_resolution_clock::now();
+            }
+            
             myNetStats.bitsReceived += (sizeof(packet.header) + packet.size()) * 8;
 
             if (packet.header.messageType == NetMessageType::Acknowledgement)

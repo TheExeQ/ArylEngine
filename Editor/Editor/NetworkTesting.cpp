@@ -215,8 +215,8 @@ void NetworkTesting::ArylNetExample()
     ImGui::Begin("Net Stats");
     ImGui::Text("Ping: %d ms", stats.ping);
     ImGui::Text("Packet Loss: %.2f%%", stats.packetLoss);
-    ImGui::Text("Bits Sent: %d", stats.bitsSent);
-    ImGui::Text("Bits Received: %d", stats.bitsReceived);
+    ImGui::Text("%d Bits Sent/s", stats.bitsSent);
+    ImGui::Text("%d Bits Received/s", stats.bitsReceived);
     ImGui::End();
 
     if (!myTestingEntity.IsNull())
