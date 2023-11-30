@@ -124,8 +124,6 @@ namespace Aryl
             const auto now = std::chrono::high_resolution_clock::now();
             const auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
 
-            YL_INFO("Timepoint {0}", duration.count());
-            
             if (duration.count() > 1)
             {
                 myNetStats.bitsSent = 0;
